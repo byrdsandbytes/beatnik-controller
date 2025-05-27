@@ -1,0 +1,22 @@
+<ion-toolbar class="play-toolbar" color="dark">
+  <ion-item color="dark" lines="none">
+    <ion-thumbnail slot="start">
+      <img src="assets/mock/2-freewheelin-bob-dylan.webp" alt="cover image">
+    </ion-thumbnail>
+    <ion-label>
+      <p>Wohnzimmer</p>
+      <h2>Blowin in the wind</h2>
+      <p>Boby Dylan</p>
+    </ion-label>
+    <ion-button class="round-button">
+      <ion-icon slot="icon-only" name="play"></ion-icon>
+    </ion-button>
+  </ion-item>
+  <ion-item lines="none" color="dark">
+    <ion-range (ionChange)="setVolume($event)"  min="0" max="100" step="1" value="25">
+      <ion-icon slot="start" size="small" name="volume-mute"></ion-icon>
+      <ion-icon slot="end" size="small" name="volume-high"></ion-icon>
+    </ion-range>
+  </ion-item>
+</ion-toolbar>
+ 

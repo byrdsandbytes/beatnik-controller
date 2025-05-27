@@ -35,3 +35,17 @@
 /* @import "@ionic/angular/css/palettes/dark.always.css"; */
 /* @import "@ionic/angular/css/palettes/dark.class.css"; */
 @import "@ionic/angular/css/palettes/dark.system.css";
+
+@import 'bootstrap/dist/css/bootstrap-grid.min.css';
+@import "~bootstrap-icons/font/bootstrap-icons.css";
+
+
+@import "swiper/scss";
+@import "swiper/scss/pagination";
+@import "swiper/scss/navigation";
+@import "swiper/scss/autoplay";
+@import "swiper/scss/effect-fade";
+@import "swiper/scss/effect-cube";
+@import "swiper/scss/effect-flip";
+@import "swiper/scss/effect-coverflow";
+@import "swiper/scss/effect-cards";

@@ -9,7 +9,11 @@
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "lint": "ng lint"
+    "lint": "ng lint",
+    "generate:service": "ionic g service services/$npm_config_name && ng generate --skip-tests=true class model/$npm_config_name --type=model",
+    "generate:component": "ionic g components/$npm_config_name && ng generate module components/$npm_config_name",
+    "generate:page": "ionic g page pages/$npm_config_name",
+    "generate:guard": "ng g guard guards/$npm_config_name"
   },
   "private": true,
   "dependencies": {
@@ -27,8 +31,11 @@
     "@capacitor/keyboard": "7.0.1",
     "@capacitor/status-bar": "7.0.1",
     "@ionic/angular": "^8.0.0",
+    "bootstrap": "^5.3.6",
+    "bootstrap-icons": "^1.13.1",
     "ionicons": "^7.0.0",
     "rxjs": "~7.8.0",
+    "swiper": "7.2.0",
     "tslib": "^2.3.0",
     "zone.js": "~0.15.0"
   },

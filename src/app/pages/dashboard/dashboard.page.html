@@ -1,0 +1,79 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar color="light">
+    <ion-title>Dashboard</ion-title>
+    <!-- <ion-title *ngIf="(userProfile) as user">{{user.displayName}}s Home </ion-title> -->
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" color="light">
+  <div class="container">
+    <ion-header collapse="condense">
+      <span class="header-note">{{today | date:"EEEE, d.MMMM"}}</span>
+      <ion-toolbar color="light" class="ion-margin-top">
+        <ion-title size="large">Mittelstrasse 61</ion-title>
+
+        <!-- <ion-title size="large"><span>{{user.displayName}}s Zuhause</span></ion-title> -->
+      </ion-toolbar>
+    </ion-header>
+    <div class="fab-row row">
+      <div class="col">
+        <ion-fab>
+          <ion-fab-button class="custom-fab-button" color="light" (click)="openModal()">
+            <ion-icon name="volume-high-outline"></ion-icon>
+          </ion-fab-button>
+        </ion-fab>
+      </div>
+      <div class="col">
+
+        <ion-fab>
+          <ion-fab-button class="custom-fab-button" color="light" (click)="getDeviceStatus()">
+            <ion-icon name="wifi-outline"></ion-icon>
+          </ion-fab-button>
+        </ion-fab>
+      </div>
+      <div class="col">
+        <ion-fab>
+          <ion-fab-button class="custom-fab-button" color="light" (click)="getPlayerStatus()">
+            <ion-icon name="musical-note-outline"></ion-icon>
+          </ion-fab-button>
+        </ion-fab>
+      </div>
+
+    </div>
+
+
+    <ion-list-header>
+      <ion-label>Johnnys'Sound System</ion-label>
+      <ion-button size="small" fill="clear" (click)="openModal()">
+        <ion-icon slot="icon-only" name="add-circle-outline"></ion-icon>
+      </ion-button>
+    </ion-list-header>
+
+
+
+    <swiper *ngIf="status" (swiper)="onSwiper($event)" (slideChange)="onSlideChange($event)" [config]="swiperConfig">
+      <ng-template swiperSlide *ngFor="let group of status.server.groups">
+        <ion-card *ngIf="getStreamDataById(group.stream_id) as stream" class="card ion-text-center" color="light">
+          <img [src]="stream.properties.metadata.artUrl" class="cover">
+          <div class="img-container">
+            <img [src]="'assets/mock/JSE_small.png'" class="img" alt="Placeholder Image">
+
+          </div>
+          <ion-card-header>
+            <ion-card-title>{{stream.properties.metadata.title}}</ion-card-title>
+            <ion-card-subtitle>{{group.name? group.name:group.id}}</ion-card-subtitle>
+          </ion-card-header>
+          <ion-card-content>
+            <p>{{stream.properties.metadata.artist}} - {{stream.properties.metadata.album}}</p>
+            <h2></h2>
+            <p></p>
+          </ion-card-content>
+        </ion-card>
+      </ng-template>
+    </swiper>
+
+    <ion-list-header>
+      <ion-label>Johnnys' Sound</ion-label>
+    </ion-list-header>
+  </div>
+</ion-content>

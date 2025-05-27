@@ -1,0 +1,73 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>streams</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-header collapse="condense">
+    <ion-toolbar>
+      <ion-title size="large">Streams</ion-title>
+    </ion-toolbar>
+  </ion-header>
+
+  <ion-list *ngIf="state">
+    <ion-card *ngFor="let stream of state.server.streams" [routerLink]="['/tabs/streams', stream.id]">
+      <ion-card-header>
+        <ion-card-title>{{stream.id}}</ion-card-title>
+        <ion-card-subtitle>Stream Status: {{stream.status}}</ion-card-subtitle>
+      </ion-card-header>
+
+      <ion-card-content *ngIf="stream.properties.metadata">
+        <img *ngIf="stream.properties.metadata.artData as artData" [src]="convertBase64ToImage(artData.data, artData.extension)" alt="Album Art" />
+        <p>{{stream.properties.metadata.album}}</p>
+        <p>{{stream.properties.metadata.artist}}</p>
+        <p>{{stream.properties.metadata.title}}</p>
+        <!-- <p>{{stream.properties.metadata.artData.extension}}</p>
+
+        <p>{{stream.properties.metadata.artData.data}}</p> -->
+      </ion-card-content>
+    </ion-card>
+
+    <ion-list-header>
+      <ion-label>Groups</ion-label>
+    </ion-list-header>
+    <ng-container *ngIf="state.server.groups.length > 0">
+      <ion-card *ngFor="let group of state.server.groups">
+        <ion-card-header>
+          <ion-card-title>{{group.id}}</ion-card-title>
+        </ion-card-header>
+        <ion-card-content>
+          <p>Stream: {{group.stream_id}}</p>
+          <p>Group ID: {{group.id}}</p>
+          <p>Group Name: {{group.name}}</p>
+          <p>Group Muted: {{group.muted}}</p>
+          <ion-list>
+            <ion-item *ngFor="let client of group.clients" [routerLink]="['/tabs/streams', client.id]">
+              <ion-label>
+                <h1>{{client.host.name}}</h1>
+                <p> Client Id: {{client.id}}</p>
+                <p>Connected: {{client.connected ? 'Yes' : 'No'}}</p>
+                <p>Last Seen: {{ client.lastSeen.sec * 1000 | date:'dd.MM.yyyy (EEE) - hh:mm'}}</p>
+                <p>Snaplcient Version: {{client.snapclient.version}}</p>
+                <p>Host IP: {{client.host.ip}}</p>
+                <p>Host OS: {{client.host.os}}</p>
+                <h2>Configuration</h2>
+                <p>Instance: {{client.config.instance}}</p>
+                <p>Volume Percent: {{client.config.volume.percent}}</p>
+                <p>Volume Muted: {{client.config.volume.muted}}</p>
+                <p>Latency: {{client.config.latency}}</p>
+                <p>Name: {{client.config.name}}</p>
+              </ion-label>
+              <ion-button slot="end" fill="outline">Details</ion-button>
+              <ion-range slot="end" min="0" max="100" step="1" value="{{client.config.volume.percent}}" color="primary">
+                <ion-label>Volume</ion-label>
+              </ion-range>
+            </ion-item>
+          </ion-list>
+        </ion-card-content>
+
+      </ion-card>
+    </ng-container>
+  </ion-list>
+</ion-content>
