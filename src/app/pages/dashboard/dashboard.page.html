@@ -51,29 +51,16 @@
 
 
 
-    <swiper *ngIf="status" (swiper)="onSwiper($event)" (slideChange)="onSlideChange($event)" [config]="swiperConfig">
-      <ng-template swiperSlide *ngFor="let group of status.server.groups">
-        <ion-card *ngIf="getStreamDataById(group.stream_id) as stream" class="card ion-text-center" color="light">
-          <img [src]="stream.properties.metadata.artUrl" class="cover">
-          <div class="img-container">
-            <img [src]="'assets/mock/JSE_small.png'" class="img" alt="Placeholder Image">
-
-          </div>
-          <ion-card-header>
-            <ion-card-title>{{stream.properties.metadata.title}}</ion-card-title>
-            <ion-card-subtitle>{{group.name? group.name:group.id}}</ion-card-subtitle>
-          </ion-card-header>
-          <ion-card-content>
-            <p>{{stream.properties.metadata.artist}} - {{stream.properties.metadata.album}}</p>
-            <h2></h2>
-            <p></p>
-          </ion-card-content>
-        </ion-card>
+    <swiper *ngIf="groups$" (swiper)="onSwiper($event)" (slideChange)="onSlideChange($event)" [config]="swiperConfig">
+      <ng-template swiperSlide *ngFor="let group of groups$ | async; let i = index">
+        <app-snapcast-group-preview [streams]="streams$|async" [group]="group"></app-snapcast-group-preview>   
       </ng-template>
     </swiper>
 
     <ion-list-header>
       <ion-label>Johnnys' Sound</ion-label>
     </ion-list-header>
+    <app-snapcast-status></app-snapcast-status>
+
   </div>
 </ion-content>

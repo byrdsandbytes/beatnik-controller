@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { PlayerToolbarComponent } from './player-toolbar.component';
 import { IonicModule } from '@ionic/angular';
 import { FormsModule } from '@angular/forms';
+import { SnapcastStreamVolumeControlModule } from '../snapcast-stream-volume-control/snapcast-stream-volume-control.module';
 
 
 
@@ -13,7 +14,8 @@ import { FormsModule } from '@angular/forms';
   imports: [
     CommonModule,
     IonicModule,
-    FormsModule
+    FormsModule,
+    SnapcastStreamVolumeControlModule
   ],
   exports: [
     PlayerToolbarComponent

@@ -8,6 +8,8 @@ import { DashboardPageRoutingModule } from './dashboard-routing.module';
 
 import { DashboardPage } from './dashboard.page';
 import { SwiperModule } from 'swiper/angular';
+import { SnapcastStatusModule } from 'src/app/components/snapcast-status/snapcast-status.module';
+import { SnapcastGroupPreviewModule } from 'src/app/components/snapcast-group-preview/snapcast-group-preview.module';
 
 
 @NgModule({
@@ -16,7 +18,9 @@ import { SwiperModule } from 'swiper/angular';
     FormsModule,
     IonicModule,
     DashboardPageRoutingModule,
-    SwiperModule
+    SwiperModule,
+    SnapcastStatusModule,
+    SnapcastGroupPreviewModule
   ],
   declarations: [DashboardPage]
 })

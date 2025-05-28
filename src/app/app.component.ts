@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { SnapcastService } from './services/snapcast.service';
 
 @Component({
   selector: 'app-root',
@@ -7,5 +8,10 @@ import { Component } from '@angular/core';
   standalone: false,
 })
 export class AppComponent {
-  constructor() {}
+  constructor(
+    private snapcastService: SnapcastService
+  ) {
+    this.snapcastService.connect();
+
+  }
 }

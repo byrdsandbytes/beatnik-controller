@@ -13,10 +13,60 @@
     </ion-button>
   </ion-item>
   <ion-item lines="none" color="dark">
-    <ion-range (ionChange)="setVolume($event)"  min="0" max="100" step="1" value="25">
+    <ion-range (ionChange)="setVolume($event)" min="0" max="100" step="1" value="25">
       <ion-icon slot="start" size="small" name="volume-mute"></ion-icon>
       <ion-icon slot="end" size="small" name="volume-high"></ion-icon>
     </ion-range>
   </ion-item>
+  <ng-container *ngFor="let stream of streams$ | async">
+    <ion-item *ngIf="stream.properties.metadata" lines="none" color="dark">
+      <ion-thumbnail slot="start">
+        <img [src]="stream.properties.metadata.artUrl" alt="cover image">
+      </ion-thumbnail>
+      <ion-label *ngIf="stream.properties.metadata">
+        <p>Wohnzimmer</p>
+        <h2> {{ stream.properties.metadata.title }}</h2>
+        <p>{{ stream.properties.metadata.artist }}</p>
+        
+      </ion-label>
+      <ion-button *ngIf="stream.properties.canControl" class="round-button" (click)="pauseStream(stream.id)">
+        <ng-container [ngSwitch]="stream.status">
+          <ion-icon *ngSwitchCase="'playing'" slot="icon-only" name="pause"></ion-icon>
+          <ion-icon *ngSwitchCase="'idle'" slot="icon-only" name="play"></ion-icon>
+          <!-- <ion-icon *ngSwitchDefault slot="icon-only" name="play"></ion-icon> -->
+        </ng-container>
+        <!-- <ion-icon slot="icon-only" name="play"></ion-icon> -->
+      </ion-button>
+      <!-- <ion-button class="round-button" (click)="playStream(streams.id)">
+        <ion-icon slot="icon-only" name="play"></ion-icon>
+      </ion-button>
+      <ion-button class="round-button" (click)="pauseStream(streams.id)">
+        <ion-icon slot="icon-only" name="pause"></ion-icon>
+      </ion-button>
+      <ion-button class="round-button" (click)="stopStream(streams.id)">
+        <ion-icon slot="icon-only" name="stop"></ion-icon>
+      </ion-button> -->
+     
+    </ion-item>
+    <ion-item color="dark" lines="none">
+      <app-snapcast-stream-volume-control [stream]="stream" [groups]="groups$|async"></app-snapcast-stream-volume-control>
+      <!-- <ion-range class="summary-range" (ionChange)="setStreamVolume($event, stream)" min="0" max="100" step="1" [value]="calculateStreamVolumeBasedOnClients(stream)" >
+        <ion-icon slot="start" size="small" name="volume-mute"></ion-icon>
+        <ion-icon slot="end" size="small" name="volume-high"></ion-icon>
+      </ion-range> -->
+    </ion-item>
+    <ng-container *ngFor="let group of groups$ | async">
+      <ion-item *ngIf="group.stream_id === stream.id" lines="none" color="dark">
+        <ion-label>
+          <p>{{ group.name || group.id }}</p>
+          <p>Clients: {{ group.clients.length }}</p>
+          <ion-range (ionChange)="setGroupVolume($event, group)" min="0" max="100" step="1" [value]="group.clients[0].config.volume.percent">
+            <ion-icon slot="start" size="small" name="volume-mute"></ion-icon>
+            <ion-icon slot="end" size="small" name="volume-high"></ion-icon>
+          </ion-range>
+        </ion-label>
+      </ion-item>
+    </ng-container>
+  </ng-container>
+
 </ion-toolbar>
- 

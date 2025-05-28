@@ -122,4 +122,44 @@ export interface SnapCastServerStatusResponse {
     port?: string
     sampleformat: string
   }
+
+
+  // --- Stream Control Types ---
+export type StreamControlCommandType =
+| 'play'
+| 'pause'
+| 'playPause'
+| 'stop'
+| 'next'
+| 'previous'
+| 'seek'
+| 'setPosition';
+
+export interface StreamControlSeekParams {
+offset: number; // float, in seconds
+}
+
+export interface StreamControlSetPositionParams {
+position: number; // float, in seconds
+}
+
+// Union for parameters specific to seek/setPosition commands
+export type StreamControlCommandSpecificParams = StreamControlSeekParams | StreamControlSetPositionParams;
+
+// Parameters for the Stream.Control RPC method
+export interface StreamControlRpcPayloadParams {
+id: string; // The ID of the stream to control
+command: StreamControlCommandType;
+params?: StreamControlCommandSpecificParams; // Only for 'seek' or 'setPosition'
+}
+
+// --- Stream SetProperty Types ---
+export type StreamLoopStatus = 'none' | 'track' | 'playlist';
+
+// Parameters for the Stream.SetProperty RPC method
+export interface StreamSetPropertyRpcPayloadParams {
+id: string; // The ID of the stream
+property: string; // The name of the property to set
+value: any; // The value for the property
+}
   

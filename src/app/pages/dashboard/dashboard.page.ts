@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { SnapCastServerStatusResponse, Stream } from 'src/app/model/snapcast.model';
+import { first, firstValueFrom, Observable } from 'rxjs';
+import { Group, ServerDetail, SnapCastServerStatusResponse, Stream } from 'src/app/model/snapcast.model';
 import { SnapcastService } from 'src/app/services/snapcast.service';
 import { SwiperOptions } from 'swiper';
 
@@ -56,11 +57,15 @@ export class DashboardPage implements OnInit {
 
   today: Date = new Date();
 
-  status?: SnapCastServerStatusResponse
+  public groups$: Observable<Group[]>;
+  public streams$: Observable<Stream[]>;
+  public serverDetails$: Observable<ServerDetail | undefined>;
 
-  constructor(
-    private readonly snapcastService: SnapcastService,
-  ) { }
+  constructor(public snapcastService: SnapcastService) {
+    this.groups$ = this.snapcastService.groups$;
+    this.streams$ = this.snapcastService.streams$;
+    this.serverDetails$ = this.snapcastService.serverDetails$;
+  }
 
   ngOnInit() {
     // this.snapcastService.connect();
@@ -69,7 +74,7 @@ export class DashboardPage implements OnInit {
     //   this.status = status;
     // });
 
-    this.snapcastService.subToSocket();
+    // this.snapcastService.subToSocket();
 
   }
 
@@ -94,13 +99,14 @@ export class DashboardPage implements OnInit {
     console.log('Fetching device status...');
   }
 
-  getStreamDataById(streamId: string): Stream{
-    const stream = this.status?.server.streams?.find(s => s.id === streamId);
-    if (!stream) {
-      throw new Error(`Stream with ID ${streamId} not found`);
-    }
-    return stream;
-  }
+  // async getStreamDataById(streamId: string): Promise<Stream | undefined> {
+  //   // This method would typically fetch the stream data by ID from a service
+  //   console.log(`Fetching stream data for ID: ${streamId}`);
+  //   const streams = await firstValueFrom(this.streams$);
+  //   return streams.find(stream => stream.id === streamId);
+  // }
+
+
 
 
 

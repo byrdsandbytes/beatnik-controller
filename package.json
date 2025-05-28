@@ -11,7 +11,7 @@
     "test": "ng test",
     "lint": "ng lint",
     "generate:service": "ionic g service services/$npm_config_name && ng generate --skip-tests=true class model/$npm_config_name --type=model",
-    "generate:component": "ionic g components/$npm_config_name && ng generate module components/$npm_config_name",
+    "generate:component": "ionic g component $npm_config_name && ng generate module $npm_config_name",
     "generate:page": "ionic g page pages/$npm_config_name",
     "generate:guard": "ng g guard guards/$npm_config_name"
   },
