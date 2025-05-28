@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { Client, Group, Stream } from 'src/app/model/snapcast.model';
 import { SnapcastService } from 'src/app/services/snapcast.service';
 
@@ -12,6 +12,8 @@ export class SnapcastStreamVolumeControlComponent implements OnInit {
 
   @Input() stream?: Stream;
   @Input() groups?: Group[] | null;
+
+  @Output() streamVolumeChange: EventEmitter<number> = new EventEmitter<number>();
 
   streamVolume: number = 0;
   clietsInStream: Client[] = [];

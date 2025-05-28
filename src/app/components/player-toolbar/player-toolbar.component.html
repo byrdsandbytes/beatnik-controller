@@ -13,7 +13,7 @@
     </ion-button>
   </ion-item>
   <ion-item lines="none" color="dark">
-    <ion-range (ionChange)="setVolume($event)" min="0" max="100" step="1" value="25">
+    <ion-range  min="0" max="100" step="1" value="25">
       <ion-icon slot="start" size="small" name="volume-mute"></ion-icon>
       <ion-icon slot="end" size="small" name="volume-high"></ion-icon>
     </ion-range>
@@ -49,7 +49,7 @@
      
     </ion-item>
     <ion-item color="dark" lines="none">
-      <app-snapcast-stream-volume-control [stream]="stream" [groups]="groups$|async"></app-snapcast-stream-volume-control>
+      <app-snapcast-stream-volume-control (streamVolumeChange)="streamVolumeChanged()" [stream]="stream" [groups]="groups$|async"></app-snapcast-stream-volume-control>
       <!-- <ion-range class="summary-range" (ionChange)="setStreamVolume($event, stream)" min="0" max="100" step="1" [value]="calculateStreamVolumeBasedOnClients(stream)" >
         <ion-icon slot="start" size="small" name="volume-mute"></ion-icon>
         <ion-icon slot="end" size="small" name="volume-high"></ion-icon>

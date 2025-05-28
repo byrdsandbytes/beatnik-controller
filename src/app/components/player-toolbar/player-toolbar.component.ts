@@ -1,5 +1,5 @@
-import { Component, OnInit } from '@angular/core';
-import { first, firstValueFrom, Observable, Subscription } from 'rxjs';
+import { Component, Input, OnChanges, OnInit } from '@angular/core';
+import { first, firstValueFrom, Observable, Subscription, tap } from 'rxjs';
 import { Group, Stream, ServerDetail } from 'src/app/model/snapcast.model';
 import { SnapcastService } from 'src/app/services/snapcast.service';
 
@@ -9,7 +9,8 @@ import { SnapcastService } from 'src/app/services/snapcast.service';
   styleUrls: ['./player-toolbar.component.scss'],
   standalone: false
 })
-export class PlayerToolbarComponent implements OnInit {
+export class PlayerToolbarComponent implements OnInit, OnChanges {
+
 
 
   public groups$: Observable<Group[]>;
@@ -22,27 +23,27 @@ export class PlayerToolbarComponent implements OnInit {
     this.groups$ = this.snapcastService.groups$;
     this.streams$ = this.snapcastService.streams$;
     this.serverDetails$ = this.snapcastService.serverDetails$;
+    this.groups$ = this.snapcastService.groups$.pipe(
+      tap(groups => console.log('%cPlayerToolbarComponent: received groups$ update', 'color: orange; font-weight: bold;', new Date().toLocaleTimeString(), groups))
+    );
   }
 
   ngOnInit(): void {
     this.snapcastService.connect();
+    this.groups$.subscribe(groups => {
+      console.log("groups", groups)
+    });
   }
 
-
-
-  getPlayerStatus() {
-    // this.playerStatusService.getPlayerStatus(this.baseIP)
-  }
-
-  setVolume(event: any) {
-    const value = event.detail.value;
-    console.log(value);
-    // this.playerStatusService.setPlayerVolume(this.baseIP, event.detail.value);
+  ngOnChanges(): void {
+    console.log('PlayerToolbarComponent: ngOnChanges called');
   }
 
   pauseStream(streamId: string): void {
     this.snapcastService.streamControl(streamId, 'pause').subscribe({
-      next: () => console.log(`Stream ${streamId} pause command sent.`),
+      next: () => {
+        console.log(`Stream ${streamId} pause command sent.`)
+      },
       error: err => console.error(`Failed to play stream ${streamId}`, err)
     }
     );
@@ -60,41 +61,19 @@ export class PlayerToolbarComponent implements OnInit {
         })
       );
     }
+  }
 
-
+  streamVolumeChanged(){
+    console.log('Stream volume changed for group');
+    this.snapcastService.groups$.subscribe(groups => {
+      console.log('Updated groups:', groups);
+    });
 
   }
 
-  setStreamVolume(event: any, stream: Stream): void {
-    const value = event.detail.value;
-    console.log(`Setting volume for stream ${stream.id} to ${value}`);
-  }
+  
 
-   calculateStreamVolumeBasedOnClients(stream: Stream): number {
-    const streamId = stream.id;
-    const groups =  firstValueFrom(this.groups$).then(groups => groups.filter(group => group.stream_id === streamId));
-    let totalVolume = 0;
-    let clientCount = 0;
-    groups.then(groups => {
-      for (const group of groups) {
-        const clients = group.clients || [];
-        for (const client of clients) {
-          if (client.config && client.config.volume && typeof client.config.volume.percent === 'number') {
-            totalVolume += client.config.volume.percent;
-            clientCount++;
-          }
-        }
-      }
-      return clientCount > 0 ? totalVolume / clientCount : 0;
-    }
-    ).catch(err => {
-      console.error(`Failed to calculate stream volume for ${stream.id}`, err);
-      return 0;
-    }
-    );
-    return 0; // Default return value in case of error or no clients
-   
-  }
+  
 
 
 
