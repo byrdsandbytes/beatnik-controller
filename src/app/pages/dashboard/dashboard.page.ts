@@ -12,48 +12,13 @@ import { SwiperOptions } from 'swiper';
 })
 export class DashboardPage implements OnInit {
 
-  devices = [{
-    name: 'Wohnzimmer Links',
-    groupName: 'Wohnzimmer',
-    imgUrl: 'assets/mock/JSE_small_002.png',
-    status: 'online',
-    coverUrl: 'assets/mock/2-freewheelin-bob-dylan.webp',
-    artist: 'Bob Dylan',
-    song: 'Blowin in the Wind',
-    album: 'Freewheelin',
-  },
-  {
-    name: 'Wohnzimmer Links',
-    groupName: 'Wohnzimmer',
-    imgUrl: 'assets/mock/JSE_small.png',
-    status: 'online',
-    coverUrl: 'assets/mock/2-freewheelin-bob-dylan.webp',
-    artist: 'Bob Dylan',
-    song: 'Blowin in the Wind',
-    album: 'Freewheelin',
-  },
-  {
-    name: 'Wohnzimmer Rechts',
-    groupName: 'Wohnzimmer',
-    imgUrl: 'assets/mock/boxe_Aeg_frei_frontal_004.png',
-    status: 'online',
-    coverUrl: 'assets/mock/2-freewheelin-bob-dylan.webp',
-    artist: 'Artist 1',
-    song: 'Song 1',
-    album: 'Album 1',
-  },
-  ];
 
   swiperConfig: SwiperOptions = {
     slidesPerView: 1.3,
     spaceBetween: 10,
   };
 
-
-
-
-
-
+  displayState?: Observable<SnapCastServerStatusResponse | null>;
 
   today: Date = new Date();
 
@@ -68,13 +33,8 @@ export class DashboardPage implements OnInit {
   }
 
   ngOnInit() {
-    // this.snapcastService.connect();
-    // this.snapcastService.status.subscribe(status => {
-    //   console.log('Server Status:', status);
-    //   this.status = status;
-    // });
+    this.displayState = this.snapcastService.displayState$
 
-    // this.snapcastService.subToSocket();
 
   }
 

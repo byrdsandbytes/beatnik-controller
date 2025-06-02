@@ -1,1 +1,31 @@
-
+.bottom-sheet {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 40px;                // stays under the tab-bar
+    height: 90vh;                // <-- max-height breakpoint
+    background: var(--ion-color-dark);
+    border-radius: 16px 16px 0 0;
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.15);
+    transition: transform 0.3s ease;
+    z-index: 10;
+    will-change: transform;
+    /* Optional, avoids flash of full sheet before TS runs */
+    transform: translateY(calc(90vh - 120px));   // collapsed offset (min-height)
+  }
+  
+  .drag-handle {
+    width: 40px;
+    height: 5px;
+    background: #ccc;
+    border-radius: 5px;
+    margin: 10px auto;
+  }
+  
+  .backdrop {
+    position: fixed;
+    inset: 0;                                   // shorthand for top/left/right/bottom
+    background: rgba(0,0,0,.3);
+    z-index: 5;
+  }
+  

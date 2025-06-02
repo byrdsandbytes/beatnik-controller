@@ -1,7 +1,8 @@
-<p>
-  snapcast-stream-volume-control works!
-</p>
+
   <ion-range class="summary-range" (ionInput)="calculateKnobMoveDelta($event)" [value]="streamVolume" min="0" max="100" step="1" >
     <ion-icon slot="start" size="small" name="volume-mute"></ion-icon>
     <ion-icon slot="end" size="small" name="volume-high"></ion-icon>
   </ion-range>
+  <p *ngIf="stream!.id">
+    {{( stream!.id) }}
+  </p>

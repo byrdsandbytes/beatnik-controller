@@ -1,22 +1,29 @@
 <ion-tabs>
+  <div class="bottom-sheet" *ngIf="isModalOpen" #bottomSheet>
+    <div class="drag-handle"></div>
+    <div class="modal-content">
+      <app-player-toolbar class="player-toolbar"></app-player-toolbar>
+    </div>
+  </div>
 
-  <app-player-toolbar></app-player-toolbar>
-
-  <ion-tab-bar slot="bottom" color="dark">
+  <ion-tab-bar class="tabbar" slot="bottom" color="dark">
     <ion-tab-button tab="dashboard" href="/tabs/dashboard">
-      <ion-icon aria-hidden="true" name="triangle"></ion-icon>
-      <ion-label>Tab 1</ion-label>
+      <ion-icon aria-hidden="true" name="home-outline"></ion-icon>
+      <ion-label>Dashboard</ion-label>
     </ion-tab-button>
 
     <ion-tab-button tab="tab2" href="/tabs/tab2">
-      <ion-icon aria-hidden="true" name="ellipse"></ion-icon>
-      <ion-label>Tab 2</ion-label>
+      <ion-icon aria-hidden="true" name="volume-high-outline"></ion-icon>
+      <ion-label>Devices</ion-label>
     </ion-tab-button>
 
     <ion-tab-button tab="streams" href="/tabs/streams">
-      <ion-icon aria-hidden="true" name="square"></ion-icon>
+      <ion-icon aria-hidden="true" name="musical-notes-outline"></ion-icon>
       <ion-label>Streams</ion-label>
     </ion-tab-button>
   </ion-tab-bar>
 
 </ion-tabs>
+
+
+
