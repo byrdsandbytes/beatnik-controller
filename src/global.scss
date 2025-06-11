@@ -49,3 +49,60 @@
 @import "swiper/scss/effect-flip";
 @import "swiper/scss/effect-coverflow";
 @import "swiper/scss/effect-cards";
+
+
+ion-modal {
+    // --height: 50%;
+    --border-radius: 16px;
+    // --box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+    margin-bottom: calc(50px + var(--ion-safe-area-bottom, 0));
+    // margin-bottom: (var(--ion-safe-area-bottom, 0) + 50px);
+    --width: 100%;
+  }
+
+  /* src/global.scss */
+
+/* Regular */
+@font-face {
+    font-family: 'IBM Plex Mono';
+    font-style: normal;
+    font-weight: 400;
+    src: url('assets/fonts/IBMPlexMono-Regular.ttf') format('truetype');
+    font-display: swap;
+  }
+  
+  /* Italic */
+  @font-face {
+    font-family: 'IBM Plex Mono';
+    font-style: italic;
+    font-weight: 400;
+    src: url('assets/fonts/IBMPlexMono-Italic.ttf') format('truetype');
+    font-display: swap;
+  }
+  
+  /* Semi-Bold */
+  @font-face {
+    font-family: 'IBM Plex Mono';
+    font-style: normal;
+    font-weight: 600;
+    src: url('assets/fonts/IBMPlexMono-SemiBold.ttf') format('truetype');
+    font-display: swap;
+  }
+  
+  /* Your Specific Variation: Semi-Bold Italic */
+  @font-face {
+    font-family: 'IBM Plex Mono';
+    font-style: italic;
+    font-weight: 600;
+    src: url('assets/fonts/IBMPlexMono-SemiBoldItalic.ttf') format('truetype');
+    font-display: swap;
+  }
+  
+  /* Bold */
+  @font-face {
+    font-family: 'IBM Plex Mono';
+    font-style: normal;
+    font-weight: 700;
+    src: url('assets/fonts/IBMPlexMono-Bold.ttf') format('truetype');
+    font-display: swap;
+  }

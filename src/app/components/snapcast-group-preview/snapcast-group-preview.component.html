@@ -1,16 +1,20 @@
 <ion-card *ngIf="group" class="card ion-text-center" color="light">
-  <img *ngIf="activeStream" [src]="activeStream.properties.metadata.artUrl" class="cover">
   <div class="img-container">
     <img [src]="'assets/mock/JSE_small.png'" class="img" alt="Placeholder Image">
 
   </div>
-  <ion-card-header>
-    <ion-card-title *ngIf="activeStream">{{activeStream.properties.metadata.title}}</ion-card-title>
-    <ion-card-subtitle>{{group.name? group.name:group.id}}</ion-card-subtitle>
-  </ion-card-header>
-  <ion-card-content *ngIf="activeStream">
-    <p>{{activeStream.properties.metadata.artist}} - {{activeStream.properties.metadata.album}}</p>
-    <h2></h2>
-    <p></p>
-  </ion-card-content>
+  <ng-container *ngIf="activeStream && activeStream.properties.metadata">
+    
+    <img [src]="activeStream.properties.metadata.artUrl" class="cover">
+    
+    <ion-card-header>
+      <ion-card-title *ngIf="activeStream">{{activeStream.properties.metadata.title}}</ion-card-title>
+      <ion-card-subtitle>{{group.name? group.name:group.id}}</ion-card-subtitle>
+    </ion-card-header>
+    <ion-card-content *ngIf="activeStream">
+      <p>{{activeStream.properties.metadata.artist}} - {{activeStream.properties.metadata.album}}</p>
+      <h2></h2>
+      <p></p>
+    </ion-card-content>
+  </ng-container>
 </ion-card>

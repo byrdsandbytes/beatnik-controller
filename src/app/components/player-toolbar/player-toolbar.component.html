@@ -1,7 +1,7 @@
 <ion-toolbar class="play-toolbar" color="dark">
   <ng-container *ngIf="(displayState$|async) as state ">
     <ng-container *ngFor="let stream of state.server.streams">
-      <ion-item *ngIf="stream.properties.metadata" lines="none" color="dark">
+      <ion-item *ngIf="stream.status =='playing'" lines="none" color="dark">
         <ion-thumbnail slot="start">
           <img [src]="stream.properties.metadata.artUrl" alt="cover image">
         </ion-thumbnail>
@@ -30,12 +30,12 @@
       </ion-button> -->
 
       </ion-item>
-      <ion-item *ngIf="stream.properties.metadata" color="dark" lines="none">
+      <ion-item *ngIf="stream.properties.metadata && stream.status=='playing'" color="dark" lines="none">
         <app-snapcast-stream-volume-control class="stream-range" (streamVolumeChange)="streamVolumeChanged()"
-          [stream]="stream" [groups]="state.server.groups"></app-snapcast-stream-volume-control>
+          [stream]="stream" [groups]="state.server.groups "></app-snapcast-stream-volume-control>
       </ion-item>
       <ng-container *ngFor="let group of state.server.groups">
-        <ion-item *ngIf="group.stream_id === stream.id" lines="none" color="dark">
+        <ion-item *ngIf="group.stream_id === stream.id && stream.status=='playing'" lines="none" color="dark">
           <ion-label>
             <p>{{ group.name || group.id }}</p>
             <p>Clients: {{ group.clients.length }}</p>
