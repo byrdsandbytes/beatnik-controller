@@ -22,7 +22,7 @@ export class PlayerToolbarComponent implements OnInit, OnChanges, OnDestroy {
   ) {
     // The component subscribes to the main displayState$.
     // The async pipe in the template will handle unwrapping it.
-    this.displayState$ = this.snapcastService.displayState$.pipe(
+    this.displayState$ = this.snapcastService.state$.pipe(
       tap(state => console.log('%cPlayerToolbarComponent: displayState$ received', 'color: orange; font-weight: bold;', new Date().toLocaleTimeString(), state))
     );
   }

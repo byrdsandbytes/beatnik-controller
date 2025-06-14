@@ -35,7 +35,7 @@ export class DashboardPage implements OnInit {
   }
 
   ngOnInit() {
-    this.displayState = this.snapcastService.displayState$
+    this.displayState = this.snapcastService.state$
 
 
   }

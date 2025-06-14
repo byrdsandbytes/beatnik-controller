@@ -25,9 +25,7 @@
           [stream]="stream" [groups]="state.server.groups "></app-snapcast-stream-volume-control>
       </ion-item> -->
       <ng-container *ngFor="let group of state.server.groups">
-        group
         <ion-item *ngIf="group.stream_id === stream.id && stream.status=='playing'" lines="none" color="dark">
-          stream: {{ stream.id }}
           <ion-label>
             <p>{{ group.name || group.id }}</p>
             <p>Clients: {{ group.clients.length }}</p>
@@ -43,53 +41,3 @@
   </ng-container>
 
 </ion-toolbar>
-
-
-
-
-
-<!-- <ion-toolbar class="play-toolbar" color="dark">
-  <ng-container *ngIf="displayState$ | async as state; else loadingOrError">
-
-    <ng-container *ngIf="state && state.server">
-
-      <ng-container *ngFor="let stream of state.server.streams">
-        <ion-item *ngIf="stream.properties.metadata" lines="none" color="dark">
-          </ion-item>
-        
-        <ng-container *ngFor="let group of state.server.groups">
-          <ion-item *ngIf="group.stream_id === stream.id" lines="none" color="dark">
-            <ion-label>
-              <p>{{ group.name || group.id }}</p>
-
-              <div *ngFor="let client of group.clients" class="client-volume-control">
-                <p class="client-name">{{ client.config.name || client.id }}</p>
-                
-                <ion-range
-                  *ngIf="client.config?.volume"
-                  (ionChange)="changeVolumeForClient(client, $event)"
-                  [min]="0"
-                  [max]="100"
-                  [step]="1"
-                  [value]="client.config.volume.percent"
-                  color="secondary">
-                  <ion-icon slot="start" size="small" name="volume-mute-outline"></ion-icon>
-                  <ion-icon slot="end" size="small" name="volume-high-outline"></ion-icon>
-                </ion-range>
-              </div>
-
-            </ion-label>
-          </ion-item>
-        </ng-container>
-      </ng-container>
-
-    </ng-container>
-  </ng-container>
-
-  <ng-template #loadingOrError>
-    <ion-item color="dark" lines="none">
-      <ion-label>Loading Snapcast status...</ion-label>
-      <ion-spinner name="crescent"></ion-spinner>
-    </ion-item>
-  </ng-template>
-</ion-toolbar> -->

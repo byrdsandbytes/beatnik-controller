@@ -20,7 +20,7 @@ export class StreamsPage implements OnInit {
   ) { }
 
   ngOnInit() {
-    this.displayState = this.snapcastService.displayState$
+    this.displayState = this.snapcastService.state$
   }
 
   convertBase64ToImage(base64String: string, format: string): string {
