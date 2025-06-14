@@ -98,7 +98,7 @@ export class SnapcastStreamVolumeControlComponent implements OnInit {
     this.knobMoveDelta = this.knobMoveRealtimeValue - this.knobMoveStartValue;
     console.log(`Knob move delta: ${this.knobMoveDelta}`);
     if (this.knobMoveDelta !== 0) {
-      this.changeStreambasedOnClientsVolume(this.stream!);
+      // this.changeStreambasedOnClientsVolume(this.stream!);
     }
   }
 

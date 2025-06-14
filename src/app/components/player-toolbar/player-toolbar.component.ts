@@ -12,109 +12,87 @@ import { SnapcastService } from 'src/app/services/snapcast.service';
 })
 export class PlayerToolbarComponent implements OnInit, OnChanges, OnDestroy {
 
-  // public groups$: Observable<Group[]>;
-  // public streams$: Observable<Stream[]>;
-  // public serverDetails$: Observable<ServerDetail | undefined>;
+  // This is the primary state observable for the component.
   public displayState$: Observable<SnapCastServerStatusResponse | null>;
 
   private subscriptions = new Subscription();
 
   constructor(
-    public snapcastService: SnapcastService, // public gemacht, damit im Template direkt darauf zugegriffen werden kann, falls nötig
-    // private modalController: ModalController // Behalten, wenn es verwendet wird, sonst entfernen
+    public snapcastService: SnapcastService
   ) {
-
+    // The component subscribes to the main displayState$.
+    // The async pipe in the template will handle unwrapping it.
     this.displayState$ = this.snapcastService.displayState$.pipe(
-      tap(state => console.log('%cPlayerToolbarComponent: displayState$ empfangen', 'color: orange; font-weight: bold;', new Date().toLocaleTimeString(), state))
+      tap(state => console.log('%cPlayerToolbarComponent: displayState$ received', 'color: orange; font-weight: bold;', new Date().toLocaleTimeString(), state))
     );
-    // Zuweisung der Observables vom Service
-    // Der tap-Operator ist nützlich für Debugging-Zwecke.
-    // this.groups$ = this.snapcastService.groups$.pipe(
-    //   tap(groups => console.log('%cPlayerToolbarComponent: groups$ empfangen', 'color: orange; font-weight: bold;', new Date().toLocaleTimeString(), groups))
-    // );
-    // this.streams$ = this.snapcastService.streams$.pipe(
-    //   tap(streams => console.log('%cPlayerToolbarComponent: streams$ empfangen', 'color: teal; font-weight: bold;', new Date().toLocaleTimeString(), streams))
-    // );
-    // this.serverDetails$ = this.snapcastService.serverDetails$.pipe(
-    //   tap(details => console.log('%cPlayerToolbarComponent: serverDetails$ empfangen', 'color: magenta; font-weight: bold;', new Date().toLocaleTimeString(), details))
-    // );
   }
 
   ngOnInit(): void {
+    // The service connection should ideally be initiated once at the application's root level (e.g., AppComponent).
+    // Calling it here is fine, but be aware that it will re-trigger on every component initialization.
     this.snapcastService.connect();
-
-    // Diese Subskription ist hauptsächlich für Debugging-Zwecke.
-    // Für die Anzeige im Template wird die async-Pipe bevorzugt.
-    // this.subscriptions.add(
-    //   this.groups$.subscribe(groups => {
-    //     console.log("PlayerToolbarComponent: Manuelle Subskription auf groups$:", groups);
-    //   })
-    // );
   }
 
+  /**
+   * This lifecycle hook is only triggered if the component has @Input() properties
+   * that receive new values. If there are no inputs, this method can be removed.
+   */
   ngOnChanges(changes: SimpleChanges): void {
-    // Dieser Hook wird nur aufgerufen, wenn die Komponente @Input()-Properties hat
-    // und sich deren Werte ändern.
-    console.log('PlayerToolbarComponent: ngOnChanges aufgerufen', changes);
+    console.log('PlayerToolbarComponent: ngOnChanges triggered', changes);
   }
 
-  pauseStream(streamId: string): void {
-    // Die Subskription wird zum subscriptions-Objekt hinzugefügt,
-    // um sie in ngOnDestroy automatisch zu beenden.
+  /**
+   * Handles a volume change event for a specific client.
+   * @param client The client object whose volume is being changed.
+   * @param event The event emitted from the range slider (e.g., ionChange).
+   */
+  changeVolumeForClient(client: Client, event: any): void {
+    // Step 1: Robustly extract the numerical value from the event.
+    // Ionic's ion-range often uses `event.detail.value`.
+    let newVolume: number;
+    if (event && typeof event.detail?.value === 'number') {
+      newVolume = event.detail.value;
+    } else if (event && event.target && typeof event.target.value !== 'undefined') {
+      newVolume = parseFloat(event.target.value);
+    } else {
+      console.error('PlayerToolbarComponent: Could not extract volume value from event:', event);
+      return;
+    }
+
+    if (isNaN(newVolume)) {
+      console.error('PlayerToolbarComponent: Volume value is not a number:', event);
+      return;
+    }
+
+    console.log(`PlayerToolbarComponent: Setting desired volume for client ${client.id} to ${newVolume}`);
+
+    // Step 2: Call the service method.
+    // The service will optimistically update the `desiredState`, which makes the UI feel instant.
+    // It then sends the RPC command to the server.
+    const volumeUpdate$ = this.snapcastService.setClientVolumePercent(client.id, newVolume);
+
+    // Step 3: Subscribe to handle the result of the RPC call (especially errors).
+    // This subscription is managed to prevent memory leaks.
     this.subscriptions.add(
-      this.snapcastService.streamControl(streamId, 'pause').subscribe({
+      volumeUpdate$.subscribe({
         next: () => {
-          console.log(`Stream ${streamId} Pause-Befehl gesendet.`);
+          // The UI has already updated optimistically. This confirms the RPC was sent.
+          console.log(`PlayerToolbarComponent: RPC for client ${client.id} volume sent successfully.`);
         },
-        error: err => console.error(`Fehler beim Pausieren von Stream ${streamId}`, err)
+        error: err => {
+          // If the RPC fails, the service should ideally handle rolling back the desiredState.
+          // The component can show a user-facing error here.
+          console.error(`PlayerToolbarComponent: Failed to set volume for client ${client.id}`, err);
+          // Example: this.toastController.create({ message: 'Failed to change volume', ... }).present();
+        }
       })
     );
   }
 
-  setGroupVolume(event: any, group: Group): void {
-    const clients = group.clients || [];
-    let value: number;
-
-    // Sicherstellen, dass der Wert korrekt aus dem Event extrahiert wird
-    if (event && typeof event.detail?.value === 'number') {
-        value = event.detail.value;
-    } else if (event && event.target && typeof event.target.value !== 'undefined') {
-        value = parseFloat(event.target.value);
-    } else {
-        console.error('PlayerToolbarComponent: Konnte Lautstärkewert nicht aus Event extrahieren:', event);
-        return;
-    }
-
-    if (isNaN(value)) {
-        console.error('PlayerToolbarComponent: Lautstärkewert ist NaN:', event);
-        return;
-    }
-
-    console.log(`PlayerToolbarComponent: Setze Lautstärke für Gruppe ${group.id} auf ${value}`);
-    for (const client of clients) {
-      this.subscriptions.add(
-        this.snapcastService.setClientVolumePercent(client.id, value).subscribe({
-          next: () => console.log(`PlayerToolbarComponent: Lautstärke für Client ${client.id} auf ${value} gesetzt (RPC gesendet).`),
-          error: err => console.error(`PlayerToolbarComponent: Fehler beim Setzen der Lautstärke für Client ${client.id}`, err)
-        })
-      );
-    }
-  }
-
-  // Diese Methode wurde angepasst, um Speicherlecks zu vermeiden und den aktuellen Wert einmalig zu loggen.
-  async streamVolumeChanged(): Promise<void> {
-    console.log('PlayerToolbarComponent: streamVolumeChanged Event ausgelöst.');
-    try {
-      // Ruft den aktuellen Wert von groups$ ab und loggt ihn.
-      const currentGroups = await firstValueFrom(this.snapcastService.groups$);
-      console.log('PlayerToolbarComponent: Aktuelle Gruppen bei streamVolumeChanged:', currentGroups);
-    } catch (error) {
-      console.error('PlayerToolbarComponent: Fehler beim Abrufen der Gruppen bei streamVolumeChanged:', error);
-    }
-  }
-
+  /**
+   * Good practice: Implement OnDestroy to clean up all manual subscriptions.
+   */
   ngOnDestroy(): void {
-    // Alle manuellen Subskriptionen beenden, um Speicherlecks zu vermeiden.
     this.subscriptions.unsubscribe();
   }
 }

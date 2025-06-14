@@ -336,21 +336,7 @@ export class SnapcastService implements OnDestroy {
       } as any
     });
 
-
-    return this.getClient(clientId).pipe(
-      take(1),
-      switchMap(clientState => {
-        if (!clientState) return throwError(() => new Error(`Client ${clientId} not found.`));
-        const volumePayload: Volume = { percent, muted: clientState.config.volume.muted };
-        return this.rpc('Client.SetVolume', { id: clientId, volume: volumePayload });
-      }),
-      map(() => void 0),
-      catchError(err => {
-        console.error(`SnapcastService: Failed to set volume for client ${clientId}`, err);
-        this.clearDesiredClientVolume(clientId); // Rollback optimistic update
-        return throwError(() => err);
-      })
-    );
+    return EMPTY;
   }
 
   public setClientMute(clientId: string, mute: boolean): Observable<void> {

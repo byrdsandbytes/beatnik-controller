@@ -13,7 +13,16 @@ const routes: Routes = [
   {
     path: 'dashboard',
     loadChildren: () => import('./pages/dashboard/dashboard.module').then( m => m.DashboardPageModule)
-  }
+  },
+  {
+    path: 'server-status',
+    loadChildren: () => import('./pages/server-status/server-status.module').then( m => m.ServerStatusPageModule)
+  },
+  {
+    path: 'stream-details',
+    loadChildren: () => import('./pages/stream-details/stream-details.module').then( m => m.StreamDetailsPageModule)
+  },
+ 
 ];
 @NgModule({
   imports: [

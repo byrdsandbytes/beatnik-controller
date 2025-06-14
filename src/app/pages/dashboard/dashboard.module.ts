@@ -10,6 +10,8 @@ import { DashboardPage } from './dashboard.page';
 import { SwiperModule } from 'swiper/angular';
 import { SnapcastStatusModule } from 'src/app/components/snapcast-status/snapcast-status.module';
 import { SnapcastGroupPreviewModule } from 'src/app/components/snapcast-group-preview/snapcast-group-preview.module';
+import { RouterModule } from '@angular/router';
+import { SnapcastStreamPreviewModule } from 'src/app/components/snapcast-stream-preview/snapcast-stream-preview.module';
 
 
 @NgModule({
@@ -20,7 +22,9 @@ import { SnapcastGroupPreviewModule } from 'src/app/components/snapcast-group-pr
     DashboardPageRoutingModule,
     SwiperModule,
     SnapcastStatusModule,
-    SnapcastGroupPreviewModule
+    SnapcastGroupPreviewModule,
+    RouterModule,
+    SnapcastStreamPreviewModule
   ],
   declarations: [DashboardPage]
 })

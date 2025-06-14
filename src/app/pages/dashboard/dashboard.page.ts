@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { ModalController } from '@ionic/angular';
 import { first, firstValueFrom, Observable } from 'rxjs';
 import { Group, ServerDetail, SnapCastServerStatusResponse, Stream } from 'src/app/model/snapcast.model';
 import { SnapcastService } from 'src/app/services/snapcast.service';
@@ -26,7 +27,8 @@ export class DashboardPage implements OnInit {
   public streams$: Observable<Stream[]>;
   public serverDetails$: Observable<ServerDetail | undefined>;
 
-  constructor(public snapcastService: SnapcastService) {
+  constructor(public snapcastService: SnapcastService,
+  ) {
     this.groups$ = this.snapcastService.groups$;
     this.streams$ = this.snapcastService.streams$;
     this.serverDetails$ = this.snapcastService.serverDetails$;

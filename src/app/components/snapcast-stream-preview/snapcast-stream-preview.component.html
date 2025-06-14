@@ -1,0 +1,25 @@
+<ng-container *ngIf="stream">
+  <ion-card>
+
+    <ion-card-header class="ion-text-center align-items-center">
+
+      <ion-card-title>{{ stream.id }}</ion-card-title>
+      <ion-card-subtitle>Stream Status: {{ stream.status }}</ion-card-subtitle>
+      <ion-icon [color]="stream.status=='idle'? 'medium':'primary'" class="stream-icon ion-margin" *ngIf="stream.uri.scheme as scheme"
+        [src]="'/assets/streams/' +scheme +'.svg'"></ion-icon>
+
+    </ion-card-header>
+
+    <div *ngIf="stream.properties.metadata as meta"
+      class="d-flex flex-column align-items-center justify-content-center ion-text-center">
+      <img *ngIf="meta.album" class="cover-image" [src]="meta.artUrl" alt="Album Art" />
+
+
+      <p>{{ meta.album }}<br>
+        {{ meta.artist }} <br>
+        {{ meta.title }}
+      </p>
+
+    </div>
+  </ion-card>
+</ng-container>

@@ -33,6 +33,7 @@
     "@capacitor/keyboard": "7.0.1",
     "@capacitor/status-bar": "7.0.1",
     "@ionic/angular": "^8.0.0",
+    "@types/lodash-es": "^4.17.12",
     "bootstrap": "^5.3.6",
     "bootstrap-icons": "^1.13.1",
     "immer": "^10.1.1",

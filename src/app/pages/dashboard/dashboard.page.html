@@ -26,7 +26,8 @@
       <div class="col">
 
         <ion-fab>
-          <ion-fab-button class="custom-fab-button" color="light" (click)="getDeviceStatus()">
+          <ion-fab-button class="custom-fab-button" color="light" [routerLink]="'/server-status'"
+           >
             <ion-icon name="wifi-outline"></ion-icon>
           </ion-fab-button>
         </ion-fab>
@@ -43,24 +44,41 @@
 
 
     <ion-list-header>
-      <ion-label>Idrimis Sound System</ion-label>
+      <ion-label>Idrimis Devices</ion-label>
       <ion-button size="small" fill="clear" (click)="openModal()">
         <ion-icon slot="icon-only" name="add-circle-outline"></ion-icon>
       </ion-button>
     </ion-list-header>
+  </div>
 
 
 
-    <swiper *ngIf="(displayState|async) as state" (swiper)="onSwiper($event)" (slideChange)="onSlideChange($event)" [config]="swiperConfig">
+  <div class="container-fluid">
+
+
+    <swiper *ngIf="(displayState|async) as state" (swiper)="onSwiper($event)" (slideChange)="onSlideChange($event)"
+      [config]="swiperConfig">
       <ng-template swiperSlide *ngFor="let group of state.server.groups; let i = index">
-        <app-snapcast-group-preview [streams]="streams$|async" [group]="group"></app-snapcast-group-preview>   
+        <app-snapcast-group-preview [streams]="streams$|async" [group]="group"></app-snapcast-group-preview>
       </ng-template>
     </swiper>
+  </div>
+  <div class="container">
+
 
     <ion-list-header>
-      <ion-label>Idrimis Sound</ion-label>
+      <ion-label>Idrimis Streams</ion-label>
     </ion-list-header>
-    <app-snapcast-status></app-snapcast-status>
-
+    <swiper *ngIf="(displayState|async) as state" (swiper)="onSwiper($event)" (slideChange)="onSlideChange($event)"
+      [config]="swiperConfig">
+      <ng-template swiperSlide *ngFor="let stream of state.server.streams; let i = index">
+        <app-snapcast-stream-preview [stream]="stream"></app-snapcast-stream-preview>
+      </ng-template>
+    </swiper>
   </div>
+
+  <!-- <app-snapcast-status></app-snapcast-status> -->
+   <div class="page-padding-bottom">
+  </div>
+
 </ion-content>

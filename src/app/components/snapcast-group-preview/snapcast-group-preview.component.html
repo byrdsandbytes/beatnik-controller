@@ -1,4 +1,4 @@
-<ion-card *ngIf="group" class="card ion-text-center" color="light">
+<ion-card *ngIf="group" class="card ion-text-center" color="light" [routerLink]="['/tabs/devices', group.id]">
   <div class="img-container">
     <img [src]="'assets/mock/JSE_small.png'" class="img" alt="Placeholder Image">
 

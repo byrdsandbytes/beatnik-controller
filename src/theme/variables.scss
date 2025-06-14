@@ -4,7 +4,11 @@
 :root {
     --ion-font-family: 'IBM Plex Mono',
    monospace;
-    --ion-font-family-base: 'Helvetica',  
+  --ion-font-family-base: 'IBM Plex Mono',
+   monospace;
+
+  //  background
+  --ion-background-color: #f5f3e8; /* Light background color */
 
 
 
@@ -15,7 +19,7 @@
   --ion-color-secondary-shade: #3691bf; /* Slightly darker shade of the secondary color */
   --ion-color-secondary-tint: #4eb3e3; /* Slightly lighter tint of the secondary color */
 
-  --ion-color-primary: #000000; /* Yellow */
+  --ion-color-primary: #1d1d1e; /* Yellow */
   --ion-color-primary-rgb: 249, 181, 38;
   --ion-color-primary-contrast: #ffffff;
   --ion-color-primary-contrast-rgb: 255, 255, 255;
@@ -50,21 +54,21 @@
   --ion-color-warning-shade: #d45586; /* Shade */
   --ion-color-warning-tint: #ec71a3; /* Tint */
 
-  --ion-color-light: #fffef8;
+  --ion-color-light: #f5f3e8;
   --ion-color-light-rgb: 255, 250, 232;
   --ion-color-light-contrast: #292929;
   --ion-color-light-contrast-rgb: 0, 0, 0;
   --ion-color-light-shade: #e0dccc;
   --ion-color-light-tint: #fffbea;
 
-  --ion-color-medium: #5f5f5f;
+  --ion-color-medium: #c7c7c7;
   --ion-color-medium-rgb: 95, 95, 95;
   --ion-color-medium-contrast: #ffffff;
   --ion-color-medium-contrast-rgb: 255, 255, 255;
   --ion-color-medium-shade: #545454;
   --ion-color-medium-tint: #6f6f6f;
 
-  --ion-color-dark: #313131;
+  --ion-color-dark: #1d1d1e;
   --ion-color-dark-rgb: 47, 47, 47;
   --ion-color-dark-contrast: #ffffff;
   --ion-color-dark-contrast-rgb: 255, 255, 255;
@@ -77,4 +81,7 @@
   --ion-color-white-contrast-rgb: 0, 0, 0;
   --ion-color-white-shade: #e0e0e0;
   --ion-color-white-tint: #ffffff;
+
+
+  
 }
