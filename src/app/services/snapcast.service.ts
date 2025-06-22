@@ -38,6 +38,7 @@ import {
   ClientVolumeChange, GroupMuteChange, GroupNameChange, GroupStreamChange,
   ServerOnUpdate as ServerOnUpdateNotificationParams, StreamOnProperties, StreamOnUpdate, ClientOnConnect, ClientOnDisconnect
 } from '../model/snapcast-websocket-notification.model';
+import { environment } from 'src/environments/environment.prod';
 
 // --- Type Definitions ---
 interface JsonRpcBaseRequest { jsonrpc: '2.0'; id: number; method: string; }
@@ -47,7 +48,7 @@ type SnapcastWebSocketMessage = JsonRpcResponse<unknown> | SnapcastWebsocketNoti
 
 @Injectable({ providedIn: 'root' })
 export class SnapcastService implements OnDestroy {
-  private readonly DEFAULT_HOSTNAME = 'byrds-audiopi.local';
+  private readonly DEFAULT_HOSTNAME = environment.snapcastServerUrl;
   private readonly DEFAULT_PORT = 1780;
   private readonly RECONNECT_INTERVAL_MS = 5000;
 
@@ -86,14 +87,12 @@ export class SnapcastService implements OnDestroy {
     this.disconnectInternals(false);
     const wsUrl = `ws://${host}:${port}/jsonrpc`;
     console.info(`SnapcastService: Connecting to ${wsUrl}...`);
-    // (this.isConnected$ as BehaviorSubject<boolean>).next(false);
 
     const config: WebSocketSubjectConfig<SnapcastWebSocketMessage> = {
       url: wsUrl,
       openObserver: {
         next: () => {
           console.info('SnapcastService: WebSocket connection established.');
-          // (this.isConnected$ as BehaviorSubject<boolean>).next(true);
           this.fetchInitialServerStatus();
         },
       },
@@ -278,7 +277,7 @@ export class SnapcastService implements OnDestroy {
     );
   }
 
-  // ... Implement other action methods like setGroupName, setGroupMute, streamControl, etc.
+  // TODO  ... Implement other action methods like  setGroupMute, streamControl, etc.
   // They just need to call `this.rpc` with the correct parameters.
 
   // --- Data Access Helpers ---
@@ -286,7 +285,7 @@ export class SnapcastService implements OnDestroy {
     return this.state$.pipe(map(state => state?.server?.groups.flatMap(g => g.clients).find(c => c.id === clientId)));
   }
 
-  // ... other get... methods ...
+  //  TODO: ... other get... methods ...
 
   // --- Lifecycle and Disconnect ---
   public disconnect(): void {
