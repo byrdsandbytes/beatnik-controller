@@ -1,89 +1,12 @@
 <div class="snapcast-container">
   <h2>Snapcast Server Status</h2>
 
-  <!-- <ng-container *ngIf="(displayState | async) as serverInfo; else loadingOrError">
-    <div *ngIf="serverInfo.server.server as server" class="server-info ion-padding-vertical">
-      <h3>Server Details</h3>
-      <p><strong>Machine Name:</strong> {{ server.host.name }}</p>
-      <p><strong>Snapserver Version:</strong> {{ server.snapserver.version || 'N/A' }}</p>
-      <p><strong>OS:</strong> {{ serverInfo.server.server.host.os || 'N/A' }} / {{ serverInfo.server.server.host.arch || 'N/A' }}</p>
-    </div>
-
-    <div *ngIf="serverInfo.server.streams as streams" class="streams-info ion-padding-vertical">
-      <h3>Streams</h3>
-      <ul>
-        <li *ngFor="let stream of streams">
-
-          ID: {{ stream.id }} | Status: {{ stream.status }} | Pause: {{ stream.properties.canPause}} | Play: {{
-          stream.properties.canPlay }} | Control: {{ stream.properties.canControl }}
-          <br>
-          <small>URI: {{ stream.uri.raw || 'N/A' }}</small>
-          <div *ngIf="stream.properties.metadata as meta">
-            <small>Title: {{ meta.title || 'N/A' }} - Artist: {{ meta.artist.join(', ') || 'N/A' }}</small>
-          </div>
-        </li>
-      </ul>
-    </div>
-  
-    <div class="groups-info ion-padding-vertical" *ngIf="serverInfo.server.groups as groups">
-      <h3>Client Groups</h3>
-      <div *ngFor="let group of groups" class="group-card">
-        <h4>
-          Group:
-          <input type="text" [value]="group.name || group.id" #groupNameInput
-            (blur)="onChangeGroupName(group.id, groupNameInput.value)"
-            (keyup.enter)="onChangeGroupName(group.id, groupNameInput.value); groupNameInput.blur()"
-            placeholder="Group Name" style="margin-left: 5px; font-weight: normal; font-size: 0.9em;">
-          (Stream: {{ group.stream_id }})
-          <span [class.muted]="group.muted"> {{ group.muted ? '[MUTED]' : '[UNMUTED]' }} </span>
-        </h4>
-        <ul *ngIf="group.clients.length > 0; else noClientsInGroup">
-          <ng-container>
-
-            <li *ngFor="let client of group.clients" class="client-card">
-              <strong>Client: {{ client.config.name || client.id }}</strong>
-              ({{ client.host.name || 'Unknown host' }})
-              <span [class.connected]="client.connected" [class.disconnected]="!client.connected">
-                {{ client.connected ? '[Connected]' : '[Disconnected]' }}
-              </span>
-              <div class="client-controls" *ngIf="client.config.volume">
-                Volume: {{ client.config.volume.percent }}%
-                <span [class.muted]="client.config.volume.muted">
-                  {{ client.config.volume.muted ? '[MUTED]' : '[UNMUTED]' }}
-                </span>
-                <br>
-                Set Volume:
-                <input type="range" min="0" max="100"
-                  [attr.aria-label]="'Volume for ' + (client.config.name || client.id)"
-                  [value]="client.config.volume.percent" (change)="onSetClientVolumePercent(client.id, $event)">
-                <button type="button" (click)="onToggleClientMute(client)">
-                  {{ client.config.volume.muted ? 'Unmute' : 'Mute' }} Client
-                </button>
-              </div>
-            </li>
-          </ng-container>
-        </ul>
-        <ng-template #noClientsInGroup>
-          <p>No clients in this group.</p>
-        </ng-template>
-      </div>
-    </div>
-
-   
-  </ng-container> -->
   <h3>JSON Server Response:</h3>
 
   <div *ngIf="(displayState |async) as state" class="key-value-container">
 
     <pre>{{ state.server| json }}</pre>
-    <!-- <h4>Streams</h4>
-    <pre>{{ streams | json }}</pre>
-    <h4>Groups</h4>
-    <pre>{{ groups | json }}</pre>
-    <h4>Clients</h4>
-    <pre>{{ serverInfo.server.clients | json }}</pre> -->
-
-     
+    
   </div>
 
   <ng-template #loadingOrError>

@@ -23,19 +23,19 @@ export class DashboardPage implements OnInit {
 
   today: Date = new Date();
 
-  public groups$: Observable<Group[]>;
-  public streams$: Observable<Stream[]>;
-  public serverDetails$: Observable<ServerDetail | undefined>;
+  // public groups$: Observable<Group[]>;
+  // public streams$: Observable<Stream[]>;
+  // public serverDetails$: Observable<ServerDetail | undefined>;
 
   constructor(public snapcastService: SnapcastService,
   ) {
-    this.groups$ = this.snapcastService.groups$;
-    this.streams$ = this.snapcastService.streams$;
-    this.serverDetails$ = this.snapcastService.serverDetails$;
+    // this.groups$ = this.snapcastService.groups$;
+    // this.streams$ = this.snapcastService.streams$;
+    // this.serverDetails$ = this.snapcastService.serverDetails$;
   }
 
   ngOnInit() {
-    this.displayState = this.snapcastService.displayState$
+    this.displayState = this.snapcastService.state$
 
 
   }

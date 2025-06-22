@@ -3,12 +3,14 @@ import { Component, OnInit, OnDestroy, OnChanges, SimpleChanges } from '@angular
 import { Observable, Subscription, tap, firstValueFrom } from 'rxjs'; // firstValueFrom hinzugefügt
 import { Group, Stream, ServerDetail, Client, SnapCastServerStatusResponse } from 'src/app/model/snapcast.model'; // Client importiert für Typisierung
 import { SnapcastService } from 'src/app/services/snapcast.service';
+import { Haptics, ImpactStyle, NotificationType } from '@capacitor/haptics';
+
 
 @Component({
   selector: 'app-player-toolbar',
   templateUrl: './player-toolbar.component.html',
   styleUrls: ['./player-toolbar.component.scss'],
-  standalone: false, 
+  standalone: false,
 })
 export class PlayerToolbarComponent implements OnInit, OnChanges, OnDestroy {
 
@@ -20,23 +22,17 @@ export class PlayerToolbarComponent implements OnInit, OnChanges, OnDestroy {
   constructor(
     public snapcastService: SnapcastService
   ) {
-    // The component subscribes to the main displayState$.
-    // The async pipe in the template will handle unwrapping it.
-    this.displayState$ = this.snapcastService.displayState$.pipe(
+
+    this.displayState$ = this.snapcastService.state$.pipe(
       tap(state => console.log('%cPlayerToolbarComponent: displayState$ received', 'color: orange; font-weight: bold;', new Date().toLocaleTimeString(), state))
     );
   }
 
   ngOnInit(): void {
-    // The service connection should ideally be initiated once at the application's root level (e.g., AppComponent).
-    // Calling it here is fine, but be aware that it will re-trigger on every component initialization.
+
     this.snapcastService.connect();
   }
 
-  /**
-   * This lifecycle hook is only triggered if the component has @Input() properties
-   * that receive new values. If there are no inputs, this method can be removed.
-   */
   ngOnChanges(changes: SimpleChanges): void {
     console.log('PlayerToolbarComponent: ngOnChanges triggered', changes);
   }
@@ -70,6 +66,7 @@ export class PlayerToolbarComponent implements OnInit, OnChanges, OnDestroy {
     // The service will optimistically update the `desiredState`, which makes the UI feel instant.
     // It then sends the RPC command to the server.
     const volumeUpdate$ = this.snapcastService.setClientVolumePercent(client.id, newVolume);
+    this.hapticsImpactLight();
 
     // Step 3: Subscribe to handle the result of the RPC call (especially errors).
     // This subscription is managed to prevent memory leaks.
@@ -94,5 +91,33 @@ export class PlayerToolbarComponent implements OnInit, OnChanges, OnDestroy {
    */
   ngOnDestroy(): void {
     this.subscriptions.unsubscribe();
+  }
+
+  async hapticsImpactHeavy() {
+    await Haptics.impact({ style: ImpactStyle.Heavy });
+  }
+  async hapticsImpactMedium() {
+    await Haptics.impact({ style: ImpactStyle.Medium });
+  }
+
+  async hapticsImpactLight() {
+    await Haptics.impact({ style: ImpactStyle.Light });
+  }
+
+  async  hapticsNotificationSuccess() {
+    await Haptics.notification({ type: NotificationType.Success });
+  }
+
+  async hapticsNotificationWarning() {
+    await Haptics.notification({ type: NotificationType.Warning });
+  }
+
+  async hapticsNotificationError() {
+    await Haptics.notification({ type: NotificationType.Error });
+  }
+
+  // vibraate and slection methods
+  async hapticsVibrate() {
+    await Haptics.vibrate();
   }
 }

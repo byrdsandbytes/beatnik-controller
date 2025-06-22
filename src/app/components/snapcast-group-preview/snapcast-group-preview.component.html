@@ -1,12 +1,12 @@
-<ion-card *ngIf="group" class="card ion-text-center" color="light" [routerLink]="['/tabs/devices', group.id]">
+<ion-card *ngIf="group" class="card ion-text-center" color="light" (click)="navToGroupDetails()">
   <div class="img-container">
     <img [src]="'assets/mock/JSE_small.png'" class="img" alt="Placeholder Image">
 
   </div>
   <ng-container *ngIf="activeStream && activeStream.properties.metadata">
-    
+
     <img [src]="activeStream.properties.metadata.artUrl" class="cover">
-    
+
     <ion-card-header>
       <ion-card-title *ngIf="activeStream">{{activeStream.properties.metadata.title}}</ion-card-title>
       <ion-card-subtitle>{{group.name? group.name:group.id}}</ion-card-subtitle>

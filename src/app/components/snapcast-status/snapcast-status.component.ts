@@ -22,7 +22,7 @@ export class SnapcastStatusComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    this.displayState = this.snapcastService.displayState$
+    this.displayState = this.snapcastService.state$
 
   }
 

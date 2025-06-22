@@ -1,4 +1,5 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnChanges, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 import { Group, Stream } from 'src/app/model/snapcast.model';
 
 @Component({
@@ -7,16 +8,22 @@ import { Group, Stream } from 'src/app/model/snapcast.model';
   styleUrls: ['./snapcast-group-preview.component.scss'],
   standalone: false
 })
-export class SnapcastGroupPreviewComponent  implements OnInit {
+export class SnapcastGroupPreviewComponent  implements OnInit, OnChanges {
 
   @Input() group?: Group;
   @Input() streams?: Stream[] | null;
 
   activeStream?: Stream;
 
-  constructor() { }
+  constructor(
+    private router: Router
+  ) { }
 
   ngOnInit() {
+    this.getActiveStream();
+  }
+
+  ngOnChanges() {
     this.getActiveStream();
   }
 
@@ -31,6 +38,16 @@ export class SnapcastGroupPreviewComponent  implements OnInit {
     }
     this.activeStream = this.getStreamById(this.group.stream_id);
     return this.activeStream;
+  }
+
+  navToGroupDetails(): void {
+    if (!this.group) {
+      console.error('SnapcastGroupPreviewComponent: No group available to navigate to details');
+      return;
+    }
+    // Navigate to the group details page using the group's ID
+    // Assuming you have a route set up for group details like '/group-details/:id'
+    this.router.navigate(['tabs/devices', this.group.id]);
   }
 
 }
