@@ -1,13 +1,54 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
-    <ion-title>devices</ion-title>
+    <ion-title>Devices</ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">devices</ion-title>
-    </ion-toolbar>
-  </ion-header>
+  <div class="container" *ngIf="serverState | async as state else noState">
+    <ion-header collapse="condense">
+      <ion-toolbar>
+        <ion-title size="large">Devices</ion-title>
+      </ion-toolbar>
+    </ion-header>
+    <ion-list>
+      <ion-list-header>
+        <ion-label>Device Groups</ion-label>
+      </ion-list-header>
+      <ion-item *ngFor="let group of state.server.groups" [routerLink]="['/tabs/devices', group.id]">
+        <ion-label>
+          <h2>{{ group.name || group.id }}</h2>
+          <p>Clients: {{ group.clients.length }}</p>
+        </ion-label>
+      </ion-item>
+
+      <ion-list-header>
+        <ion-label>Clients</ion-label>
+      </ion-list-header>
+     <ng-container *ngFor="let group of state.server.groups">
+        <ng-container *ngFor="let client of group.clients">
+          <ion-item [routerLink]="['/tabs/devices', client.id]">
+            <ion-label>
+              <h2>{{ client.id }}</h2>
+              <p>Group: {{ group.name || group.id }}</p>
+              <p>Volume: {{ client.config.volume.percent || 'N/A' }}%</p>
+              <p>Last Seen: {{ client.lastSeen.sec *1000 | date }}</p>
+              <p>Connected: {{ client.connected }}</p>
+
+            </ion-label>
+          </ion-item>
+        </ng-container>
+
+     </ng-container>
+    
+    </ion-list>
+  </div>
+  <ng-template #noState>
+    <ion-text class="ion-padding" color="medium">
+      No server state available.
+    </ion-text>
+  </ng-template>
+
+
+
 </ion-content>
