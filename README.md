@@ -1,11 +1,13 @@
 
 # Beatnik Controller
 
+![Beatnik Dashboard Screen](docs/images/iphone15_screen.webp)
+
 
 
 Beatnik Controller is a project built with Angular that demonstrates integration with the Snapcast media streaming server. This repository provides a sample implementation to manage and control audio streams.
 
-**NOTE:** This project is work in progess and not ment to be installed yet.
+**NOTE: This project is work in progess and not ment to be installed yet.**
 
 ## Table of Contents
 - [Prerequisites](#prerequisites)
@@ -27,7 +29,7 @@ Beatnik Controller is a project built with Angular that demonstrates integration
 - **Snapcast Server:** Install and configure the Snapcast media streaming server.
 Find the tutorial here: https://github.com/byrdsandbytes/beatnik-pi
 
-## Installation
+## Developper Installation
 
 1. **Clone the Repository:**
         ```
@@ -49,13 +51,4 @@ Find the tutorial here: https://github.com/byrdsandbytes/beatnik-pi
 ## Usage
 
 - **Configuration:** Configure your Snapcast settings in the project's environment files.
-- **Development:** Use Angular CLI commands to generate new components or services.
-## Contributing
-
-Contributions are welcome! Follow these steps:
-1. Fork the repository.
-2. Create a new feature branch.
-3. Commit your changes and open a pull request.
-
-Please adhere to the existing code style and include tests as necessary.
 
