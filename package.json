@@ -1,8 +1,8 @@
 {
-  "name": "angular-snapcast",
+  "name": "beatnik-controller",
   "version": "0.0.1",
-  "author": "Ionic Framework",
-  "homepage": "https://ionicframework.com/",
+  "author": "byrds & bytes gmbh",
+  "homepage": "https://beatnik.ch",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
