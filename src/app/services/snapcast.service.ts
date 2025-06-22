@@ -1,5 +1,3 @@
-// src/app/services/snapcast.service.ts
-
 import { Injectable, OnDestroy } from '@angular/core';
 import { webSocket, WebSocketSubject, WebSocketSubjectConfig } from 'rxjs/webSocket';
 import {
@@ -18,7 +16,7 @@ import {
   EMPTY,
   BehaviorSubject,
 } from 'rxjs';
-import { produce } from 'immer'; // REQUIRED: npm install immer
+import { produce } from 'immer'; 
 
 // --- Model Imports (ensure paths are correct) ---
 import {
@@ -181,7 +179,13 @@ export class SnapcastService implements OnDestroy {
           const groupMute = server.groups.find(g => g.id === gmParams.id);
           if (groupMute) groupMute.muted = gmParams.mute;
           break;
-        // ... Implement all other notification cases similarly ...
+        case 'Stream.OnProperties':
+          const streamProps = notification.params as StreamOnProperties;
+          const stream = server.streams.find(s => s.id === streamProps.id);
+          if (stream) {
+            stream.properties = { ...stream.properties, ...streamProps.properties };
+          }
+          break;
         default:
           console.warn(`SnapcastService: Unhandled notification method: ${notification.method}`);
           break;
@@ -248,6 +252,27 @@ export class SnapcastService implements OnDestroy {
       map((): void => void 0),
       catchError(err => {
         console.error(`SnapcastService: Failed to set mute for client ${clientId}`, err);
+        return throwError(() => err);
+      })
+    );
+  }
+
+  setGroupName(groupId: string, name: string): Observable<void> {
+    return this.rpc('Group.SetName', { id: groupId, name }).pipe(
+      map((): void => void 0),
+      catchError(err => {
+        console.error(`SnapcastService: Failed to set group name for group ${groupId}`, err);
+        return throwError(() => err);
+      })
+    );
+  }
+
+
+  setGroupStream(groupId: string, streamId: string): Observable<void> {
+    return this.rpc('Group.SetStream', { id: groupId, stream_id: streamId }).pipe(
+      map((): void => void 0),
+      catchError(err => {
+        console.error(`SnapcastService: Failed to set stream for group ${groupId}`, err);
         return throwError(() => err);
       })
     );
