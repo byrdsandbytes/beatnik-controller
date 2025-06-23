@@ -2,7 +2,6 @@ import { Component, OnInit } from '@angular/core';
 import { Observable } from 'rxjs';
 import { SnapcastWebsocketNotification } from 'src/app/model/snapcast-websocket-notification.model';
 import { SnapCastServerStatusResponse } from 'src/app/model/snapcast.model';
-import { SnapcastWebsocketNotificationService } from 'src/app/services/snapcast-websocket-notification.service';
 import { SnapcastService } from 'src/app/services/snapcast.service';
 
 @Component({
@@ -16,7 +15,6 @@ export class StreamsPage implements OnInit {
 
   constructor(
     private readonly snapcastService: SnapcastService,
-    private readonly snapcastWebsocketNotificationService: SnapcastWebsocketNotificationService
   ) { }
 
   ngOnInit() {
