@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  snapcastServerUrl: 'byrds-audiopi.local', // Update this to your Snapcast server URL
+  snapcastServerUrl: 'beatnik-server.local', // Update this to your Snapcast server URL
 };
