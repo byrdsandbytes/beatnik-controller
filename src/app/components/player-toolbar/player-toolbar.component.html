@@ -1,7 +1,7 @@
 <ion-toolbar class="play-toolbar" color="dark">
   <ng-container *ngIf="(displayState$|async) as state ">
     <ng-container *ngFor="let stream of state.server.streams">
-      <ion-item *ngIf="stream.status =='playing'" lines="none" color="dark">
+      <ion-item class="ion-padding-top" *ngIf="stream.status =='playing'" lines="none" color="dark">
         <ion-thumbnail slot="start">
           <img [src]="stream.properties.metadata.artUrl" alt="cover image">
         </ion-thumbnail>
@@ -25,20 +25,23 @@
           [stream]="stream" [groups]="state.server.groups "></app-snapcast-stream-volume-control>
       </ion-item> -->
       <ng-container *ngFor="let group of state.server.groups">
-        <ion-item *ngIf="group.stream_id === stream.id && stream.status=='playing'" lines="none" color="dark">
-          <ion-label>
-            <p>{{ group.name || group.id }}</p>
-            <p>Clients: {{ group.clients.length }}</p>
-            <ng-container *ngFor="let client of group.clients">
-              <ion-range *ngIf="client.config.volume" color="light" min="0" max="100" step="1" [(ngModel)]="client.config.volume.percent"
-                (ionInput)="changeVolumeForClient(client, $event)">
-                <ion-icon slot="start" size="small" name="volume-mute"></ion-icon>
-                <ion-icon slot="end" size="small" name="volume-high"></ion-icon>
-              </ion-range>
-            </ng-container>
+        <ng-container *ngIf="group.clients[0].connected">
+          <ion-item *ngIf="group.stream_id === stream.id && stream.status=='playing'" lines="none" color="dark">
+            <ion-label>
+              <p>{{ group.name || group.id }}</p>
+              <p>Clients: {{ group.clients.length }}</p>
+              <ng-container *ngFor="let client of group.clients">
+                <ion-range *ngIf="client.config.volume.percent" color="light" min="0" max="100" step="1"
+                  [(ngModel)]="client.config.volume.percent" (ionInput)="changeVolumeForClient(client, $event)">
+                  <ion-icon slot="start" size="small" name="volume-mute"></ion-icon>
+                  <ion-icon slot="end" size="small" name="volume-high"></ion-icon>
+                </ion-range>
+              </ng-container>
 
-          </ion-label>
-        </ion-item>
+            </ion-label>
+          </ion-item>
+        </ng-container>
+
       </ng-container>
     </ng-container>
   </ng-container>

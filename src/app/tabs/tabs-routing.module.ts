@@ -10,7 +10,16 @@ const routes: Routes = [
 
       {
         path: 'streams',
+        children: [
+          {
+            path: '',
         loadChildren: () => import('../pages/streams/streams.module').then(m => m.StreamsPageModule)
+          },
+          {
+            path: ':id',
+            loadChildren: () => import('../pages/streams/stream-details/stream-details.module').then(m => m.StreamDetailsPageModule)
+          }
+        ]
       },
 
       {
@@ -26,7 +35,7 @@ const routes: Routes = [
           },
           {
             path: ':id',
-            loadChildren: () => import('../pages/device-details/device-details.module').then(m => m.DeviceDetailsPageModule)
+            loadChildren: () => import('../pages/devices/device-details/device-details.module').then(m => m.DeviceDetailsPageModule)
           }
         ]
       },

@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Observable } from 'rxjs';
-import { SnapCastServerStatusResponse } from 'src/app/model/snapcast.model';
+import { SnapCastServerStatusResponse, Stream } from 'src/app/model/snapcast.model';
 import { SnapcastService } from 'src/app/services/snapcast.service';
 
 @Component({
@@ -14,7 +14,7 @@ export class DeviceDetailsPage implements OnInit {
 
   id?: string;
 
-  serverState?: Observable<SnapCastServerStatusResponse>
+  serverState?: Observable<SnapCastServerStatusResponse>;
 
   constructor(
     private avtivateRoute: ActivatedRoute,

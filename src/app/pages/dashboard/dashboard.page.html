@@ -26,8 +26,7 @@
       <div class="col">
 
         <ion-fab>
-          <ion-fab-button class="custom-fab-button" color="light" [routerLink]="'/server-status'"
-           >
+          <ion-fab-button class="custom-fab-button" color="light" [routerLink]="'/server-status'">
             <ion-icon name="wifi-outline"></ion-icon>
           </ion-fab-button>
         </ion-fab>
@@ -58,9 +57,19 @@
 
     <swiper *ngIf="(displayState|async) as state" (swiper)="onSwiper($event)" (slideChange)="onSlideChange($event)"
       [config]="swiperConfig">
-      <ng-template swiperSlide *ngFor="let group of state.server.groups; let i = index">
-        <app-snapcast-group-preview  [streams]="state.server.streams" [group]="group"></app-snapcast-group-preview>
-      </ng-template>
+      <ng-container *ngFor="let group of state.server.groups; let i = index">
+        <ng-template swiperSlide *ngIf="group.clients[0].connected">
+
+          <app-snapcast-group-preview [streams]="state.server.streams" [group]="group"></app-snapcast-group-preview>
+        </ng-template>
+
+      </ng-container>
+      <ng-container *ngFor="let group of state.server.groups; let i = index">
+        <ng-template swiperSlide *ngIf="group.clients[0].connected === false">
+          <app-snapcast-group-preview class="disconnected" [streams]="state.server.streams" [group]="group"></app-snapcast-group-preview>
+        </ng-template>
+
+      </ng-container>
     </swiper>
   </div>
   <div class="container">
@@ -78,7 +87,7 @@
   </div>
 
   <!-- <app-snapcast-status></app-snapcast-status> -->
-   <div class="page-padding-bottom">
+  <div class="page-padding-bottom">
   </div>
 
 </ion-content>
