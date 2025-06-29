@@ -20,7 +20,7 @@ const routes: Routes = [
   },
   {
     path: 'stream-details',
-    loadChildren: () => import('./pages/stream-details/stream-details.module').then( m => m.StreamDetailsPageModule)
+    loadChildren: () => import('./pages/streams/stream-details/stream-details.module').then( m => m.StreamDetailsPageModule)
   },
  
 ];

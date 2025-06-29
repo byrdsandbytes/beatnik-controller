@@ -50,4 +50,14 @@ export class SnapcastGroupPreviewComponent  implements OnInit, OnChanges {
     this.router.navigate(['tabs/devices', this.group.id]);
   }
 
+  checkClientOnlineState(client: any): string {
+    if (client.online) {
+      return 'online';
+    } else if (client.connecting) {
+      return 'connecting';
+    } else {
+      return 'offline';
+    }
+  }
+
 }

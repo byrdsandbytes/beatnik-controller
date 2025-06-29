@@ -6,7 +6,28 @@
   <ng-container *ngIf="activeStream && activeStream.properties.metadata">
 
     <img [src]="activeStream.properties.metadata.artUrl" class="cover">
+    <ng-conainer [ngSwitch]="activeStream.status">
+      <ng-container *ngSwitchCase="'playing'">
+        <ion-icon class="status-icon" name="play-circle"></ion-icon>
+      </ng-container>
+      <!-- <ng-container *ngSwitchCase="'idle'">
+        <ion-icon class="status-icon" name="pause-circle"></ion-icon>
+      </ng-container> -->
+      <ng-container *ngSwitchDefault>
+        <ion-icon class="status-icon" name="stop-circle"></ion-icon>
+      </ng-container>
 
+    </ng-conainer>
+    <ng-container *ngFor="let client of group.clients">
+      <ng-container [ngSwitch]="client.connected">
+        <ng-container *ngSwitchCase="true">
+          <ion-icon class="connection-icon" name="wifi"></ion-icon>
+        </ng-container>
+        <ng-container *ngSwitchDefault>
+          <ion-icon color="medium" class="connection-icon" name="wifi"></ion-icon>
+        </ng-container>
+      </ng-container>
+    </ng-container>
     <ion-card-header>
       <ion-card-title *ngIf="activeStream">{{activeStream.properties.metadata.title}}</ion-card-title>
       <ion-card-subtitle>{{group.name? group.name:group.id}}</ion-card-subtitle>
