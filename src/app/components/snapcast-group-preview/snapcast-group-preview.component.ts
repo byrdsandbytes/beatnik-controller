@@ -60,4 +60,12 @@ export class SnapcastGroupPreviewComponent  implements OnInit, OnChanges {
     }
   }
 
+  convertCoverDataBase64(coverData: string, extension: string): string {
+    if (!coverData) {
+      return '';
+    }
+    // Convert base64 data to a data URL
+    return `data:image/${extension};base64,${coverData}`;
+  }
+
 }
