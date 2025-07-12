@@ -31,7 +31,7 @@
               <p>{{ group.name || group.id }}</p>
               <p>Clients: {{ group.clients.length }}</p>
               <ng-container *ngFor="let client of group.clients">
-                <ion-range *ngIf="client.config.volume.percent" color="light" min="0" max="100" step="1"
+                <ion-range *ngIf="client.config.volume" color="light" min="0" max="100" step="1"
                   [(ngModel)]="client.config.volume.percent" (ionInput)="changeVolumeForClient(client, $event)">
                   <ion-icon slot="start" size="small" name="volume-mute"></ion-icon>
                   <ion-icon slot="end" size="small" name="volume-high"></ion-icon>
