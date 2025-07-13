@@ -19,6 +19,10 @@ export class PlayerToolbarComponent implements OnInit, OnChanges, OnDestroy {
 
   private subscriptions = new Subscription();
 
+  // Make sure it's this device that changes the volume. If multiple devices are connected, we want to avoid conflicts.
+  private knobMoveStart = false;
+  private knobMoveEnd = false;
+
   constructor(
     public snapcastService: SnapcastService
   ) {
@@ -43,6 +47,10 @@ export class PlayerToolbarComponent implements OnInit, OnChanges, OnDestroy {
    * @param event The event emitted from the range slider (e.g., ionChange).
    */
   changeVolumeForClient(client: Client, event: any): void {
+    if (!this.knobMoveStart) {
+      console.warn('PlayerToolbarComponent: changeVolumeForClient called without knobMoveStart. Ignoring event:', event);
+      return;
+    }
     // Step 1: Robustly extract the numerical value from the event.
     // Ionic's ion-range often uses `event.detail.value`.
     let newVolume: number;
@@ -104,7 +112,7 @@ export class PlayerToolbarComponent implements OnInit, OnChanges, OnDestroy {
     await Haptics.impact({ style: ImpactStyle.Light });
   }
 
-  async  hapticsNotificationSuccess() {
+  async hapticsNotificationSuccess() {
     await Haptics.notification({ type: NotificationType.Success });
   }
 
@@ -120,4 +128,28 @@ export class PlayerToolbarComponent implements OnInit, OnChanges, OnDestroy {
   async hapticsVibrate() {
     await Haptics.vibrate();
   }
+
+
+  convertCoverDataBase64(coverData: string, extension: string): string {
+    if (!coverData) {
+      return '';
+    }
+    // Convert base64 data to a data URL
+    return `data:image/${extension};base64,${coverData}`;
+  }
+
+  knobMoveStartEvent(event: any): void {
+    console.log('Knob move started:', event);
+    this.knobMoveStart = true;
+    this.knobMoveEnd = false;
+  }
+
+  knobMoveEndEvent(event: any): void {
+    console.log('Knob move ended:', event);
+    this.knobMoveEnd = true;
+    this.knobMoveStart = false;
+    // Optionally, you can add haptic feedback here
+  }
+
+
 }
