@@ -5,7 +5,7 @@
   </div>
   <ng-container *ngIf="activeStream && activeStream.properties.metadata">
 
-    <img [src]="activeStream.properties.metadata.artUrl" class="cover">
+    <img *ngIf="activeStream.properties.metadata.artData as artData" [src]="convertCoverDataBase64(artData.data, artData.extension)" class="cover">
     <ng-conainer [ngSwitch]="activeStream.status">
       <ng-container *ngSwitchCase="'playing'">
         <ion-icon class="status-icon" name="play-circle"></ion-icon>

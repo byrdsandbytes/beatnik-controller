@@ -10,7 +10,7 @@
     <ion-header collapse="condense">
       <span class="header-note">{{today | date:"EEEE, d.MMMM"}}</span>
       <ion-toolbar color="light" class="ion-margin-top">
-        <ion-title size="large">Idrimis Home</ion-title>
+        <ion-title size="large"><span *ngIf="userPreeferenceUsername as name">{{name ? name+"s": 'Your'}}</span> Home</ion-title>
 
         <!-- <ion-title size="large"><span>{{user.displayName}}s Zuhause</span></ion-title> -->
       </ion-toolbar>
@@ -26,7 +26,7 @@
       <div class="col">
 
         <ion-fab>
-          <ion-fab-button class="custom-fab-button" color="light" [routerLink]="'/server-status'">
+          <ion-fab-button class="custom-fab-button" color="light" [routerLink]="'/tabs/menu/server-status'">
             <ion-icon name="wifi-outline"></ion-icon>
           </ion-fab-button>
         </ion-fab>
@@ -42,52 +42,82 @@
     </div>
 
 
-    <ion-list-header>
-      <ion-label>Idrimis Devices</ion-label>
-      <ion-button size="small" fill="clear" (click)="openModal()">
-        <ion-icon slot="icon-only" name="add-circle-outline"></ion-icon>
-      </ion-button>
-    </ion-list-header>
+
   </div>
 
+  <ng-container *ngIf="(displayState|async) as state else noState">
+    <div class="container">
+      <ion-list-header>
+        <ion-label><span *ngIf="userPreeferenceUsername as name">{{name ? name+"s": 'Your'}}</span> Devices</ion-label>
+        <ion-button size="small" fill="clear" (click)="openModal()">
+          <ion-icon slot="icon-only" name="add-circle-outline"></ion-icon>
+        </ion-button>
+      </ion-list-header>
+    </div>
 
 
-  <div class="container-fluid">
+    <div class="container-fluid">
+      <swiper (swiper)="onSwiper($event)" (slideChange)="onSlideChange($event)" [config]="swiperConfig">
+        <ng-container *ngFor="let group of state.server.groups; let i = index">
+          <ng-template swiperSlide *ngIf="group.clients[0].connected">
+
+            <app-snapcast-group-preview [streams]="state.server.streams" [group]="group"></app-snapcast-group-preview>
+          </ng-template>
+
+        </ng-container>
+        <ng-container *ngFor="let group of state.server.groups; let i = index">
+          <ng-template swiperSlide *ngIf="group.clients[0].connected === false">
+            <app-snapcast-group-preview class="disconnected" [streams]="state.server.streams"
+              [group]="group"></app-snapcast-group-preview>
+          </ng-template>
+
+        </ng-container>
+      </swiper>
+    </div>
+    <div class="container">
 
 
-    <swiper *ngIf="(displayState|async) as state" (swiper)="onSwiper($event)" (slideChange)="onSlideChange($event)"
-      [config]="swiperConfig">
-      <ng-container *ngFor="let group of state.server.groups; let i = index">
-        <ng-template swiperSlide *ngIf="group.clients[0].connected">
-
-          <app-snapcast-group-preview [streams]="state.server.streams" [group]="group"></app-snapcast-group-preview>
+      <ion-list-header>
+        <ion-label><span *ngIf="userPreeferenceUsername as name">{{name ? name+"s": 'Your'}}</span> Streams</ion-label>
+      </ion-list-header>
+      <swiper (swiper)="onSwiper($event)" (slideChange)="onSlideChange($event)" [config]="swiperConfig">
+        <ng-template swiperSlide *ngFor="let stream of state.server.streams; let i = index">
+          <app-snapcast-stream-preview [stream]="stream"></app-snapcast-stream-preview>
         </ng-template>
-
-      </ng-container>
-      <ng-container *ngFor="let group of state.server.groups; let i = index">
-        <ng-template swiperSlide *ngIf="group.clients[0].connected === false">
-          <app-snapcast-group-preview class="disconnected" [streams]="state.server.streams" [group]="group"></app-snapcast-group-preview>
-        </ng-template>
-
-      </ng-container>
-    </swiper>
-  </div>
-  <div class="container">
-
-
-    <ion-list-header>
-      <ion-label>Idrimis Streams</ion-label>
-    </ion-list-header>
-    <swiper *ngIf="(displayState|async) as state" (swiper)="onSwiper($event)" (slideChange)="onSlideChange($event)"
-      [config]="swiperConfig">
-      <ng-template swiperSlide *ngFor="let stream of state.server.streams; let i = index">
-        <app-snapcast-stream-preview [stream]="stream"></app-snapcast-stream-preview>
-      </ng-template>
-    </swiper>
-  </div>
+      </swiper>
+    </div>
+  </ng-container>
 
   <!-- <app-snapcast-status></app-snapcast-status> -->
   <div class="page-padding-bottom">
   </div>
 
 </ion-content>
+
+<ng-template #noState>
+  <div class="no-state-container">
+    <div *ngIf="isLoading else noServer" class="ion-text-center">
+      <ion-spinner name="crescent" class="ion-padding"></ion-spinner>
+      <ion-card-header>
+        <ion-card-title>Loading...</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        Please wait while the server status is being loaded. Checking url: <b>{{userPreferenceServerUrl? userPreferenceServerUrl:environment.snapcastServerUrl}}</b>
+      </ion-card-content>
+    </div>
+    <ng-template #noServer>
+      <div class="ion-text-center">
+        <ion-card-header>
+          <ion-card-title>No Server Available</ion-card-title>
+        </ion-card-header>
+        <ion-card-content>
+          Please check your Beatnik Pi server connection. No Server found at <b>{{userPreferenceServerUrl? userPreferenceServerUrl:environment.snapcastServerUrl}}</b>
+          <br>
+          Wanna use a different server? Go to the <a routerLink="/tabs/menu/settings">Settings</a> page and change the Snapcast server URL.
+          <br>
+
+        </ion-card-content>
+      </div>
+    </ng-template>
+  </div>
+</ng-template>
