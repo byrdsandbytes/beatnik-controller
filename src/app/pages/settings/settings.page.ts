@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { UserPreferenceService } from '../../services/user-preference.service';
 import { Preferences } from '@capacitor/preferences';
 import { UserPreference } from '../../enum/user-preference.enum';
 
