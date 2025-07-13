@@ -38,7 +38,9 @@ import {
   ClientVolumeChange, GroupMuteChange, GroupNameChange, GroupStreamChange,
   ServerOnUpdate as ServerOnUpdateNotificationParams, StreamOnProperties, StreamOnUpdate, ClientOnConnect, ClientOnDisconnect
 } from '../model/snapcast-websocket-notification.model';
-import { environment } from 'src/environments/environment.prod';
+import { environment } from 'src/environments/environment';
+import { Preferences } from '@capacitor/preferences';
+import { UserPreference } from '../enum/user-preference.enum';
 
 // --- Type Definitions ---
 interface JsonRpcBaseRequest { jsonrpc: '2.0'; id: number; method: string; }
@@ -51,6 +53,8 @@ export class SnapcastService implements OnDestroy {
   private readonly DEFAULT_HOSTNAME = environment.snapcastServerUrl;
   private readonly DEFAULT_PORT = 1780;
   private readonly RECONNECT_INTERVAL_MS = 5000;
+
+  private USERPREFERENCE_HOSTNAME?: string;
 
   private ws$?: WebSocketSubject<SnapcastWebSocketMessage>;
   private rpcRequestId = 1;
@@ -69,7 +73,9 @@ export class SnapcastService implements OnDestroy {
   public readonly serverDetails$: Observable<ServerDetail | undefined>;
   public readonly isConnected$ = new BehaviorSubject<boolean>(false).asObservable();
 
-  constructor() {
+  constructor(
+    ) {
+    
     this.state$ = this.stateSubject$.asObservable().pipe(
       shareReplay({ bufferSize: 1, refCount: true })
     );
@@ -82,7 +88,15 @@ export class SnapcastService implements OnDestroy {
 
   // --- Core Connection and RPC Logic ---
 
-  connect(host: string = this.DEFAULT_HOSTNAME, port: number = this.DEFAULT_PORT): void {
+  async connect(host: string = this.DEFAULT_HOSTNAME, port: number = this.DEFAULT_PORT): Promise<void> {
+    // Load user preference for hostname if available
+    const url = await Preferences.get({ key: UserPreference.SERVER_URL });
+    // overwrite host if user did set a custom URL
+    if (url.value) {
+      this.USERPREFERENCE_HOSTNAME = url.value;
+      host = this.USERPREFERENCE_HOSTNAME;
+    }
+
     if (this.ws$ && !this.ws$.closed) return;
     this.disconnectInternals(false);
     const wsUrl = `ws://${host}:${port}/jsonrpc`;
