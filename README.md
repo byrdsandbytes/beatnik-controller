@@ -1,4 +1,3 @@
-
 # Beatnik Controller
 
 ![Beatnik Dashboard Screen](docs/images/iphone15_screen.webp)
@@ -29,24 +28,65 @@ Beatnik Controller is a project built with Angular that demonstrates integration
 - **Snapcast Server:** Install and configure the Snapcast media streaming server.
 Find the tutorial here: https://github.com/byrdsandbytes/beatnik-pi
 
-## Developper Installation
+## Full Workflow
 
-1. **Clone the Repository:**
-        ```
-        git clone https://github.com/byrdsandbytes/beatnik-controller.git
-        ```
+This section outlines the complete workflow for developing, building, and running the Beatnik Controller application.
 
-2. **Install Dependencies:**
-        ```
-        cd beatnik-controller
-        npm install
-        ```
+### 1. Local Development
 
-3. **Run the Application:**
-        ```
-        ng serve
-        ```
-        Open your browser at `http://localhost:4200`.
+This is the standard workflow for making changes to the application on your local machine.
+
+1.  **Clone the Repository:**
+    ```bash
+    git clone https://github.com/byrdsandbytes/beatnik-controller.git
+    cd beatnik-controller
+    ```
+
+2.  **Install Dependencies:**
+    ```bash
+    npm install
+    ```
+
+3.  **Run the Development Server:**
+    ```bash
+    ng serve
+    ```
+    This will start a local development server. Open your browser and navigate to `http://localhost:4200`. The app will automatically reload if you change any of the source files.
+
+4.  **Code Scaffolding:**
+    Use the `npm run generate:*` scripts in `package.json` to easily create new pages, components, or services. For example, to create a new service:
+    ```bash
+    npm run generate:service --name=my-new-service
+    ```
+
+### 2. Continuous Integration (CI) with GitHub Actions
+
+This project uses GitHub Actions to automate building and checking the code.
+
+-   **CI Workflow (`.github/workflows/ci.yml`):** On every push or pull request to the `master` branch, this workflow automatically:
+    1.  Checks out the code.
+    2.  Installs all necessary dependencies using `npm ci`.
+    3.  Builds the Angular application for production. This step also implicitly runs the linter to ensure code quality.
+
+-   **CodeQL Analysis (`.github/workflows/codeql.yml`):** This workflow runs on the same triggers and performs a deep security scan of the codebase to find potential vulnerabilities.
+
+This automated process ensures that code merged into the `master` branch is always in a buildable and secure state.
+
+### 3. Running with Docker
+
+You can easily run the application in a containerized environment using Docker and Docker Compose.
+
+1.  **Build and Run the Docker Container:**
+    From the root of the project, run the following command:
+    ```bash
+    docker-compose up
+    ```
+    This command reads the `docker-compose.yml` file, builds the Docker image as defined in the `Dockerfile`, and starts the container.
+
+2.  **Access the Application:**
+    Once the container is running, open your browser and navigate to `http://localhost:8181`.
+
+The `Dockerfile` is optimized for production and uses a multi-stage build. It first builds the Angular application and then serves the static output files from a lightweight Nginx web server, resulting in a small and efficient final image.
 
 ## Usage
 
