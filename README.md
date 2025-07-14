@@ -110,7 +110,7 @@ sudo reboot
 1.  **Build and Run the Docker Container:**
     From the root of the project, run the following command:
     ```bash
-    docker-compose up
+    docker compose up -d
     ```
     This command reads the `docker-compose.yml` file, builds the Docker image as defined in the `Dockerfile`, and starts the container.
 
