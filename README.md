@@ -21,6 +21,7 @@ To run Beatnik Controller, you will need:
 ## Installation & Usage
 
 Getting started with Beatnik Controller is simple with Docker.
+If you have trouble setting up docker compose check our guide: [docs/DOCKER_INSTALLATION.md](DOCKER_INSTALLATION.md)
 
 ### 1. Get the Code
 
