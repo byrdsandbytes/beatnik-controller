@@ -41,6 +41,7 @@ import {
 import { environment } from 'src/environments/environment';
 import { Preferences } from '@capacitor/preferences';
 import { UserPreference } from '../enum/user-preference.enum';
+import { HttpClient } from '@angular/common/http';
 
 // --- Type Definitions ---
 interface JsonRpcBaseRequest { jsonrpc: '2.0'; id: number; method: string; }
@@ -74,6 +75,7 @@ export class SnapcastService implements OnDestroy {
   public readonly isConnected$ = new BehaviorSubject<boolean>(false).asObservable();
 
   constructor(
+    private http: HttpClient
   ) {
 
     this.state$ = this.stateSubject$.asObservable().pipe(
@@ -384,6 +386,19 @@ export class SnapcastService implements OnDestroy {
   // --- Data Access Helpers ---
   public getClient(clientId: string): Observable<Client | undefined> {
     return this.state$.pipe(map(state => state?.server?.groups.flatMap(g => g.clients).find(c => c.id === clientId)));
+  }
+
+  public mockServerState(): void {
+   const url = "assets/mock/json/server-state.json"
+     this.http.get<SnapCastServerStatusResponse>(url).subscribe({
+      next: (data) => {
+        console.log('Mock server state loaded:', data);
+        this.stateSubject$.next(data);
+      },
+      error: (err) => {
+        console.error('Failed to load mock server state:', err);
+      }
+    });
   }
 
   //  TODO: ... other get methods ...

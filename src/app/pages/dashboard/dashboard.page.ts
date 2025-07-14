@@ -192,6 +192,12 @@ export class DashboardPage implements OnInit {
 
   }
 
+  enableDemoMode(): void {
+    console.log('Enabling demo mode...');
+    this.snapcastService.mockServerState()
+    this.isLoading = false;
+  }
+
  
 
 
