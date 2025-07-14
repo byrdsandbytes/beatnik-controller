@@ -10,4 +10,45 @@
       <ion-title size="large">client-details</ion-title>
     </ion-toolbar>
   </ion-header>
+
+  <ion-list *ngIf="serverState | async as state">
+    <ion-item>
+      <ion-label>
+        <h2>Client ID: {{ id }}</h2>
+      </ion-label>
+    </ion-item>
+    <ion-item >
+      <ion-input type="text" placeholder="Enter client name" [(ngModel)]="client.config.name" (ngModelChange)="setClientName()"></ion-input>
+    </ion-item>
+
+    <ng-container *ngIf="state.server.groups">
+      <ng-container *ngFor="let group of state.server.groups">
+        <ng-container *ngFor="let client of group.clients">
+          <ion-item *ngIf="client.id === id">
+            <ion-label>
+              <h2>{{ client.id }}</h2>
+              <p>Group: {{ group.name || group.id }}</p>
+              <p>Volume: {{ client.config.volume.percent || 'N/A' }}%</p>
+              <p>Last Seen: {{ client.lastSeen.sec * 1000 | date }}</p>
+              <p>Connected: {{ client.connected }}</p>
+            </ion-label>
+          </ion-item>
+        </ng-container>
+      </ng-container>
+    </ng-container>
+  </ion-list>
+
+  <ion-accordion-group *ngIf="client">
+    <ion-accordion value="{{ client.id }}">
+      <ion-item slot="header">
+        <ion-label>
+          <h2>{{ client.id }}</h2>
+          <p>{{ client.connected}}</p>
+        </ion-label>
+      </ion-item>
+      <ion-item slot="content" lines="none" color="dark">
+        <pre>{{ client| json }}</pre>
+      </ion-item>
+    </ion-accordion>
+  </ion-accordion-group>
 </ion-content>
