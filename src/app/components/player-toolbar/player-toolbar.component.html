@@ -1,7 +1,7 @@
 <ion-toolbar class="play-toolbar" color="dark">
   <ng-container *ngIf="(displayState$|async) as state ">
     <ng-container *ngFor="let stream of state.server.streams">
-      <ion-item class="ion-padding-top" *ngIf="stream.status =='playing'" lines="none" color="dark">
+      <ion-item *ngIf="stream.properties.metadata" class="ion-padding-top"  lines="none" color="dark">
         <ion-thumbnail slot="start">
           <img *ngIf="stream.properties.metadata.artData as artData" [src]="convertCoverDataBase64(artData.data, artData.extension)" alt="cover image">
         </ion-thumbnail>
@@ -32,9 +32,7 @@
               <p>Clients: {{ group.clients.length }}</p>
               <ng-container *ngFor="let client of group.clients">
                 <ion-range *ngIf="client.config.volume" color="light" min="0" max="100" step="1"
-                  [(ngModel)]="client.config.volume.percent" (ionKnobMoveStart)="knobMoveStartEvent($event)" (ionKnobMoveEnd)="knobMoveEndEvent($event)" (ionInput)="changeVolumeForClient(client, $event)">
-                                    <!-- [(ngModel)]="client.config.volume.percent" (ionKnobMoveStart)="knobMoveStartEvent($event)" (ionInput)="changeVolumeForClient(client, $event)"> -->
-
+                  [ngModel]="client.config.volume.percent" (ionKnobMoveStart)="knobMoveStartEvent($event)" (ionKnobMoveEnd)="knobMoveEndEvent($event)" (ionInput)="changeVolumeForClient(client, $event)">
                   <ion-icon slot="start" size="small" name="volume-mute"></ion-icon>
                   <ion-icon slot="end" size="small" name="volume-high"></ion-icon>
                 </ion-range>
