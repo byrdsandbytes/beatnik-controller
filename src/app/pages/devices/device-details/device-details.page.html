@@ -41,7 +41,7 @@
             <ion-select slot="end" interface="action-sheet" [(ngModel)]="group.clients" multiple="true"
               placeholder="Select Clients">
               <ion-select-option *ngFor="let client of group.clients" [value]="client">
-                {{ client.id }} 
+                {{ client.config.name || client.id }} 
               </ion-select-option>
             </ion-select>
           </ion-item>

@@ -368,6 +368,16 @@ export class SnapcastService implements OnDestroy {
 
   }
 
+  setClientName(clientId: string, name: string): Observable<void> {
+    return this.rpc('Client.SetName', { id: clientId, name }).pipe(
+      map((): void => void 0),
+      catchError(err => {
+        console.error(`SnapcastService: Failed to set name for client ${clientId}`, err);
+        return throwError(() => err);
+      })
+    );
+  }
+
   // TODO  ... Implement other action methods like.
   // They just need to call `this.rpc` with the correct parameters.
 
@@ -376,7 +386,7 @@ export class SnapcastService implements OnDestroy {
     return this.state$.pipe(map(state => state?.server?.groups.flatMap(g => g.clients).find(c => c.id === clientId)));
   }
 
-  //  TODO: ... other get... methods ...
+  //  TODO: ... other get methods ...
 
 
 
