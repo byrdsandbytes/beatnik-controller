@@ -24,7 +24,16 @@ const routes: Routes = [
 
       {
         path: 'dashboard',
+        children: [
+          {
+            path: '',
         loadChildren: () => import('../pages/dashboard/dashboard.module').then(m => m.DashboardPageModule)
+          },
+          {
+            path: 'devices/:id',
+            loadChildren: () => import('../pages/devices/device-details/device-details.module').then(m => m.DeviceDetailsPageModule)
+          }
+        ]
       },
       {
         path: 'devices',

@@ -47,7 +47,7 @@ export class SnapcastGroupPreviewComponent  implements OnInit, OnChanges {
     }
     // Navigate to the group details page using the group's ID
     // Assuming you have a route set up for group details like '/group-details/:id'
-    this.router.navigate(['tabs/devices', this.group.id]);
+    this.router.navigate(['tabs/dashboard/devices', this.group.id]);
   }
 
   checkClientOnlineState(client: any): string {
