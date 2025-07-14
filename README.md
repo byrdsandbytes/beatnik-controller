@@ -2,124 +2,61 @@
 
 ![Beatnik Dashboard Screen](docs/images/iphone15_screen.webp)
 
+Beatnik Controller is a web-based remote control for your [Snapcast](https://github.com/badaix/snapcast) multi-room audio server. It allows you to easily manage and control audio streams from any device with a web browser. The application can also be compiled for Android and iOS.
 
+## Features
 
-Beatnik Controller is a project built with Angular that demonstrates integration with the Snapcast media streaming server. This repository provides a sample implementation to manage and control audio streams.
-
-**NOTE: This project is work in progess and not ment to be installed yet.**
-
-## Table of Contents
-- [Prerequisites](#prerequisites)
-- [Installation](#installation)
-- [Usage](#usage)
-- [Contributing](#contributing)
-- [License](#license)
-
+-   Control volume for all connected clients.
+-   Manage client groups.
+-   View what's currently playing on each stream.
+-   Simple and intuitive user interface.
 
 ## Prerequisites
-- **Node.js:** For better Node.js version management, we recommend using nvm. First, install nvm by following the instructions on [nvm-sh/nvm](https://github.com/nvm-sh/nvm). Then, install the latest Node.js version with:
-    ```bash
-    nvm install node
-    ```
-- **Angular CLI:** Install Angular CLI globally using:
-    ```bash
-    npm install -g @angular/cli
-    ```
-- **Snapcast Server:** Install and configure the Snapcast media streaming server.
-Find the tutorial here: https://github.com/byrdsandbytes/beatnik-pi
 
-## Full Workflow
+To run Beatnik Controller, you will need:
 
-This section outlines the complete workflow for developing, building, and running the Beatnik Controller application.
+-   A running Snapcast server on your network. This application is compatible with the standard [Snapcast server](https://github.com/badaix/snapcast). For a detailed installation guide for a Raspberry Pi based setup, we recommend [beatnik-pi](https://github.com/byrdsandbytes/beatnik-pi).
+-   [Docker](https://www.docker.com/get-started) and [Docker Compose](https://docs.docker.com/compose/install/).
 
-### 1. Local Development
+## Installation & Usage
 
-This is the standard workflow for making changes to the application on your local machine.
+Getting started with Beatnik Controller is simple with Docker.
 
-1.  **Clone the Repository:**
-    ```bash
-    git clone https://github.com/byrdsandbytes/beatnik-controller.git
-    cd beatnik-controller
-    ```
+### 1. Get the Code
 
-2.  **Install Dependencies:**
-    ```bash
-    npm install
-    ```
+Clone this repository to your local machine:
 
-3.  **Run the Development Server:**
-    ```bash
-    ng serve
-    ```
-    This will start a local development server. Open your browser and navigate to `http://localhost:4200`. The app will automatically reload if you change any of the source files.
-
-4.  **Code Scaffolding:**
-    Use the `npm run generate:*` scripts in `package.json` to easily create new pages, components, or services. For example, to create a new service:
-    ```bash
-    npm run generate:service --name=my-new-service
-    ```
-
-### 2. Continuous Integration (CI) with GitHub Actions
-
-This project uses GitHub Actions to automate building and checking the code.
-
--   **CI Workflow (`.github/workflows/ci.yml`):** On every push or pull request to the `master` branch, this workflow automatically:
-    1.  Checks out the code.
-    2.  Installs all necessary dependencies using `npm ci`.
-    3.  Builds the Angular application for production. This step also implicitly runs the linter to ensure code quality.
-
--   **CodeQL Analysis (`.github/workflows/codeql.yml`):** This workflow runs on the same triggers and performs a deep security scan of the codebase to find potential vulnerabilities.
-
-This automated process ensures that code merged into the `master` branch is always in a buildable and secure state.
-
-### 3. Running with Docker
-
-You can easily run the application in a containerized environment using Docker and Docker Compose.
-
-## Prequisites
-
-**Install Docker & docker compose**
-
-Perform update and upgrade
-```
-sudo apt update && sudo apt upgrade -y
-``````
-Install Docker via Script
-```
-curl -fsSL test.docker.com -o get-docker.sh && sh get-docker.sh
+```bash
+git clone https://github.com/byrdsandbytes/beatnik-controller.git
+cd beatnik-controller
 ```
 
-Add current user to the Docker Group
+### 2. Configure the Snapcast Server (Optional)
+
+By default, the application will try to connect to a Snapcast server at `beatnik-server.local`. If your server is at a different address, you can configure it in two ways:
+
+-   **During Setup (Optional):** Edit `src/environments/environment.prod.ts` and change `snapcastServerUrl` to your server's hostname or IP address.
+-   **In-App Settings:** Once the application is running, you can go to the settings page and change the Snapcast server address directly in the user interface.
+
+### 3. Run with Docker
+
+Once configured, you can build and run the application using Docker Compose:
+
+```bash
+docker compose up -d
 ```
-sudo usermod -aG docker ${USER}
-```
 
-Check if it's running:
-```
-groups ${USER}
-```
+This will build the Docker image and start the application in the background.
 
-Check docker user
-Reboot the Raspberry Pi to let the changes take effect
-```
-sudo reboot
-```
+### 4. Access the Application
 
-## Installation
+Open your web browser and navigate to `http://localhost:8181` or `http://your-hostname.local:8181`. You should now see the Beatnik Controller interface.
 
-1.  **Build and Run the Docker Container:**
-    From the root of the project, run the following command:
-    ```bash
-    docker compose up -d
-    ```
-    This command reads the `docker-compose.yml` file, builds the Docker image as defined in the `Dockerfile`, and starts the container.
+## Contributing
 
-2.  **Access the Application:**
-    Once the container is running, open your browser and navigate to `http://localhost:8181`.
+If you are a developer and want to contribute to the project, build mobile apps, or run the application in a development environment, please see our [CONTRIBUTING.md](CONTRIBUTING.md) file for more information.
 
-The `Dockerfile` is optimized for production and uses a multi-stage build. It first builds the Angular application and then serves the static output files from a lightweight Nginx web server, resulting in a small and efficient final image.
+## License
 
-## Usage
-
-- **Configuration:** Configure your Snapcast settings in the project's environment files.
+This project is licensed under the AGPL v3 License - see the [LICENSE](LICENSE) file for details.
 
