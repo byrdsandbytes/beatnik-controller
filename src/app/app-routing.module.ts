@@ -19,6 +19,10 @@ const routes: Routes = [
     loadChildren: () => import('./pages/server-status/server-status.module').then( m => m.ServerStatusPageModule)
   },
   // {
+  //   path: 'client-details',
+  //   loadChildren: () => import('./pages/client-details/client-details.module').then( m => m.ClientDetailsPageModule)
+  // },
+  // {
   //   path: 'settings',
   //   loadChildren: () => import('./pages/settings/settings.module').then( m => m.SettingsPageModule)
   // },
