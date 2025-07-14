@@ -76,6 +76,37 @@ This automated process ensures that code merged into the `master` branch is alwa
 
 You can easily run the application in a containerized environment using Docker and Docker Compose.
 
+## Prequisites
+
+**Install Docker & docker compose**
+
+Perform update and upgrade
+```
+sudo apt update && sudo apt upgrade -y
+``````
+Install Docker via Script
+```
+curl -fsSL test.docker.com -o get-docker.sh && sh get-docker.sh
+```
+
+Add current user to the Docker Group
+```
+sudo usermod -aG docker ${USER}
+```
+
+Check if it's running:
+```
+groups ${USER}
+```
+
+Check docker user
+Reboot the Raspberry Pi to let the changes take effect
+```
+sudo reboot
+```
+
+## Installation
+
 1.  **Build and Run the Docker Container:**
     From the root of the project, run the following command:
     ```bash
