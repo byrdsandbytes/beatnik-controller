@@ -12,7 +12,7 @@
 
     <div *ngIf="stream.properties.metadata as meta"
       class="d-flex flex-column align-items-center justify-content-center ion-text-center">
-      <img *ngIf="meta.album" class="cover-image" [src]="meta.artUrl" alt="Album Art" />
+      <img *ngIf="meta.artData as artData" class="cover-image" [src]="convertCoverDataBase64(artData.data, artData.extension)" alt="Album Art" />
 
 
       <p>{{ meta.album }}<br>

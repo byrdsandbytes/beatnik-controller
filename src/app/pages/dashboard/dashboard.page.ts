@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ModalController } from '@ionic/angular';
-import { first, firstValueFrom, Observable } from 'rxjs';
-import { Group, ServerDetail, SnapCastServerStatusResponse, Stream } from 'src/app/model/snapcast.model';
+import { first, firstValueFrom, interval, Observable } from 'rxjs';
+import { Client, Group, ServerDetail, SnapCastServerStatusResponse, Stream } from 'src/app/model/snapcast.model';
 import { SnapcastService } from 'src/app/services/snapcast.service';
 import { SwiperOptions } from 'swiper';
 import { environment } from 'src/environments/environment';
@@ -33,9 +33,16 @@ export class DashboardPage implements OnInit {
   userPreferenceServerUrl?: string;
   userPreeferenceUsername?: string;
 
-  // public groups$: Observable<Group[]>;
-  // public streams$: Observable<Stream[]>;
-  // public serverDetails$: Observable<ServerDetail | undefined>;
+  hasAnyPlayingClients = false;
+  hasPlayingStreams = false;
+  numberOfPlayingClients = 0;
+  numberOfPlayingStreams = 0;
+  totalClients = 0;
+  totalStreams = 0;
+  lastServerResponseTime?: Date;
+  lastServerResponseDeltaInSeconds?: number;
+
+
 
   constructor(
     private snapcastService: SnapcastService,
@@ -48,7 +55,7 @@ export class DashboardPage implements OnInit {
   async ngOnInit() {
     // this.snapcastService.connect();
 
-     this.userPreferenceServerUrl = await this.getUserPreferenceServerUrl();
+    this.userPreferenceServerUrl = await this.getUserPreferenceServerUrl();
     this.userPreeferenceUsername = await this.getUserName();
 
     this.displayState = this.snapcastService.state$;
@@ -61,6 +68,20 @@ export class DashboardPage implements OnInit {
       }
     });
     this.noServerTimeout();
+
+    this.displayState.subscribe(state => {
+      if (state) {
+        this.lastServerResponseTime = new Date();
+        this.checkForPlayingStreamsAndClients();
+      } else {
+        console.warn('SnapcastStateIndicatorService: No state available to check for playing streams and clients.');
+      }
+    });
+
+    interval(1000).subscribe(() => {
+      const today = new Date();
+      this.lastServerResponseDeltaInSeconds = Math.floor((today.getTime() - (this.lastServerResponseTime?.getTime() || today.getTime())) / 1000);
+    });
 
   }
 
@@ -137,6 +158,41 @@ export class DashboardPage implements OnInit {
       return undefined;
     }
   }
+
+  async checkForPlayingStreamsAndClients(): Promise<void> {
+    console.log('PlayerToolbarComponent: Checking for playing streams and clients...');
+    const state = await firstValueFrom(this.displayState);
+    if (!state) {
+      console.warn('PlayerToolbarComponent: No state available to check for playing streams and clients.');
+      return;
+    }
+    // Check if there are any playing streams
+    this.hasPlayingStreams = state.server.streams.some(stream => stream.status === 'playing');
+    console.log('PlayerToolbarComponent: hasPlayingStreams:', this.hasPlayingStreams);
+    // Check if there are any playing clients, i.e., clients that have a playing stream asigned
+    this.hasAnyPlayingClients = state.server.groups.some((group: Group) =>
+      group.clients.some((client: Client) => {
+        const clientStream = state.server.streams.find(stream => stream.id === group.stream_id);
+        return client.connected && clientStream && clientStream.status === 'playing';
+      })
+    );
+    console.log('PlayerToolbarComponent: hasAnyPlayingClients:', this.hasAnyPlayingClients);
+    this.numberOfPlayingClients = state.server.groups.reduce((count, group) => {
+      return count + group.clients.filter(client => client.connected && state.server.streams.some(stream => stream.id === group.stream_id && stream.status === 'playing')).length;
+    }, 0);
+    console.log('PlayerToolbarComponent: numberOfPlayingClients:', this.numberOfPlayingClients);
+    this.numberOfPlayingStreams = state.server.streams.filter(stream => stream.status === 'playing').length;
+    console.log('PlayerToolbarComponent: numberOfPlayingStreams:', this.numberOfPlayingStreams);
+
+    this.totalClients = state.server.groups.reduce((total, group) => total + group.clients.length, 0);
+    console.log('PlayerToolbarComponent: totalClients:', this.totalClients);
+
+    this.totalStreams = state.server.streams.length;
+    console.log('PlayerToolbarComponent: totalStreams:', this.totalStreams);
+
+  }
+
+ 
 
 
 

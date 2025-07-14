@@ -10,33 +10,32 @@
     <ion-header collapse="condense">
       <span class="header-note">{{today | date:"EEEE, d.MMMM"}}</span>
       <ion-toolbar color="light" class="ion-margin-top">
-        <ion-title size="large"><span *ngIf="userPreeferenceUsername as name">{{name ? name+"s": 'Your'}}</span> Home</ion-title>
+        <ion-title size="large"><span *ngIf="userPreeferenceUsername as name">{{name ? name+"s": 'Your'}}</span>
+          Home</ion-title>
 
         <!-- <ion-title size="large"><span>{{user.displayName}}s Zuhause</span></ion-title> -->
       </ion-toolbar>
     </ion-header>
     <div class="fab-row row">
-      <div class="col">
-        <ion-fab>
-          <ion-fab-button class="custom-fab-button" color="light" (click)="openModal()">
-            <ion-icon name="volume-high-outline"></ion-icon>
-          </ion-fab-button>
-        </ion-fab>
-      </div>
-      <div class="col">
+      <div class="col ">
+        <ion-fab-button class="custom-fab-button" color="light" (click)="openModal()">
+          <ion-icon [name]="numberOfPlayingClients>0?'volume-high':'volume-high-outline'"></ion-icon>
+        </ion-fab-button>
+        <div class="fab-label">{{numberOfPlayingClients +"/"+ totalClients}} Client(s) playing</div>
 
-        <ion-fab>
-          <ion-fab-button class="custom-fab-button" color="light" [routerLink]="'/tabs/menu/server-status'">
-            <ion-icon name="wifi-outline"></ion-icon>
-          </ion-fab-button>
-        </ion-fab>
       </div>
       <div class="col">
-        <ion-fab>
-          <ion-fab-button class="custom-fab-button" color="light" (click)="getPlayerStatus()">
-            <ion-icon name="musical-note-outline"></ion-icon>
-          </ion-fab-button>
-        </ion-fab>
+        <ion-fab-button class="custom-fab-button" color="light" [routerLink]="'/tabs/menu/server-status'">
+          <ion-icon [name]="lastServerResponseDeltaInSeconds < 2400?'wifi':'wifi-outline'"></ion-icon>
+        </ion-fab-button>
+        <div class="fab-label">{{lastServerResponseDeltaInSeconds < 240?'Online':'Offline'}}: {{lastServerResponseTime | date: 'dd.MM.yy HH:mm'}}</div>
+      </div>
+      <div class="col">
+        <ion-fab-button class="custom-fab-button" color="light" (click)="getPlayerStatus()">
+          <ion-icon [name]="numberOfPlayingStreams>0?'musical-note':'musical-note-outline'"></ion-icon>
+        </ion-fab-button>
+        <div class="fab-label">{{numberOfPlayingStreams +"/"+ totalStreams}} Stream(s) playing</div>
+
       </div>
 
     </div>
@@ -102,7 +101,8 @@
         <ion-card-title>Loading...</ion-card-title>
       </ion-card-header>
       <ion-card-content>
-        Please wait while the server status is being loaded. Checking url: <b>{{userPreferenceServerUrl? userPreferenceServerUrl:environment.snapcastServerUrl}}</b>
+        Please wait while the server status is being loaded. Checking url: <b>{{userPreferenceServerUrl?
+          userPreferenceServerUrl:environment.snapcastServerUrl}}</b>
       </ion-card-content>
     </div>
     <ng-template #noServer>
@@ -111,9 +111,11 @@
           <ion-card-title>No Server Available</ion-card-title>
         </ion-card-header>
         <ion-card-content>
-          Please check your Beatnik Pi server connection. No Server found at <b>{{userPreferenceServerUrl? userPreferenceServerUrl:environment.snapcastServerUrl}}</b>
+          Please check your Beatnik Pi server connection. No Server found at <b>{{userPreferenceServerUrl?
+            userPreferenceServerUrl:environment.snapcastServerUrl}}</b>
           <br>
-          Wanna use a different server? Go to the <a routerLink="/tabs/menu/settings">Settings</a> page and change the Snapcast server URL.
+          Wanna use a different server? Go to the <a routerLink="/tabs/menu/settings">Settings</a> page and change the
+          Snapcast server URL.
           <br>
 
         </ion-card-content>

@@ -14,8 +14,13 @@ export class SnapcastStreamPreviewComponent  implements OnInit {
 
   ngOnInit() {}
 
-  convertBase64ToImage(base64String: string, format: string): string {
-    return `data:image/${format};base64,${base64String}`;
+  
+  convertCoverDataBase64(coverData: string, extension: string): string {
+    if (!coverData) {
+      return '';
+    }
+    // Convert base64 data to a data URL
+    return `data:image/${extension};base64,${coverData}`;
   }
 
 }

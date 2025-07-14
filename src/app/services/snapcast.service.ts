@@ -16,7 +16,7 @@ import {
   EMPTY,
   BehaviorSubject,
 } from 'rxjs';
-import { produce } from 'immer'; 
+import { produce } from 'immer';
 
 // --- Model Imports (ensure paths are correct) ---
 import {
@@ -74,8 +74,8 @@ export class SnapcastService implements OnDestroy {
   public readonly isConnected$ = new BehaviorSubject<boolean>(false).asObservable();
 
   constructor(
-    ) {
-    
+  ) {
+
     this.state$ = this.stateSubject$.asObservable().pipe(
       shareReplay({ bufferSize: 1, refCount: true })
     );
@@ -180,25 +180,96 @@ export class SnapcastService implements OnDestroy {
       const server = draft.server;
       if (!server) return;
 
-      // This is the logic from your old SnapcastWebsocketNotificationService, now self-contained.
+      // This is the logic from the old SnapcastWebsocketNotificationService,
       switch (notification.method) {
         case 'Client.OnVolumeChanged':
           const volParams = notification.params as ClientVolumeChange;
           const clientVol = server.groups.flatMap(g => g.clients).find(c => c.id === volParams.id);
           if (clientVol) clientVol.config.volume = volParams.volume;
           break;
+        case 'Client.OnConnect':
+          const connectParams = notification.params as ClientOnConnect;
+          const newClient = connectParams.client;
+          console.log(`SnapcastService: Client connected: ${newClient.id}`);
+          break;
+
+        case 'Client.OnDisconnect':
+          const disconnectParams = notification.params as ClientOnDisconnect;
+          const disconnectedClient = server.groups.flatMap(g => g.clients).find(c => c.id === disconnectParams.id);
+          if (disconnectedClient) {
+            console.log(`SnapcastService: Client disconnected: ${disconnectedClient.id}`);
+            disconnectedClient.connected = false; // Mark as disconnected
+          } else {
+            console.warn(`SnapcastService: Client disconnected but not found in current state: ${disconnectParams.id}`);
+          }
+          break;
+
+
         case 'Group.OnMute':
           const gmParams = notification.params as GroupMuteChange;
           const groupMute = server.groups.find(g => g.id === gmParams.id);
           if (groupMute) groupMute.muted = gmParams.mute;
           break;
+
+        case 'Group.OnStreamChanged':
+          const gsParams = notification.params as GroupStreamChange;
+          const groupStream = server.groups.find(g => g.id === gsParams.id);
+          if (groupStream) {
+            groupStream.stream_id = gsParams.stream_id;
+            const stream = server.streams.find(s => s.id === gsParams.stream_id);
+            if (stream) {
+              console.log(`SnapcastService: Group ${groupStream.id} changed stream to ${stream.id}`);
+            } else {
+              console.warn(`SnapcastService: Stream ${gsParams.stream_id} not found for group ${groupStream.id}`);
+            }
+          } else {
+            console.warn(`SnapcastService: Group ${gsParams.id} not found for stream change.`);
+          }
+          break;
+
+        case 'Group.OnNameChanged':
+          const gnParams = notification.params as GroupNameChange;
+          const groupName = server.groups.find(g => g.id === gnParams.id);
+          if (groupName) {
+            groupName.name = gnParams.name;
+            console.log(`SnapcastService: Group ${groupName.id} name changed to ${gnParams.name}`);
+          } else {
+            console.warn(`SnapcastService: Group ${gnParams.id} not found for name change.`);
+          }
+          break;
+
         case 'Stream.OnProperties':
           const streamProps = notification.params as StreamOnProperties;
           const stream = server.streams.find(s => s.id === streamProps.id);
           if (stream) {
+            console.log(`SnapcastService: Stream ${stream.id} properties updated.`);
+            console.log('SnapcastService: Stream properties details:', streamProps);
             stream.properties = { ...stream.properties, ...streamProps.properties };
+          } else {
+            console.warn(`SnapcastService: Stream ${streamProps.id} not found for properties update.`);
           }
           break;
+        case 'Stream.OnUpdate':
+          const streamUpdate = notification.params as StreamOnUpdate;
+          const updatedStream = server.streams.find(s => s.id === streamUpdate.id);
+          if (updatedStream) {
+            console.log(`SnapcastService: Updating stream ${updatedStream.id} with new status and properties.`);
+            console.log('SnapcastService: Stream update details:', streamUpdate);
+            updatedStream.status = streamUpdate.stream.status;
+            updatedStream.properties = { ...updatedStream.properties, ...streamUpdate.stream.properties };
+          }
+          break;
+        case 'Server.OnUpdate':
+          const serverUpdate = notification.params as ServerOnUpdateNotificationParams;
+          if (serverUpdate.server) {
+            console.log('SnapcastService: Server.OnUpdate received, replacing current state with new server data.');
+            console.log('SnapcastService: Server update details:', serverUpdate);
+            draft.server = serverUpdate.server;
+          } else {
+            console.warn('SnapcastService: Server.OnUpdate received but no server data found in notification.');
+          }
+          break;
+
         default:
           console.warn(`SnapcastService: Unhandled notification method: ${notification.method}`);
           break;
@@ -223,7 +294,6 @@ export class SnapcastService implements OnDestroy {
   }
 
   // --- Simplified Action Methods ---
-  // These methods send the command and return. The state update happens when the server notification is received.
 
   public setClientVolumePercent(clientId: string, percent: number): Observable<void> {
     if (percent < 0 || percent > 100) return throwError(() => new Error('Volume percentage must be between 0 and 100.'));
@@ -283,15 +353,22 @@ export class SnapcastService implements OnDestroy {
 
   setGroupStream(groupId: string, streamId: string): Observable<void> {
     return this.rpc('Group.SetStream', { id: groupId, stream_id: streamId }).pipe(
-      map((): void => void 0),
+      map(
+        (): void => {
+          console.log(`SnapcastService: Successfully set stream ${streamId} for group ${groupId}`);
+          this.refreshState(); // Refresh state after setting stream
+        }
+      ),
       catchError(err => {
         console.error(`SnapcastService: Failed to set stream for group ${groupId}`, err);
         return throwError(() => err);
       })
+
     );
+
   }
 
-  // TODO  ... Implement other action methods like  setGroupMute, streamControl, etc.
+  // TODO  ... Implement other action methods like.
   // They just need to call `this.rpc` with the correct parameters.
 
   // --- Data Access Helpers ---
@@ -301,7 +378,14 @@ export class SnapcastService implements OnDestroy {
 
   //  TODO: ... other get... methods ...
 
+
+
   // --- Lifecycle and Disconnect ---
+
+  public refreshState() {
+    this.fetchInitialServerStatus();
+  }
+
   public disconnect(): void {
     this.disconnectInternals(true);
     (this.isConnected$ as BehaviorSubject<boolean>).next(false);

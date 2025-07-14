@@ -23,17 +23,17 @@ export class PlayerToolbarComponent implements OnInit, OnChanges, OnDestroy {
   private knobMoveStart = false;
   private knobMoveEnd = false;
 
+ 
+
   constructor(
     public snapcastService: SnapcastService
   ) {
 
-    this.displayState$ = this.snapcastService.state$.pipe(
-      tap(state => console.log('%cPlayerToolbarComponent: displayState$ received', 'color: orange; font-weight: bold;', new Date().toLocaleTimeString(), state))
-    );
+
   }
 
   ngOnInit(): void {
-
+    this.displayState$ = this.snapcastService.state$
     this.snapcastService.connect();
   }
 
@@ -150,6 +150,8 @@ export class PlayerToolbarComponent implements OnInit, OnChanges, OnDestroy {
     this.knobMoveStart = false;
     // Optionally, you can add haptic feedback here
   }
+
+  
 
 
 }
