@@ -295,7 +295,9 @@ export class SnapcastService implements OnDestroy {
     );
   }
 
-  // --- Simplified Action Methods ---
+  // --- "Simplified" Action Methods ---
+
+  // CLIENT ACTIONS
 
   public setClientVolumePercent(clientId: string, percent: number): Observable<void> {
     if (percent < 0 || percent > 100) return throwError(() => new Error('Volume percentage must be between 0 and 100.'));
@@ -321,27 +323,17 @@ export class SnapcastService implements OnDestroy {
     );
   }
 
-  public setClientMute(clientId: string, mute: boolean): Observable<void> {
-    return this.state$.pipe(
-      take(1),
-      switchMap(currentState => {
-        const client = currentState?.server.groups.flatMap(g => g.clients).find(c => c.id === clientId);
-        if (!client) return throwError(() => new Error(`Client ${clientId} not found.`));
-
-        const volumePayload: Volume = {
-          percent: client.config.volume.percent, // Use current volume percent
-          muted: mute,
-        };
-        return this.rpc('Client.SetVolume', { id: clientId, volume: volumePayload });
-      }),
+  setClientName(clientId: string, name: string): Observable<void> {
+    return this.rpc('Client.SetName', { id: clientId, name }).pipe(
       map((): void => void 0),
       catchError(err => {
-        console.error(`SnapcastService: Failed to set mute for client ${clientId}`, err);
+        console.error(`SnapcastService: Failed to set name for client ${clientId}`, err);
         return throwError(() => err);
       })
     );
   }
 
+ 
   setGroupName(groupId: string, name: string): Observable<void> {
     return this.rpc('Group.SetName', { id: groupId, name }).pipe(
       map((): void => void 0),
@@ -370,18 +362,10 @@ export class SnapcastService implements OnDestroy {
 
   }
 
-  setClientName(clientId: string, name: string): Observable<void> {
-    return this.rpc('Client.SetName', { id: clientId, name }).pipe(
-      map((): void => void 0),
-      catchError(err => {
-        console.error(`SnapcastService: Failed to set name for client ${clientId}`, err);
-        return throwError(() => err);
-      })
-    );
-  }
+  
 
-  // TODO  ... Implement other action methods like.
-  // They just need to call `this.rpc` with the correct parameters.
+
+
 
   // --- Data Access Helpers ---
   public getClient(clientId: string): Observable<Client | undefined> {
