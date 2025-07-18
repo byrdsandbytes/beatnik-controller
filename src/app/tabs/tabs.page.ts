@@ -17,8 +17,11 @@ export class TabsPage implements OnInit, AfterViewInit {
   constructor(private snapcastService: SnapcastService) {}
 
   ngOnInit(): void {
-    this.snapcastService.connect();
     
+  }
+
+  ionViewDidEnter() {
+    // this.snapcastService.connect();
   }
 
   ngAfterViewInit() {
