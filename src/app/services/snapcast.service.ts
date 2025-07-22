@@ -205,6 +205,27 @@ export class SnapcastService implements OnDestroy {
             console.warn(`SnapcastService: Client disconnected but not found in current state: ${disconnectParams.id}`);
           }
           break;
+        case 'Client.OnNameChanged':
+          const nameParams = notification.params as { id: string; name: string };
+          const clientName = server.groups.flatMap(g => g.clients).find(c => c.id === nameParams.id);
+          if (clientName) {
+            clientName.config.name = nameParams.name;
+            console.log(`SnapcastService: Client ${clientName.id} name changed to ${nameParams.name}`);
+          } else {
+            console.warn(`SnapcastService: Client name change for unknown client ID: ${nameParams.id}`);
+          }
+          break;
+
+        case 'Client.OnLatencyChanged':
+          const latencyParams = notification.params as { id: string; latency: number };
+          const clientLatency = server.groups.flatMap(g => g.clients).find(c => c.id === latencyParams.id);
+          if (clientLatency) {
+            clientLatency.config.latency = latencyParams.latency;
+            console.log(`SnapcastService: Client ${clientLatency.id} latency changed to ${latencyParams.latency}`);
+          } else {
+            console.warn(`SnapcastService: Client latency change for unknown client ID: ${latencyParams.id}`);
+          }
+          break;
 
 
         case 'Group.OnMute':
@@ -299,6 +320,8 @@ export class SnapcastService implements OnDestroy {
 
   // CLIENT ACTIONS
 
+
+
   public setClientVolumePercent(clientId: string, percent: number): Observable<void> {
     if (percent < 0 || percent > 100) return throwError(() => new Error('Volume percentage must be between 0 and 100.'));
 
@@ -333,7 +356,31 @@ export class SnapcastService implements OnDestroy {
     );
   }
 
- 
+  setClientLatency(clientId: string, latency: number): Observable<void> {
+    if (latency < 0) return throwError(() => new Error('Latency must be a non-negative number.'));
+    return this.rpc('Client.SetLatency', { id: clientId, latency }).pipe(
+      map((): void => void 0),
+      catchError(err => {
+        console.error(`SnapcastService: Failed to set latency for client ${clientId}`, err);
+        return throwError(() => err);
+      })
+    );
+  }
+
+  // Function added just for completeness, not used in the app yet.
+  getClientStatus(id: string): Observable<Client | undefined> {
+    return this.rpc('Client.GetStatus', { id }).pipe(
+      map(response => response.result as Client | undefined),
+      catchError(err => {
+        console.error(`SnapcastService: Failed to get status for client ${id}`, err);
+        return throwError(() => err);
+      })
+    );
+  }
+
+
+
+
   setGroupName(groupId: string, name: string): Observable<void> {
     return this.rpc('Group.SetName', { id: groupId, name }).pipe(
       map((): void => void 0),
@@ -362,7 +409,7 @@ export class SnapcastService implements OnDestroy {
 
   }
 
-  
+
 
 
 
@@ -373,8 +420,8 @@ export class SnapcastService implements OnDestroy {
   }
 
   public mockServerState(): void {
-   const url = "assets/mock/json/server-state.json"
-     this.http.get<SnapCastServerStatusResponse>(url).subscribe({
+    const url = "assets/mock/json/server-state.json"
+    this.http.get<SnapCastServerStatusResponse>(url).subscribe({
       next: (data) => {
         console.log('Mock server state loaded:', data);
         this.stateSubject$.next(data);

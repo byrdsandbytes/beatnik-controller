@@ -16,7 +16,7 @@ export class ClientDetailsPage implements OnInit {
   id?: string;
 
   serverState?: Observable<SnapCastServerStatusResponse>;
-  client?: Client;
+  public client?: Client;
 
 
   constructor(
@@ -61,6 +61,53 @@ export class ClientDetailsPage implements OnInit {
       },
       error: (err) => {
         console.error(`ClientDetailsPage: Failed to set name for client ${this.client.id}`, err);
+      }
+    });
+  }
+
+
+  setClientLatency() {
+    if (!this.client || !this.client.id) {
+      console.error('ClientDetailsPage: No client or client ID available to set latency');
+      return;
+    }
+    this.snapcastService.setClientLatency(this.client.id, this.client.config.latency).subscribe({
+      next: () => {
+        console.log(`ClientDetailsPage: Successfully set latency for client ${this.client.id} to ${this.client.config.latency}`);
+      },
+      error: (err) => {
+        console.error(`ClientDetailsPage: Failed to set latency for client ${this.client.id}`, err);
+      }
+    });
+  }
+
+  setClientVolume() {
+    if (!this.client || !this.client.id) {
+      console.error('ClientDetailsPage: No client or client ID available to set volume');
+      return;
+    }
+    this.snapcastService.setClientVolumePercent(this.client.id, this.client.config.volume.percent).subscribe({
+      next: () => {
+        console.log(`ClientDetailsPage: Successfully set volume for client ${this.client.id} to ${this.client.config.volume.percent}`);
+      },
+      error: (err) => {
+        console.error(`ClientDetailsPage: Failed to set volume for client ${this.client.id}`, err);
+      }
+    });
+  }
+
+  refreshClient() {
+    if (!this.id) {
+      console.error('ClientDetailsPage: No ID available to refresh client');
+      return;
+    }
+    this.snapcastService.getClientStatus(this.id).subscribe({
+      next: () => {
+        console.log(`ClientDetailsPage: Successfully refreshed client ${this.id}`);
+        this.snapcastService.refreshState(); // Refresh the server state to get the latest data
+      },
+      error: (err) => {
+        console.error(`ClientDetailsPage: Failed to refresh client ${this.id}`, err);
       }
     });
   }
