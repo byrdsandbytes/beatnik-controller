@@ -28,4 +28,8 @@
     background: rgba(0,0,0,.3);
     z-index: 5;
   }
+
+  .page-padding-bottom {
+    margin-bottom: 300px; // Adjust as needed to ensure content is not obscured by the tab bar
+  }
   
