@@ -16,22 +16,21 @@
         <!-- <ion-title size="large"><span>{{user.displayName}}s Zuhause</span></ion-title> -->
       </ion-toolbar>
     </ion-header>
-    <div class="fab-row row">
-      <div class="col ">
-        <ion-fab-button class="custom-fab-button" color="light" (click)="openModal()">
-          <ion-icon [name]="numberOfPlayingClients>0?'volume-high':'volume-high-outline'"></ion-icon>
-        </ion-fab-button>
-        <div class="fab-label">{{numberOfPlayingClients +"/"+ totalClients}} Client(s) playing</div>
-
+    <div class="fab-row row jsutify-content-center align-items-center">
+      <div class="col col-4 col-lg-2 fab-container">
+          <ion-fab-button class="custom-fab-button" color="light" (click)="openModal()">
+            <ion-icon [name]="numberOfPlayingClients>0?'volume-high':'volume-high-outline'"></ion-icon>
+          </ion-fab-button>
+          <div class="fab-label">{{numberOfPlayingClients +"/"+ totalClients}} Client(s) playing</div>
       </div>
-      <div class="col">
+      <div class="col col-4 col-lg-2 fab-container">
         <ion-fab-button class="custom-fab-button" color="light" [routerLink]="'/tabs/menu/server-status'">
           <ion-icon [name]="lastServerResponseDeltaInSeconds < 2400?'wifi':'wifi-outline'"></ion-icon>
         </ion-fab-button>
         <div class="fab-label">{{lastServerResponseDeltaInSeconds < 240?'Online':'Offline'}}: {{lastServerResponseTime |
             date: 'dd.MM.yy HH:mm' }}</div>
         </div>
-        <div class="col">
+        <div class="col col-4 col-lg-2 fab-container">
           <ion-fab-button class="custom-fab-button" color="light" (click)="getPlayerStatus()">
             <ion-icon [name]="numberOfPlayingStreams>0?'musical-note':'musical-note-outline'"></ion-icon>
           </ion-fab-button>
@@ -57,7 +56,7 @@
       </div>
 
 
-      <div class="container-fluid">
+      <div class="container">
         <swiper (swiper)="onSwiper($event)" (slideChange)="onSlideChange($event)" [config]="swiperConfig">
           <ng-container *ngFor="let group of state.server.groups; let i = index">
             <ng-template swiperSlide *ngIf="group.clients[0].connected">
