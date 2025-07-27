@@ -8,6 +8,8 @@ import { environment } from 'src/environments/environment';
 import { omit } from 'lodash-es';
 import { Preferences } from '@capacitor/preferences';
 import { UserPreference } from 'src/app/enum/user-preference.enum';
+import { Speaker } from 'src/app/model/speaker.model';
+import { HttpClient } from '@angular/common/http';
 
 
 
@@ -67,10 +69,13 @@ export class DashboardPage implements OnInit {
   lastServerResponseTime?: Date;
   lastServerResponseDeltaInSeconds?: number;
 
+  speakerData: Speaker[] = [];
+
 
 
   constructor(
     private snapcastService: SnapcastService,
+    private http: HttpClient
   ) {
     // this.groups$ = this.snapcastService.groups$;
     // this.streams$ = this.snapcastService.streams$;
@@ -80,6 +85,7 @@ export class DashboardPage implements OnInit {
   async ngOnInit() {
     // this.snapcastService.connect();
     this.getScreenSize(null); // Initialize screen size
+    this.loadSpeakerData();
 
     this.userPreferenceServerUrl = await this.getUserPreferenceServerUrl();
     this.userPreeferenceUsername = await this.getUserName();
@@ -222,6 +228,18 @@ export class DashboardPage implements OnInit {
     console.log('Enabling demo mode...');
     this.snapcastService.mockServerState()
     this.isLoading = false;
+  }
+
+  loadSpeakerData(): void {
+    this.http.get<{ speakers: Speaker[] }>('assets/speakers/speakers-data.json').subscribe({
+      next: (response) => {
+        this.speakerData = response.speakers;
+        console.log('Speaker data loaded:', this.speakerData);
+      },
+      error: (error) => {
+        console.error('Error loading speaker data:', error);
+      }
+    });
   }
 
 

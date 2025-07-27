@@ -61,7 +61,7 @@
           <ng-container *ngFor="let group of state.server.groups; let i = index">
             <ng-template swiperSlide *ngIf="group.clients[0].connected">
 
-              <app-snapcast-group-preview [streams]="state.server.streams" [group]="group"></app-snapcast-group-preview>
+              <app-snapcast-group-preview [streams]="state.server.streams" [group]="group" [speakerData]="speakerData"></app-snapcast-group-preview>
             </ng-template>
 
           </ng-container>
@@ -90,8 +90,8 @@
     </ng-container>
 
     <!-- <app-snapcast-status></app-snapcast-status> -->
-    <div class="page-padding-bottom">
-    </div>
+    <!-- <div class="page-padding-bottom">
+    </div> -->
 
 </ion-content>
 

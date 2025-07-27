@@ -9,7 +9,8 @@
     </div>
 
   <ion-modal #modal trigger="open-modal" [isOpen]="true" [initialBreakpoint]="0.25"
-    [breakpoints]="[0.05,0.25, 0.5, 0.75]" [backdropDismiss]="false" [backdropBreakpoint]="0.5">
+    [breakpoints]="[0.05,0.25, 0.5, 0.75]" [backdropDismiss]="false" [backdropBreakpoint]="0.5"
+    [cssClass]="'player-modal'" [animated]="true" [keyboardClose]="true" [showBackdrop]="true">
     <ng-template>
       <ion-content color="dark" [fullscreen]="true">
         <app-player-toolbar class="player-toolbar"></app-player-toolbar>

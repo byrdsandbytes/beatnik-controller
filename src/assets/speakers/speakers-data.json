@@ -1,0 +1,25 @@
+{
+  "speakers": [
+    {
+      "id": "sp.1",
+      "image": "assets/speakers/img/KEF_Concerto_1971.webp",
+      "manufacturer": "KEF",
+      "model": "Concerto",
+      "year": 1971
+    },
+    {
+      "id": "sp.2",
+      "image": "assets/speakers/img/JSE_Infinite_Slope.webp",
+      "manufacturer": "JSE",
+      "model": "Infinite Slope",
+      "year": 1980
+    },
+    {
+      "id": "sp.3",
+      "image": "assets/speakers/klipsch_kg4.jpg",
+      "manufacturer": "Pioneer",
+      "model": "CS-E500",
+      "year": 1980
+    }
+  ]
+}
