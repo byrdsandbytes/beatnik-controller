@@ -68,5 +68,7 @@ testem.log
 # System files
 .DS_Store
 Thumbs.db
+
+# Platform directories
+android/*
 ios/*
-.vscode/*
