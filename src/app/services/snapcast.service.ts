@@ -379,6 +379,9 @@ export class SnapcastService implements OnDestroy {
   }
 
 
+  // GROUP ACTIONS
+
+
 
 
   setGroupName(groupId: string, name: string): Observable<void> {
@@ -409,15 +412,108 @@ export class SnapcastService implements OnDestroy {
 
   }
 
-
-
-
-
-
-  // --- Data Access Helpers ---
-  public getClient(clientId: string): Observable<Client | undefined> {
-    return this.state$.pipe(map(state => state?.server?.groups.flatMap(g => g.clients).find(c => c.id === clientId)));
+  setGroupClients(groupId: string, clientIds: string[]): Observable<void> {
+    return this.rpc('Group.SetClients', { id: groupId, clients: clientIds }).pipe(
+      map((): void => void 0),
+      catchError(err => {
+        console.error(`SnapcastService: Failed to set clients for group ${groupId}`, err);
+        return throwError(() => err);
+      })
+    );
   }
+
+  setGroupMute(groupId: string, mute: boolean): Observable<void> {
+    return this.rpc('Group.SetMute', { id: groupId, mute }).pipe(
+      map((): void => void 0),
+      catchError(err => {
+        console.error(`SnapcastService: Failed to set mute for group ${groupId}`, err);
+        return throwError(() => err);
+      })
+    );
+  }
+
+  getGroupStatus(groupId: string): Observable<Group | undefined> {
+    return this.rpc('Group.GetStatus', { id: groupId }).pipe(
+      map(response => response.result as Group | undefined),
+      catchError(err => {
+        console.error(`SnapcastService: Failed to get status for group ${groupId}`, err);
+        return throwError(() => err);
+      })
+    );
+  }
+
+
+  // SERVER ACTIONS
+
+  getServerStatus(): Observable<SnapCastServerStatusResponse | undefined> {
+    return this.rpc<never, SnapCastServerStatusResponse>('Server.GetStatus').pipe(
+      map(response => response.result),
+      catchError(err => {
+        console.error('SnapcastService: Failed to get server status', err);
+        return throwError(() => err);
+      })
+    );
+  }
+
+  getServerRpcVersion(): Observable<string | undefined> {
+    return this.rpc<never, { version: string }>('Server.GetRpcVersion').pipe(
+      map(response => response.result?.version),
+      catchError(err => {
+        console.error('SnapcastService: Failed to get server RPC version', err);
+        return throwError(() => err);
+      })
+    );
+
+  }
+
+  deleteServerClient(clientId: string): Observable<void> {
+    return this.rpc('Server.DeleteClient', { id: clientId }).pipe(
+      map((): void => void 0),
+      catchError(err => {
+        console.error(`SnapcastService: Failed to delete client ${clientId}`, err);
+        return throwError(() => err);
+      })
+    );
+  }
+
+  // Stream Actions
+
+  setStreamProperty(streamId: string, property: keyof Stream, value: any): Observable<void> {
+    const params: StreamSetPropertyRpcPayloadParams = { id: streamId, property, value };
+    return this.rpc('Stream.SetProperty', params).pipe(
+      map((): void => void 0),
+      catchError(err => {
+        console.error(`SnapcastService: Failed to set property ${property} for stream ${streamId}`, err);
+        return throwError(() => err);
+      })
+    );
+  }
+
+  addStream(stream: Stream): Observable<void> {
+    return this.rpc('Stream.Add', { stream }).pipe(
+      map((): void => void 0),
+      catchError(err => {
+        console.error(`SnapcastService: Failed to add stream`, err);
+        return throwError(() => err);
+      })
+    );
+  }
+
+  removeStream(streamId: string): Observable<void> {
+    return this.rpc('Stream.Remove', { id: streamId }).pipe(
+      map((): void => void 0),
+      catchError(err => {
+        console.error(`SnapcastService: Failed to remove stream ${streamId}`, err);
+        return throwError(() => err);
+      })
+    );
+  }
+
+
+
+
+
+  // Mock server state for testing purposes
 
   public mockServerState(): void {
     const url = "assets/mock/json/server-state.json"
