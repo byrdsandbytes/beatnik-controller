@@ -1,0 +1,32 @@
+
+
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Choose Speakers</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="closeModal()">
+        <ion-icon name="close"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div class="choose-speakers-container">
+    <p>Select the speakers you want to use:</p>
+    <!-- Add your speaker selection logic here -->
+     <div class="row">
+      <div class="col-6" *ngFor="let speaker of speakers">
+        <img [src]="speaker.image" alt="{{ speaker.manufacturer }} {{ speaker.model }}" class="speaker-image">
+        <ion-item lines="none" (click)="selectSpeaker(speaker.id)">
+          <ion-icon slot="end" [name]="'checkmark-circle'" *ngIf="selectedId === speaker.id"></ion-icon>
+          <ion-label> <h2>{{ speaker.manufacturer }} {{ speaker.model }}</h2></ion-label>
+        </ion-item>
+      </div>
+     </div>
+   
+    <ion-button expand="full" color="primary" (click)="saveSelection()">
+      Save Selection
+    </ion-button>
+  </div>
+</ion-content>

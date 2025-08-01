@@ -7,7 +7,7 @@
             "config": {
               "instance": 1,
               "latency": 0,
-              "name": "Beans",
+              "name": "sp.1",
               "volume": {
                 "muted": false,
                 "percent": 100
@@ -36,6 +36,43 @@
         "id": "f13057aa-ba82-449a-41cd-12144c04dfd3",
         "muted": false,
         "name": "Office",
+        "stream_id": "AirPlay"
+      },
+      {
+        "clients": [
+          {
+            "config": {
+              "instance": 1,
+              "latency": 0,
+              "name": "sp.2",
+              "volume": {
+                "muted": false,
+                "percent": 100
+              }
+            },
+            "connected": true,
+            "host": {
+              "arch": "aarch64",
+              "ip": "::ffff:192.168.1.151",
+              "mac": "2c:cf:67:f0:f9:4a",
+              "name": "beatnik-server",
+              "os": "Debian GNU/Linux 12 (bookworm)"
+            },
+            "id": "2c:cf:67:f0:f9:4b",
+            "lastSeen": {
+              "sec": 1752491174,
+              "usec": 663848
+            },
+            "snapclient": {
+              "name": "Snapclient",
+              "protocolVersion": 2,
+              "version": "0.31.0"
+            }
+          }
+        ],
+        "id": "k23057aa-ba82-449a-41cd-12144c04dfd3",
+        "muted": false,
+        "name": "Living Room",
         "stream_id": "AirPlay"
       }
     ],

@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+import { ModalController } from '@ionic/angular';
 import { Observable } from 'rxjs';
+import { ChooseSpeakersComponent } from 'src/app/components/choose-speakers/choose-speakers.component';
 import { Client, SnapCastServerStatusResponse } from 'src/app/model/snapcast.model';
 import { SnapcastService } from 'src/app/services/snapcast.service';
 
@@ -21,7 +23,8 @@ export class ClientDetailsPage implements OnInit {
 
   constructor(
     private avtivateRoute: ActivatedRoute,
-    private snapcastService: SnapcastService
+    private snapcastService: SnapcastService,
+    private modalController: ModalController
   ) { }
 
   async ngOnInit() {
@@ -109,6 +112,20 @@ export class ClientDetailsPage implements OnInit {
       error: (err) => {
         console.error(`ClientDetailsPage: Failed to refresh client ${this.id}`, err);
       }
+    });
+  }
+
+  chooseSpeakers() {
+    console.log('Choose speakers for client:', this.client?.id);
+    // Here you would typically open a modal to select speakers
+    this.modalController.create({
+      component: ChooseSpeakersComponent,
+      id: 'choose-speakers-modal',
+      componentProps: { clientId: this.client?.id }
+    }).then(modal => {
+      modal.present();
+    }).catch(err => {
+      console.error('Error opening speaker selection modal:', err);
     });
   }
 

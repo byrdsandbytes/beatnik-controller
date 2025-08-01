@@ -26,9 +26,7 @@ export class SnapcastStatusComponent implements OnInit, OnDestroy {
 
   }
 
-  getClientDetails(clientId: string): Observable<Client | undefined> {
-    return this.snapcastService.getClient(clientId);
-  }
+ 
 
   onSetClientVolumePercent(clientId: string, event: Event): void {
     const inputElement = event.target as HTMLInputElement;
@@ -44,31 +42,6 @@ export class SnapcastStatusComponent implements OnInit, OnDestroy {
       ).subscribe()
     );
   }
-
-  onToggleClientMute(client: Client): void {
-    // const newMuteState = !client.config.volume.muted;
-    // this.subscriptions.add(
-    //   this.snapcastService.setClientMute(client.id, newMuteState).pipe(
-    //     catchError(err => {
-    //       console.error(`Component: Failed to toggle mute for ${client.id}`, err);
-    //       return EMPTY;
-    //     })
-    //   ).subscribe()
-    // );
-  }
-
-  onChangeGroupName(groupId: string, newName: string): void {
-    // if (!newName || !newName.trim()) return;
-    // this.subscriptions.add(
-    //   this.snapcastService.setGroupName(groupId, newName.trim()).pipe(
-    //     catchError(err => {
-    //       console.error(`Component: Failed to change group name for ${groupId}`, err);
-    //       return EMPTY;
-    //     })
-    //   ).subscribe()
-    // );
-  }
-
   ngOnDestroy(): void {
     this.subscriptions.unsubscribe();
   }

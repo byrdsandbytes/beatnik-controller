@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, HostListener, OnInit } from '@angular/core';
 import { ModalController } from '@ionic/angular';
 import { first, firstValueFrom, interval, Observable } from 'rxjs';
 import { Client, Group, ServerDetail, SnapCastServerStatusResponse, Stream } from 'src/app/model/snapcast.model';
@@ -8,6 +8,8 @@ import { environment } from 'src/environments/environment';
 import { omit } from 'lodash-es';
 import { Preferences } from '@capacitor/preferences';
 import { UserPreference } from 'src/app/enum/user-preference.enum';
+import { Speaker } from 'src/app/model/speaker.model';
+import { HttpClient } from '@angular/common/http';
 
 
 
@@ -18,6 +20,31 @@ import { UserPreference } from 'src/app/enum/user-preference.enum';
   standalone: false
 })
 export class DashboardPage implements OnInit {
+
+  @HostListener('window:resize', ['$event'])
+  getScreenSize(event: any) {
+    this.scrHeight = window.innerHeight;
+    this.scrWidth = window.innerWidth;
+    // console.log(this.scrHeight, this.scrWidth);
+    if (this.scrWidth < 1024) {
+      this.swiperConfig = this.defaultConfigMd
+    } else {
+      this.swiperConfig = this.defaulConfigXl
+      this.swiperConfig.pagination = { clickable: true };
+    }
+  }
+
+  defaultConfigMd: SwiperOptions = {
+    slidesPerView: 1.6,
+    spaceBetween: 10,
+  };
+
+  defaulConfigXl: SwiperOptions = {
+    slidesPerView: 3.2,
+    spaceBetween: 10,
+  }
+  scrHeight: number;
+  scrWidth: number;
 
 
   swiperConfig: SwiperOptions = {
@@ -42,10 +69,13 @@ export class DashboardPage implements OnInit {
   lastServerResponseTime?: Date;
   lastServerResponseDeltaInSeconds?: number;
 
+  speakerData: Speaker[] = [];
+
 
 
   constructor(
     private snapcastService: SnapcastService,
+    private http: HttpClient
   ) {
     // this.groups$ = this.snapcastService.groups$;
     // this.streams$ = this.snapcastService.streams$;
@@ -54,6 +84,8 @@ export class DashboardPage implements OnInit {
 
   async ngOnInit() {
     // this.snapcastService.connect();
+    this.getScreenSize(null); // Initialize screen size
+    this.loadSpeakerData();
 
     this.userPreferenceServerUrl = await this.getUserPreferenceServerUrl();
     this.userPreeferenceUsername = await this.getUserName();
@@ -198,7 +230,19 @@ export class DashboardPage implements OnInit {
     this.isLoading = false;
   }
 
- 
+  loadSpeakerData(): void {
+    this.http.get<{ speakers: Speaker[] }>('assets/speakers/speakers-data.json').subscribe({
+      next: (response) => {
+        this.speakerData = response.speakers;
+        console.log('Speaker data loaded:', this.speakerData);
+      },
+      error: (error) => {
+        console.error('Error loading speaker data:', error);
+      }
+    });
+  }
+
+
 
 
 

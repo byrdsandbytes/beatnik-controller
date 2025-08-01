@@ -1,6 +1,7 @@
 import { Component, Input, OnChanges, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { Group, Stream } from 'src/app/model/snapcast.model';
+import { Speaker } from 'src/app/model/speaker.model';
 
 @Component({
   selector: 'app-snapcast-group-preview',
@@ -12,8 +13,10 @@ export class SnapcastGroupPreviewComponent  implements OnInit, OnChanges {
 
   @Input() group?: Group;
   @Input() streams?: Stream[] | null;
+  @Input() speakerData?: Speaker[] | null;
 
   activeStream?: Stream;
+  activeSpeaker?: Speaker;
 
   constructor(
     private router: Router
@@ -21,6 +24,7 @@ export class SnapcastGroupPreviewComponent  implements OnInit, OnChanges {
 
   ngOnInit() {
     this.getActiveStream();
+    this.getActiveSpeaker();
   }
 
   ngOnChanges() {
@@ -66,6 +70,21 @@ export class SnapcastGroupPreviewComponent  implements OnInit, OnChanges {
     }
     // Convert base64 data to a data URL
     return `data:image/${extension};base64,${coverData}`;
+  }
+
+  getActiveSpeaker(): Speaker | undefined {
+    if (!this.group || !this.speakerData) {
+      return undefined;
+    }
+    // Hacky implementation of speaker selection
+    this.activeSpeaker = this.speakerData.find(speaker => speaker.id === this.group.clients[0].config.name);
+    if (!this.activeSpeaker) {
+      console.warn('No active speaker found for the group:', this.group.id);
+      return undefined;
+    }
+    console.log('Active speaker for group:', this.group.id, this.activeSpeaker);
+
+    return this.activeSpeaker;
   }
 
 }
