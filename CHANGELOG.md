@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.2.1] - 2025-08-01
+
+### Added
+- Add changelog
+
 ## [0.2.0] - 2025-07-23
 
 ### Added
@@ -58,6 +63,7 @@
 - Remove old imports
 - Clean up old service
 - Remove auto generated assets, pages and components
+- Removed over-engineered "desired" and "reported" state logic
 
 ## [0.1.0] - 2025-07-14
 
@@ -95,12 +101,11 @@
 - Clean up old service
 - Remove auto generated assets, pages and components
 
-### Other
-- Initial commit
-- Messing with state managment
-- Killed desired and reported state. was stupid and overengineered.
-- Use base 64 for art data
-- Mock server
-- Testing docker setup
-- Add android platform to gitignore
-- Choose speaker POC
+### Changed
+- Refactored state management
+- Use base64 for art data
+- Add android platform to gitignore configuration
+
+### Added
+- Add mock server for testing
+- Add proof-of-concept for speaker selection
