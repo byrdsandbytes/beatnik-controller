@@ -1,4 +1,4 @@
-import { Component, HostListener, OnInit } from '@angular/core';
+import { Component, HostListener, NgZone, OnInit } from '@angular/core';
 import { ModalController } from '@ionic/angular';
 import { first, firstValueFrom, interval, Observable } from 'rxjs';
 import { Client, Group, ServerDetail, SnapCastServerStatusResponse, Stream } from 'src/app/model/snapcast.model';
@@ -10,6 +10,7 @@ import { Preferences } from '@capacitor/preferences';
 import { UserPreference } from 'src/app/enum/user-preference.enum';
 import { Speaker } from 'src/app/model/speaker.model';
 import { HttpClient } from '@angular/common/http';
+import { ZeroConf } from 'capacitor-zeroconf';
 
 
 
@@ -72,10 +73,15 @@ export class DashboardPage implements OnInit {
   speakerData: Speaker[] = [];
 
 
+    discoveredServices: any[] = [];
+
+
+
 
   constructor(
     private snapcastService: SnapcastService,
-    private http: HttpClient
+    private http: HttpClient,
+    private ngZone: NgZone
   ) {
     // this.groups$ = this.snapcastService.groups$;
     // this.streams$ = this.snapcastService.streams$;
@@ -86,6 +92,7 @@ export class DashboardPage implements OnInit {
     // this.snapcastService.connect();
     this.getScreenSize(null); // Initialize screen size
     this.loadSpeakerData();
+    this.startDiscovery(); // Start Zeroconf discovery
 
     this.userPreferenceServerUrl = await this.getUserPreferenceServerUrl();
     this.userPreeferenceUsername = await this.getUserName();
@@ -240,6 +247,40 @@ export class DashboardPage implements OnInit {
         console.error('Error loading speaker data:', error);
       }
     });
+  }
+
+
+  async startDiscovery() {
+    // The service type you are looking for on the local network
+    const service = {
+      type: '_http._tcp.',
+      domain: 'local.'
+    };
+
+    try {
+      // Start watching for services
+      await ZeroConf.watch(service, (result: { action: string; service: { name: any; }; }) => {
+        // Run inside NgZone to ensure UI updates happen correctly in Angular
+        this.ngZone.run(() => {
+          if (result.action === 'added' || result.action === 'resolved') {
+            // Avoid adding duplicates
+            const exists = this.discoveredServices.some(s => s.name === result.service.name);
+            if (!exists) {
+              console.log('Service found:', result.service);
+              this.discoveredServices.push(result.service);
+              // The hostname is result.service.name
+              // The IP address is in result.service.ipv4Addresses[0]
+              // The port is result.service.port
+            }
+          } else if (result.action === 'removed') {
+             console.log('Service removed:', result.service);
+             this.discoveredServices = this.discoveredServices.filter(s => s.name !== result.service.name);
+          }
+        });
+      });
+    } catch (e) {
+      console.error('Error starting Zeroconf watch:', e);
+    }
   }
 
 
