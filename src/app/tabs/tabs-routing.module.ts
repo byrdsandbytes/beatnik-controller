@@ -15,10 +15,10 @@ const routes: Routes = [
             path: '',
         loadChildren: () => import('../pages/streams/streams.module').then(m => m.StreamsPageModule)
           },
-          {
-            path: ':id',
-            loadChildren: () => import('../pages/streams/stream-details/stream-details.module').then(m => m.StreamDetailsPageModule)
-          }
+          // {
+          //   path: ':id',
+          //   loadChildren: () => import('../pages/streams/stream-details/stream-details.module').then(m => m.StreamDetailsPageModule)
+          // }
         ]
       },
 

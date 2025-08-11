@@ -13,13 +13,13 @@
 
   <ion-list *ngIf="displayState | async as state">
     
-    <div *ngFor="let stream of state.server.streams" [routerLink]="['/tabs/streams', stream.id]">
+    <div *ngFor="let stream of state.server.streams" [routerLink]="['/streams', stream.id]">
       <app-snapcast-stream-preview *ngIf="stream.status != 'idle'" [stream]="stream"></app-snapcast-stream-preview>
     </div>
     <ion-list-header>
       <ion-label>Inactive Streams</ion-label>
     </ion-list-header>
-    <div *ngFor="let stream of state.server.streams" [routerLink]="['/tabs/streams', stream.id]">
+    <div *ngFor="let stream of state.server.streams" [routerLink]="['/streams', stream.id]">
       <app-snapcast-stream-preview *ngIf="stream.status == 'idle'" [stream]="stream"></app-snapcast-stream-preview>
     </div>
   </ion-list>

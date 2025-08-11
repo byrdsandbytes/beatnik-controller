@@ -6,10 +6,7 @@ const routes: Routes = [
     path: '',
     loadChildren: () => import('./tabs/tabs.module').then(m => m.TabsPageModule)
   },
-  // {
-  //   path: 'streams',
-  //   loadChildren: () => import('./pages/streams/streams.module').then( m => m.StreamsPageModule)
-  // },
+
   // {
   //   path: 'dashboard',
   //   loadChildren: () => import('./pages/dashboard/dashboard.module').then( m => m.DashboardPageModule)
@@ -43,7 +40,20 @@ const routes: Routes = [
         loadChildren: () => import('./pages/clients/client-details/client-details.module').then(m => m.ClientDetailsPageModule)
       }
     ]
-  }
+  },
+  {
+    path: 'streams',
+    children: [
+      {
+        path: '',
+        loadChildren: () => import('./pages/streams/streams.module').then(m => m.StreamsPageModule)
+      },
+      {
+        path: ':id',
+        loadChildren: () => import('./pages/streams/stream-details/stream-details.module').then(m => m.StreamDetailsPageModule)
+      }
+    ]
+  },
   // {
   //   path: 'settings',
   //   loadChildren: () => import('./pages/settings/settings.module').then( m => m.SettingsPageModule)
