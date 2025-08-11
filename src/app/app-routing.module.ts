@@ -16,25 +16,34 @@ const routes: Routes = [
   // },
   {
     path: 'server-status',
-    loadChildren: () => import('./pages/server-status/server-status.module').then( m => m.ServerStatusPageModule)
+    loadChildren: () => import('./pages/server-status/server-status.module').then(m => m.ServerStatusPageModule)
   },
   {
     path: 'devices',
     children: [
       {
         path: '',
-        loadChildren: () => import('./pages/devices/devices.module').then( m => m.DevicesPageModule)
+        loadChildren: () => import('./pages/devices/devices.module').then(m => m.DevicesPageModule)
       },
       {
         path: ':id',
-        loadChildren: () => import('./pages/devices/device-details/device-details.module').then( m => m.DeviceDetailsPageModule)
+        loadChildren: () => import('./pages/devices/device-details/device-details.module').then(m => m.DeviceDetailsPageModule)
+      }
+    ]
+  },
+  {
+    path: 'clients',
+    children: [
+      // {
+      //   path: '',
+      //   loadChildren: () => import('./pages/clients/clients.module').then( m => m.ClientsPageModule)
+      // },
+      {
+        path: ':id',
+        loadChildren: () => import('./pages/clients/client-details/client-details.module').then(m => m.ClientDetailsPageModule)
       }
     ]
   }
-  // {
-  //   path: 'client-details',
-  //   loadChildren: () => import('./pages/client-details/client-details.module').then( m => m.ClientDetailsPageModule)
-  // },
   // {
   //   path: 'settings',
   //   loadChildren: () => import('./pages/settings/settings.module').then( m => m.SettingsPageModule)
@@ -47,7 +56,7 @@ const routes: Routes = [
   //   path: 'menu',
   //   loadChildren: () => import('./pages/menu/menu.module').then( m => m.MenuPageModule)
   // },
- 
+
 ];
 @NgModule({
   imports: [
@@ -55,4 +64,4 @@ const routes: Routes = [
   ],
   exports: [RouterModule]
 })
-export class AppRoutingModule {}
+export class AppRoutingModule { }

@@ -54,10 +54,10 @@ const routes: Routes = [
           // { path: '',
           //   loadChildren: () => import('../pages/clients/clients.module').then(m => m.ClientsPageModule)
           // },
-          {
-            path: ':id',
-            loadChildren: () => import('../pages/clients/client-details/client-details.module').then(m => m.ClientDetailsPageModule)
-          }
+          // {
+          //   path: ':id',
+          //   loadChildren: () => import('../pages/clients/client-details/client-details.module').then(m => m.ClientDetailsPageModule)
+          // }
         ]
       },
       {
