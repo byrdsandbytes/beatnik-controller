@@ -1,3 +1,4 @@
+<ion-content color="dark">
 <ion-toolbar class="play-toolbar" color="dark">
   <ng-container *ngIf="(displayState$|async) as state ">
     <ng-container *ngFor="let stream of state.server.streams">
@@ -47,3 +48,4 @@
   </ng-container>
 
 </ion-toolbar>
+</ion-content>

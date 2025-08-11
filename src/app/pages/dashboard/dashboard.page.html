@@ -24,7 +24,7 @@
           <div class="fab-label">{{numberOfPlayingClients +"/"+ totalClients}} Client(s) playing</div>
       </div>
       <div class="col col-4 col-lg-2 fab-container">
-        <ion-fab-button class="custom-fab-button" color="light" [routerLink]="'/tabs/menu/server-status'">
+        <ion-fab-button class="custom-fab-button" color="light" [routerLink]="'/server-status'">
           <ion-icon [name]="lastServerResponseDeltaInSeconds < 2400?'wifi':'wifi-outline'"></ion-icon>
         </ion-fab-button>
         <div class="fab-label">{{lastServerResponseDeltaInSeconds < 240?'Online':'Offline'}}: {{lastServerResponseTime |
