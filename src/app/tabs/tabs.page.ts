@@ -19,7 +19,6 @@ export class TabsPage implements OnInit, AfterViewInit {
     private modalController: ModalController) { }
 
   ngOnInit(): void {
-    // this.createPlayerModal();
 
   }
 
@@ -30,7 +29,6 @@ export class TabsPage implements OnInit, AfterViewInit {
 
   ionViewWillLeave() {
     console.log('ionViewWillLeave');
-    // this.snapcastService.disconnect();
     this.isModalOpen = false;
     this.modalController.dismiss();
     console.log('Modal closed');
@@ -43,7 +41,7 @@ export class TabsPage implements OnInit, AfterViewInit {
     const modal = await this.modalController.create({
       component: PlayerToolbarComponent,
       cssClass: 'player-modal',
-      animated: false,
+      animated: true,
       keyboardClose: true,
       showBackdrop: false,
       backdropDismiss: false,

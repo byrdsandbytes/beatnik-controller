@@ -18,6 +18,19 @@ const routes: Routes = [
     path: 'server-status',
     loadChildren: () => import('./pages/server-status/server-status.module').then( m => m.ServerStatusPageModule)
   },
+  {
+    path: 'devices',
+    children: [
+      {
+        path: '',
+        loadChildren: () => import('./pages/devices/devices.module').then( m => m.DevicesPageModule)
+      },
+      {
+        path: ':id',
+        loadChildren: () => import('./pages/devices/device-details/device-details.module').then( m => m.DeviceDetailsPageModule)
+      }
+    ]
+  }
   // {
   //   path: 'client-details',
   //   loadChildren: () => import('./pages/client-details/client-details.module').then( m => m.ClientDetailsPageModule)

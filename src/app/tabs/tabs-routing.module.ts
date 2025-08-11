@@ -42,10 +42,10 @@ const routes: Routes = [
             path: '',
             loadChildren: () => import('../pages/devices/devices.module').then(m => m.DevicesPageModule)
           },
-          {
-            path: ':id',
-            loadChildren: () => import('../pages/devices/device-details/device-details.module').then(m => m.DeviceDetailsPageModule)
-          }
+          // {
+          //   path: ':id',
+          //   loadChildren: () => import('../pages/devices/device-details/device-details.module').then(m => m.DeviceDetailsPageModule)
+          // }
         ]
       },
       {
