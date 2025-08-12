@@ -6,35 +6,68 @@ const routes: Routes = [
     path: '',
     loadChildren: () => import('./tabs/tabs.module').then(m => m.TabsPageModule)
   },
-  // {
-  //   path: 'streams',
-  //   loadChildren: () => import('./pages/streams/streams.module').then( m => m.StreamsPageModule)
-  // },
-  // {
-  //   path: 'dashboard',
-  //   loadChildren: () => import('./pages/dashboard/dashboard.module').then( m => m.DashboardPageModule)
-  // },
   {
     path: 'server-status',
-    loadChildren: () => import('./pages/server-status/server-status.module').then( m => m.ServerStatusPageModule)
+    loadChildren: () => import('./pages/server-status/server-status.module').then(m => m.ServerStatusPageModule)
   },
-  // {
-  //   path: 'client-details',
-  //   loadChildren: () => import('./pages/client-details/client-details.module').then( m => m.ClientDetailsPageModule)
-  // },
-  // {
-  //   path: 'settings',
-  //   loadChildren: () => import('./pages/settings/settings.module').then( m => m.SettingsPageModule)
-  // },
-  // {
-  //   path: 'stream-details',
-  //   loadChildren: () => import('./pages/streams/stream-details/stream-details.module').then( m => m.StreamDetailsPageModule)
-  // },
-  // {
-  //   path: 'menu',
-  //   loadChildren: () => import('./pages/menu/menu.module').then( m => m.MenuPageModule)
-  // },
- 
+  {
+    path: 'devices',
+    children: [
+      {
+        path: '',
+        loadChildren: () => import('./pages/devices/devices.module').then(m => m.DevicesPageModule)
+      },
+      {
+        path: ':id',
+        loadChildren: () => import('./pages/devices/device-details/device-details.module').then(m => m.DeviceDetailsPageModule)
+      }
+    ]
+  },
+  {
+    path: 'clients',
+    children: [
+      {
+        path: ':id',
+        loadChildren: () => import('./pages/clients/client-details/client-details.module').then(m => m.ClientDetailsPageModule)
+      }
+    ]
+  },
+  {
+    path: 'streams',
+    children: [
+      {
+        path: '',
+        loadChildren: () => import('./pages/streams/streams.module').then(m => m.StreamsPageModule)
+      },
+      {
+        path: ':id',
+        loadChildren: () => import('./pages/streams/stream-details/stream-details.module').then(m => m.StreamDetailsPageModule)
+      }
+    ]
+  },
+  {
+    path: 'menu',
+    children: [
+      {
+        path: '',
+        loadChildren: () => import('./pages/menu/menu.module').then(m => m.MenuPageModule)
+      },
+
+
+
+      // {
+      //   path: 'about',
+      //   loadChildren: () => import('./pages/about/about.module').then(m => m.AboutPageModule)
+      // }
+
+    ]
+  },
+  {
+    path: 'settings',
+    loadChildren: () => import('./pages/settings/settings.module').then(m => m.SettingsPageModule)
+  },
+
+
 ];
 @NgModule({
   imports: [
@@ -42,4 +75,4 @@ const routes: Routes = [
   ],
   exports: [RouterModule]
 })
-export class AppRoutingModule {}
+export class AppRoutingModule { }

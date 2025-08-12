@@ -15,7 +15,7 @@
       <ion-list-header>
         <ion-label>Device Groups</ion-label>
       </ion-list-header>
-      <ion-item *ngFor="let group of state.server.groups" [routerLink]="['/tabs/devices', group.id]">
+      <ion-item *ngFor="let group of state.server.groups" [routerLink]="['/devices', group.id]">
         <ion-label>
           <h2>{{ group.name || group.id }}</h2>
           <p>Clients: {{ group.clients.length }}</p>
@@ -27,7 +27,7 @@
       </ion-list-header>
       <ng-container *ngFor="let group of state.server.groups">
         <ng-container *ngFor="let client of group.clients">
-          <ion-item [routerLink]="['/tabs/clients', client.id]">
+          <ion-item [routerLink]="['/clients', client.id]">
             <ion-label>
               <h2> {{ client.config.name || client.id }}
               </h2>

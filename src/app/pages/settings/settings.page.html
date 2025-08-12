@@ -1,5 +1,8 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs"></ion-back-button>
+    </ion-buttons>
     <ion-title>Settings</ion-title>
   </ion-toolbar>
 </ion-header>
@@ -14,10 +17,12 @@
     </ion-header>
     <ion-list>
       <ion-item>
-        <ion-input labelPlacement="floating" label="Username" (ionInput)="setUserName()" type="text" placeholder="Enter your name" [(ngModel)]="userName"></ion-input>
+        <ion-input labelPlacement="floating" label="Username" (ionInput)="setUserName()" type="text"
+          placeholder="Enter your name" [(ngModel)]="userName"></ion-input>
       </ion-item>
       <ion-item>
-        <ion-input labelPlacement="floating" label="Server Url" (ionInput)="setServerUrl()" type="text" placeholder="Enter server URL" [(ngModel)]="serverUrl"></ion-input>
+        <ion-input labelPlacement="floating" label="Server Url" (ionInput)="setServerUrl()" type="text"
+          placeholder="Enter server URL" [(ngModel)]="serverUrl"></ion-input>
       </ion-item>
 
     </ion-list>
