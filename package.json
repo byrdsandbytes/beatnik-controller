@@ -13,7 +13,9 @@
     "generate:service": "ionic g service services/$npm_config_name && ng generate --skip-tests=true class model/$npm_config_name --type=model",
     "generate:component": "ionic g component $npm_config_name && ng generate module $npm_config_name",
     "generate:page": "ionic g page pages/$npm_config_name",
-    "generate:guard": "ng g guard guards/$npm_config_name"
+    "generate:guard": "ng g guard guards/$npm_config_name",
+    "ios": "ionic cap run ios -l --external",
+    "android": "ionic cap run android -l --external"
   },
   "private": true,
   "dependencies": {
@@ -26,9 +28,9 @@
     "@angular/platform-browser-dynamic": "^19.0.0",
     "@angular/router": "^19.0.0",
     "@capacitor/android": "^7.2.0",
-    "@capacitor/app": "^7.0.1",
-    "@capacitor/core": "^7.2.0",
-    "@capacitor/haptics": "^7.0.1",
+    "@capacitor/app": "7.0.2",
+    "@capacitor/core": "7.4.2",
+    "@capacitor/haptics": "7.0.2",
     "@capacitor/ios": "^7.2.0",
     "@capacitor/keyboard": "7.0.1",
     "@capacitor/preferences": "^7.0.1",
@@ -56,7 +58,7 @@
     "@angular/compiler-cli": "^19.0.0",
     "@angular/language-service": "^19.0.0",
     "@capacitor/assets": "^3.0.5",
-    "@capacitor/cli": "^7.2.0",
+    "@capacitor/cli": "7.4.2",
     "@ionic/angular-toolkit": "^12.0.0",
     "@types/jasmine": "~5.1.0",
     "@typescript-eslint/eslint-plugin": "^8.18.0",
