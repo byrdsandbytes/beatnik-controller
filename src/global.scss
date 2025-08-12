@@ -55,12 +55,14 @@
     // --height: 50%;
     --border-radius: 16px;
     // --box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
-    margin-bottom: calc(50px + var(--ion-safe-area-bottom, 0));
+    margin-bottom: calc(8vh + var(--ion-safe-area-bottom, 12px)); // Adjust for tab bar and safe area
     // margin-bottom: (var(--ion-safe-area-bottom, 0) + 50px);
     --width: 100%;
   }
 
-  /* src/global.scss */
+ion-tab-bar {
+  height: 8vh; /* Sets height to 8% of the viewport's height */
+}
 
 /* Regular */
 @font-face {
