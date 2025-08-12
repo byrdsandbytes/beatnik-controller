@@ -1,5 +1,29 @@
 # Changelog
 
+## [0.2.2] - 2025-08-12
+
+### Added
+- Add missing android icon
+- Add Android assets
+- Add terms of service
+- Add privacy policy
+
+### Fixed
+- Fix navigation for iPad
+- Adapt device detail navigation to prevent screen squeeze
+- Fix navigation issues resulting in cropped of screens
+- Hide modal when user leaves tab view
+- Fix webview serving over https while snapcast websocket is not served over wss
+
+### Changed
+- Make "stream" routing standalone
+- Adapt client navigation
+- Format changelog
+
+### Removed
+- Remove deprecated getclient func
+- Remove codeql.yml workflow
+
 ## [0.2.1] - 2025-08-01
 
 ### Added
