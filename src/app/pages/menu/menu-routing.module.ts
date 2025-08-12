@@ -7,14 +7,6 @@ const routes: Routes = [
   {
     path: '',
     component: MenuPage
-  },
-  {
-    path: 'settings',
-    loadChildren: () => import('../settings/settings.module').then(m => m.SettingsPageModule)
-  },
-  {
-    path: 'server-status',
-    loadChildren: () => import('../server-status/server-status.module').then(m => m.ServerStatusPageModule)
   }
 ];
 

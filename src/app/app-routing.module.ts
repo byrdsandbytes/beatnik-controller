@@ -6,11 +6,6 @@ const routes: Routes = [
     path: '',
     loadChildren: () => import('./tabs/tabs.module').then(m => m.TabsPageModule)
   },
-
-  // {
-  //   path: 'dashboard',
-  //   loadChildren: () => import('./pages/dashboard/dashboard.module').then( m => m.DashboardPageModule)
-  // },
   {
     path: 'server-status',
     loadChildren: () => import('./pages/server-status/server-status.module').then(m => m.ServerStatusPageModule)
@@ -31,10 +26,6 @@ const routes: Routes = [
   {
     path: 'clients',
     children: [
-      // {
-      //   path: '',
-      //   loadChildren: () => import('./pages/clients/clients.module').then( m => m.ClientsPageModule)
-      // },
       {
         path: ':id',
         loadChildren: () => import('./pages/clients/client-details/client-details.module').then(m => m.ClientDetailsPageModule)
@@ -54,18 +45,28 @@ const routes: Routes = [
       }
     ]
   },
-  // {
-  //   path: 'settings',
-  //   loadChildren: () => import('./pages/settings/settings.module').then( m => m.SettingsPageModule)
-  // },
-  // {
-  //   path: 'stream-details',
-  //   loadChildren: () => import('./pages/streams/stream-details/stream-details.module').then( m => m.StreamDetailsPageModule)
-  // },
-  // {
-  //   path: 'menu',
-  //   loadChildren: () => import('./pages/menu/menu.module').then( m => m.MenuPageModule)
-  // },
+  {
+    path: 'menu',
+    children: [
+      {
+        path: '',
+        loadChildren: () => import('./pages/menu/menu.module').then(m => m.MenuPageModule)
+      },
+
+
+
+      // {
+      //   path: 'about',
+      //   loadChildren: () => import('./pages/about/about.module').then(m => m.AboutPageModule)
+      // }
+
+    ]
+  },
+  {
+    path: 'settings',
+    loadChildren: () => import('./pages/settings/settings.module').then(m => m.SettingsPageModule)
+  },
+
 
 ];
 @NgModule({
