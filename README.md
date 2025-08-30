@@ -55,7 +55,7 @@ Open your web browser and navigate to `http://localhost:8181` or `http://your-ho
 
 ## Contributing
 
-If you are a developer and want to contribute to the project, build mobile apps, or run the application in a development environment, please see our [CONTRIBUTING.md](CONTRIBUTING.md) file for more information.
+If you are a developer and want to contribute to the project, build mobile apps, or run the application in a development environment, please see our [CONTRIBUTING.md](CONTRIBUTING.md) file for more information. For details on the automated build pipeline, see [BUILD_PIPELINE.md](./docs/BUILD_PIPELINE.md).
 
 ## License
 
