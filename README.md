@@ -2,7 +2,9 @@
 
 ![Beatnik Dashboard Screen](docs/images/iphone15_screen.webp)
 
-Beatnik Controller is a web-based remote control for your [Snapcast](https://github.com/badaix/snapcast) multi-room audio server. It allows you to easily manage and control audio streams from any device with a web browser. The application can also be compiled for Android and iOS.
+Beatnik Controller is a web-based remote control for your [Beatnik Pi](https://github.com/byrdsandbytes/beatnik-pi) or [Snapcast](https://github.com/badaix/snapcast) multi-room audio server. It allows you to easily manage and control audio streams from any device with a web browser. The application can also be compiled for Android and iOS and is available in the App- & Play Store.
+
+
 
 ## Features
 
@@ -20,10 +22,16 @@ To run Beatnik Controller, you will need:
 
 ## Installation & Usage
 
-Getting started with Beatnik Controller is simple with Docker.
-If you have trouble setting up docker compose check our guide: [DOCKER_INSTALLATION.md](./docs/DOCKER_INSTALLATION.md)
+There are two ways to get Beatnik Controller running:
 
-### 1. Get the Code
+1.  **Run with Docker (Recommended):** This is the easiest way to get started. It uses the pre-built Docker image from our registry and requires no local setup.
+2.  **Build from Source:** This is for developers who want to modify the code or contribute to the project.
+
+### Method 1: Run with Docker (Recommended)
+
+This method uses Docker to run the application without needing to build it yourself.
+
+#### 1. Get the Code
 
 Clone this repository to your local machine:
 
@@ -32,30 +40,58 @@ git clone https://github.com/byrdsandbytes/beatnik-controller.git
 cd beatnik-controller
 ```
 
-### 2. Configure the Snapcast Server (Optional)
+#### 2. Configure the Beatnik Pi or Snapcast Server (Optional)
 
-By default, the application will try to connect to a Snapcast server at `beatnik-server.local`. If your server is at a different address, you can configure it in two ways:
+By default, the application will try to connect to a Snapcast server at `beatnik-server.local`. If your server is at a different address, you can configure it in the in-app settings once the application is running.
 
--   **During Setup (Optional):** Edit `src/environments/environment.prod.ts` and change `snapcastServerUrl` to your server's hostname or IP address.
--   **In-App Settings:** Once the application is running, you can go to the settings page and change the Snapcast server address directly in the user interface.
+#### 3. Run with Docker
 
-### 3. Run with Docker
-
-Once configured, you can build and run the application using Docker Compose:
+You can run the application using Docker Compose:
 
 ```bash
 docker compose up -d
 ```
 
-This will build the Docker image and start the application in the background.
+This will pull the latest Docker image and start the application in the background.
 
-### 4. Access the Application
+#### 4. Access the Application
 
 Open your web browser and navigate to `http://localhost:8181` or `http://your-hostname.local:8181`. You should now see the Beatnik Controller interface.
 
+### Method 2: Build from Source (for Developers)
+
+This method is for developers who want to modify the code or contribute to the project.
+
+#### 1. Get the Code
+
+Clone this repository to your local machine:
+
+```bash
+git clone https://github.com/byrdsandbytes/beatnik-controller.git
+cd beatnik-controller
+```
+
+#### 2. Configure the Beatnik Pi or Snapcast Server (Optional)
+
+By default, the application will try to connect to a Snapcast server at `beatnik-server.local`. If your server is at a different address, you can edit `src/environments/environment.ts` and change `snapcastServerUrl` to your server's hostname or IP address.
+
+#### 3. Build and Run
+
+You have two options for building and running the application locally:
+
+##### Build with Docker
+
+If you want to build the Docker image from the source code, you can use the provided `docker-compose.build.yml` file. This is useful for testing local changes in a containerized environment.
+
+```bash
+docker compose -f docker-compose.build.yml up -d --build
+```
+
+This command builds the image and runs it locally. The application will be available at `http://localhost:8181`.
+
 ## Contributing
 
-If you are a developer and want to contribute to the project, build mobile apps, or run the application in a development environment, please see our [CONTRIBUTING.md](CONTRIBUTING.md) file for more information.
+We welcome contributions! If you'd like to help improve Beatnik Controller, please see our [CONTRIBUTING.md](CONTRIBUTING.md) file for more information on how to get started. For details on the automated build pipeline, see [BUILD_PIPELINE.md](./docs/BUILD_PIPELINE.md).
 
 ## License
 

@@ -51,4 +51,9 @@ To build the mobile apps, you will need to have the necessary development enviro
     npx capacitor open ios
     ```
 
+## Generate Assets
+```bash
+npx @capacitor/assets generate
+```
+
 From there, you can build and run the app on a device or emulator using the standard development tools for that platform.
