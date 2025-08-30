@@ -2,7 +2,7 @@
   "name": "beatnik",
   "version": "0.3.0",
   "author": "byrds & bytes gmbh",
-  "homepage": "https://beatnik.ch",
+  "homepage": "https://beatnik.audio",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
