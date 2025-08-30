@@ -1,5 +1,7 @@
 {
   "name": "beatnik",
-  "integrations": {},
+  "integrations": {
+    "capacitor": {}
+  },
   "type": "angular"
 }

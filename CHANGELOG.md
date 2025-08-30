@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.3.0] - 2025-08-30
+
+### Added
+- Add livereload command for native platform development
+
+### Fixed
+- Fix tabbar issue on iPad
+
+
 ## [0.2.2] - 2025-08-12
 
 ### Added
