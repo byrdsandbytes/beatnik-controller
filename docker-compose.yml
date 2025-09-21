@@ -1,5 +1,6 @@
 services:
   beatnik:
-    build: .
+    image: ghcr.io/byrdsandbytes/beatnik-controller:latest
+    container_name: beatnik-controller
     ports:
       - "8181:80"

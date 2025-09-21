@@ -1,0 +1,6 @@
+services:
+  beatnik:
+    build: .
+    container_name: beatnik-controller-local
+    ports:
+      - "8181:80"
