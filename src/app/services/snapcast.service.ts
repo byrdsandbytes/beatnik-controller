@@ -90,11 +90,12 @@ export class SnapcastService implements OnDestroy {
 
   // --- Core Connection and RPC Logic ---
 
-  async connect(host: string = this.DEFAULT_HOSTNAME, port: number = this.DEFAULT_PORT): Promise<void> {
+  async connect(host: string = this.DEFAULT_HOSTNAME, port: number = this.DEFAULT_PORT, overrideUserPreference: boolean = false): Promise<void> {
+   console.log(`SnapcastService: connect called with host=${host}, port=${port}, overrideUserPreference=${overrideUserPreference}`);
     // Load user preference for hostname if available
     const url = await Preferences.get({ key: UserPreference.SERVER_URL });
     // overwrite host if user did set a custom URL
-    if (url.value) {
+    if (url.value && !overrideUserPreference) {
       this.USERPREFERENCE_HOSTNAME = url.value;
       host = this.USERPREFERENCE_HOSTNAME;
     }

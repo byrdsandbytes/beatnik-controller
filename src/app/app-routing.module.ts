@@ -70,6 +70,10 @@ const routes: Routes = [
     path: 'zeroconf',
     loadChildren: () => import('./pages/zeroconf/zeroconf.module').then( m => m.ZeroconfPageModule)
   },
+  {
+    path: 'setup-server',
+    loadChildren: () => import('./pages/setup/setup-server/setup-server.module').then( m => m.SetupServerPageModule)
+  },
 
 
 ];

@@ -13,7 +13,6 @@
         <ion-title size="large"><span *ngIf="userPreeferenceUsername as name">{{name ? name+"s": 'Your'}}</span>
           Home</ion-title>
 
-        <!-- <ion-title size="large"><span>{{user.displayName}}s Zuhause</span></ion-title> -->
       </ion-toolbar>
     </ion-header>
     <div class="fab-row row jsutify-content-center align-items-center">
@@ -49,7 +48,7 @@
         <ion-list-header>
           <ion-label><span *ngIf="userPreeferenceUsername as name">{{name ? name+"s": 'Your'}}</span>
             Devices</ion-label>
-          <ion-button size="small" fill="clear" (click)="openModal()">
+          <ion-button size="small" fill="clear" [routerLink]="'/setup-server'">
             <ion-icon slot="icon-only" name="add-circle-outline"></ion-icon>
           </ion-button>
         </ion-list-header>
@@ -125,6 +124,9 @@
         </ion-card-content>
         <ion-button fill="clear" color="primary" (click)="enableDemoMode()">
           <ion-icon name="play"></ion-icon> Enable Demo Mode
+        </ion-button>
+        <ion-button fill="clear" color="primary" routerLink="/setup-server">
+          <ion-icon name="settings"></ion-icon> Setup Server
         </ion-button>
       </div>
     </ng-template>
