@@ -74,6 +74,10 @@ const routes: Routes = [
     path: 'setup-server',
     loadChildren: () => import('./pages/setup/setup-server/setup-server.module').then( m => m.SetupServerPageModule)
   },
+  {
+    path: 'camilla-dsp',
+    loadChildren: () => import('./pages/camilla-dsp/camilla-dsp.module').then( m => m.CamillaDspPageModule)
+  },
 
 
 ];
