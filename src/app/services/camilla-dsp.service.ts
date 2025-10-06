@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { webSocket, WebSocketSubject } from 'rxjs/webSocket';
 import { Subject, Observable, BehaviorSubject, timer, of } from 'rxjs';
-import { retryWhen, switchMap, tap, delayWhen } from 'rxjs/operators';
+import { retryWhen, switchMap, tap, delayWhen, filter } from 'rxjs/operators';
 
 // Defines the possible connection states
 export type ConnectionStatus = 'Connected' | 'Connecting' | 'Disconnected' | 'Error';
@@ -24,8 +24,13 @@ export class CamillaDspService {
   // Public observables for components to subscribe to
   public messages$: Observable<any> = this.messagesSubject.asObservable();
   public connectionStatus$: Observable<ConnectionStatus> = this.connectionStatusSubject.asObservable();
+  public signalLevels$: Observable<any>;
 
-  constructor() {}
+  constructor() {
+    this.signalLevels$ = this.messages$.pipe(
+      filter(msg => msg && msg.SignalLevels)
+    );
+  }
 
   /**
    * Establishes a connection to the CamillaDSP WebSocket server.
@@ -99,10 +104,28 @@ export class CamillaDspService {
   }
 
   /**
+   * Tells CamillaDSP to start sending SignalLevels messages periodically.
+   * @param intervalMs The update interval in milliseconds.
+   */
+  public startLevelUpdates(intervalMs: number): void {
+    if (intervalMs > 0) {
+      this.sendCommand('SetUpdateInterval', intervalMs);
+    }
+  }
+
+  /**
+   * Tells CamillaDSP to stop sending SignalLevels messages.
+   */
+  public stopLevelUpdates(): void {
+    this.sendCommand('SetUpdateInterval', { value: 0 });
+  }
+
+  /**
    * Closes the WebSocket connection gracefully.
    */
   public disconnect(): void {
     if (this.socket$) {
+      this.stopLevelUpdates();
       this.socket$.complete(); // This will trigger the closeObserver
     }
   }

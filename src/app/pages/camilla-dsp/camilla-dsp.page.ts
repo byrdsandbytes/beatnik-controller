@@ -1,6 +1,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
+import { set } from 'lodash-es';
 import { Subscription } from 'rxjs';
-import { CamillaDspConfig } from 'src/app/model/camilla-dsp.model';
+import { CamillaDspConfig, SignalLevels } from 'src/app/model/camilla-dsp.model';
 import { CamillaDspService, ConnectionStatus } from 'src/app/services/camilla-dsp.service';
 
 @Component({
@@ -18,8 +19,11 @@ export class CamillaDspPage implements OnInit, OnDestroy {
   parsedConfig: CamillaDspConfig | null = null;
   // Your CamillaDSP URL
   private readonly CAMILLA_URL = 'ws://beatnik-client-amp.local:1234';
+  levels: SignalLevels | null = null;
 
-  constructor(private camillaService: CamillaDspService) {}
+  private levelSubscription: Subscription | undefined;
+
+  constructor(private camillaService: CamillaDspService) { }
 
   ngOnInit() {
     // Subscribe to connection status changes
@@ -45,9 +49,18 @@ export class CamillaDspPage implements OnInit, OnDestroy {
           } catch (error) {
             console.error('Error parsing Config JSON:', error);
           }
+        } else if (message.GetSignalLevels) {
+          this.levels = message.GetSignalLevels.value;
+          console.log('Signal Levels received:', this.levels);
         }
       })
     );
+
+    this.levelSubscription = this.camillaService.signalLevels$.subscribe(message => {
+      console.log('Received message in component:', message);
+      this.levels = message.SignalLevels.value;
+      console.log('Signal Levels received:', this.levels);
+    });
   }
 
   connect() {
@@ -95,7 +108,23 @@ export class CamillaDspPage implements OnInit, OnDestroy {
     // send the full configJson back to CamillaDSP
     this.camillaService.sendCommand('SetConfigJson', JSON.stringify(this.parsedConfig));
 
-  } 
+  }
+
+  getUpdateInterval() {
+    this.camillaService.sendCommand('GetUpdateInterval');
+  }
+
+  getCaptureSignalLevels() {
+    const interval = 50; // e.g., 100 ms
+    setInterval(() => {
+      this.camillaService.sendCommand('GetSignalLevels');
+    }, interval);
+  }
+
+  setUpdateInterval(interval: number) {
+    this.camillaService.startLevelUpdates(interval);
+  }
+
   ngOnDestroy() {
     // Clean up subscriptions to prevent memory leaks
     this.subscriptions.unsubscribe();

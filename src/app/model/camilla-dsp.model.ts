@@ -1,6 +1,3 @@
-
-
-
 export interface CamillaDspConfig {
   title: string | null;
   description: string | null;
@@ -62,5 +59,12 @@ export interface Pipeline {
   names: string[];
   description: string | null;
   bypassed: boolean | null;
+}
+
+export interface SignalLevels {
+  playback_rms: number[];
+  playback_peak: number[];
+  capture_rms: number[];
+  capture_peak: number[];
 }
 
