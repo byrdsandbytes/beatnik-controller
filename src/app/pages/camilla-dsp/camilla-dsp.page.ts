@@ -1,7 +1,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { set } from 'lodash-es';
 import { Subscription } from 'rxjs';
-import { CamillaDspConfig, SignalLevels } from 'src/app/model/camilla-dsp.model';
+import { CamillaDspConfig, MixerSource, SignalLevels } from 'src/app/model/camilla-dsp.model';
 import { CamillaDspService, ConnectionStatus } from 'src/app/services/camilla-dsp.service';
 
 @Component({
@@ -18,8 +18,9 @@ export class CamillaDspPage implements OnInit, OnDestroy {
   private configJson: any = null;
   parsedConfig: CamillaDspConfig | null = null;
   // Your CamillaDSP URL
-  private readonly CAMILLA_URL = 'ws://beatnik-client-amp.local:1234';
+  CAMILLA_URL = 'ws://beatnik-server.local:1234';
   levels: SignalLevels | null = null;
+  currentVolume: number = 0;
 
   private levelSubscription: Subscription | undefined;
 
@@ -110,6 +111,19 @@ export class CamillaDspPage implements OnInit, OnDestroy {
 
   }
 
+  updateMixerMapping(mixerSource:MixerSource, mixerKey: string) {
+    if (!this.parsedConfig) {
+      console.error('No configuration loaded.');
+      return;
+    }
+    
+
+    // Send the full configJson back to CamillaDSP
+    this.camillaService.sendCommand('SetConfigJson', JSON.stringify(this.parsedConfig));
+
+
+  }
+
   getUpdateInterval() {
     this.camillaService.sendCommand('GetUpdateInterval');
   }
@@ -123,6 +137,16 @@ export class CamillaDspPage implements OnInit, OnDestroy {
 
   setUpdateInterval(interval: number) {
     this.camillaService.startLevelUpdates(interval);
+  }
+
+  getVolume() {
+    this.camillaService.sendCommand('GetVolume');
+    this.currentVolume = this.lastMessage.GetVolume?.value ?? this.currentVolume;
+    console.log('Current volume:', this.currentVolume);
+  }
+
+  setVolume(volume: number) {
+    this.camillaService.sendCommand('SetVolume', volume);
   }
 
   ngOnDestroy() {

@@ -2,7 +2,7 @@ export interface CamillaDspConfig {
   title: string | null;
   description: string | null;
   devices: Devices;
-  mixers: any;
+  mixers: { [key: string]: Mixer };
   filters: { [key: string]: Filter };
   processors: any;
   pipeline: Pipeline[];
@@ -66,5 +66,30 @@ export interface SignalLevels {
   playback_peak: number[];
   capture_rms: number[];
   capture_peak: number[];
+}
+
+export interface Mixer {
+  description: string | null;
+  channels: MixerChannels;
+  mapping: MixerMapping[];
+}
+
+export interface MixerChannels {
+  in: number;
+  out: number;
+}
+
+export interface MixerMapping {
+  dest: number;
+  sources: MixerSource[];
+  mute: boolean | null;
+}
+
+export interface MixerSource {
+  channel: number;
+  gain: number;
+  inverted: boolean | null;
+  mute: boolean;
+  scale: string | null;
 }
 
