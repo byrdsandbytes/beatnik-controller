@@ -27,6 +27,7 @@
     "@angular/platform-browser": "^19.0.0",
     "@angular/platform-browser-dynamic": "^19.0.0",
     "@angular/router": "^19.0.0",
+    "@capacitor-community/bluetooth-le": "^7.2.0",
     "@capacitor/android": "^7.2.0",
     "@capacitor/app": "7.0.2",
     "@capacitor/core": "7.4.2",
