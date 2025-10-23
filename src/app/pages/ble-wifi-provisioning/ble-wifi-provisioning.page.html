@@ -21,6 +21,13 @@
     Scan available networks
   </ion-button>
 
+  <!-- read wifi networks  -->
+  <ion-button (click)="bleService.readWifiNetworks()">
+    Read Wi-Fi networks
+  </ion-button>
+
+
+
   <ng-container *ngIf="network$">
     <ng-container *ngFor="let network of network$ | async">
       <p>SSID: {{ network.ssid }}</p>
@@ -30,15 +37,26 @@
   </ng-container>
 
   <ng-container *ngIf="scanResults">
-    <ng-container *ngFor="let result of scanResults |async">
+    <ion-item *ngFor="let result of scanResults |async">
+      
       <p>Device Name: {{ result.device.name || 'Unknown' }}</p>
       <!-- <p>Device ID: {{ result.device.id }}</p> -->
       <hr />
-    </ng-container>
+      <pre>{{ result | json }}</pre>
+    </ion-item>
   </ng-container>
 
   <div *ngIf="(bleService.status$ | async) !== 'Disconnected'">
     <ion-list>
+      <!-- selection dropdown of SSIDs -->
+      <ion-item>
+        <ion-label>Available Networks</ion-label>
+        <ion-select [(ngModel)]="ssid" placeholder="Select SSID">
+          <ion-select-option *ngFor="let network of network$ | async" [value]="network.ssid">
+            {{ network.ssid }} ({{ network.signalStrength }} dBm)
+          </ion-select-option>
+        </ion-select>
+      </ion-item>
       <ion-item>
         <ion-label position="floating">Wi-Fi SSID</ion-label>
         <ion-input type="text" [(ngModel)]="ssid"></ion-input>

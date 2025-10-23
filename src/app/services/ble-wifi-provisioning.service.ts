@@ -8,13 +8,13 @@ function stringToDataView(str: string): DataView {
   return new DataView(encoder.encode(str).buffer);
 }
 
-// Use the UUIDs from your Python script
-const PROVISIONING_SERVICE = '12345678-1234-5678-1234-56789abcdef0';
-const SSID_CHARACTERISTIC = '12345678-1234-5678-1234-56789abcdef1';
-const PASS_CHARACTERISTIC = '12345678-1234-5678-1234-56789abcdef2';
-const CONNECT_CHARACTERISTIC = '12345678-1234-5678-1234-56789abcdef3';
-const STATUS_CHARACTERISTIC = '12345678-1234-5678-1234-56789abcdef4';
-const SCAN_CHARACTERISTIC = '12345678-1234-5678-1234-56789abcdef5';
+// Nordic UART Service inspired UUIDs
+const PROVISIONING_SERVICE = '6E400001-B5A3-F393-E0A9-E50E24DCCA9E';
+const SSID_CHARACTERISTIC = '6E400002-B5A3-F393-E0A9-E50E24DCCA9E';
+const PASS_CHARACTERISTIC = '6E400003-B5A3-F393-E0A9-E50E24DCCA9E';
+const CONNECT_CHARACTERISTIC = '6E400004-B5A3-F393-E0A9-E50E24DCCA9E';
+const STATUS_CHARACTERISTIC = '6E400005-B5A3-F393-E0A9-E50E24DCCA9E';
+const SCAN_CHARACTERISTIC = '6E400006-B5A3-F393-E0A9-E50E24DCCA9E';
 
 export interface WifiNetwork {
   ssid: string;
@@ -44,25 +44,56 @@ export class BleWifiProvisioningService {
       this.updateStatus('Scanning...');
       const device = await BleClient.requestDevice({
         // services: [PROVISIONING_SERVICE],
-        name: 'beatnik-server',
+        name: 'beatnik',
       });
 
       this.updateStatus('Connecting...');
       await BleClient.connect(device.deviceId, (deviceId) => this.onDisconnect(deviceId));
       this.connectedDevice = device;
-      this.updateStatus('Connected. Subscribing to status...');
+      console.log('Connected device:', this.connectedDevice);
+      
+      // Make sure services are discovered first
+      this.updateStatus('Discovering services...');
 
+      const services = await BleClient.getServices(device.deviceId);
+      console.log('Available services:', services);
+      
+      const hasProvisioningService = services.some((s: { uuid: string }) => 
+        s.uuid.toLowerCase() === PROVISIONING_SERVICE.toLowerCase()
+      );
+      if (!hasProvisioningService) {
+        throw new Error(`Device does not have the provisioning service ${PROVISIONING_SERVICE}`);
+      }
+      
+      this.updateStatus('Setting up notifications...');
+      
       // Subscribe to status updates
-      await BleClient.startNotifications(
+      BleClient.startNotifications(
         this.connectedDevice.deviceId,
         PROVISIONING_SERVICE,
         STATUS_CHARACTERISTIC,
         (value) => {
-          console.log('Status notification received:', value);
-          const status = new TextDecoder().decode(value);
-          this.updateStatus(status);
+          console.log('Status notification received - raw value:', value);
+          console.log('Value type:', value.constructor.name);
+          console.log('Value buffer:', Array.from(new Uint8Array(value.buffer)));
+          
+          try {
+            const status = new TextDecoder().decode(value);
+            console.log('Decoded status:', status);
+            this.updateStatus(status);
+          } catch (error) {
+            console.error('Error decoding status:', error);
+            // Try alternative decoding if the value is a DataView
+            if (value instanceof DataView) {
+              const bytes = new Uint8Array(value.buffer);
+              const status = new TextDecoder().decode(bytes);
+              console.log('Decoded status from DataView:', status);
+              this.updateStatus(status);
+            }
+          }
         }
       );
+
 
       // Subscribe to scan results
       await BleClient.startNotifications(
@@ -70,8 +101,24 @@ export class BleWifiProvisioningService {
         PROVISIONING_SERVICE,
         SCAN_CHARACTERISTIC,
         (value) => {
-          const results = new TextDecoder().decode(value);
-          this.parseAndUpdateNetworks(results);
+          console.log('Scan notification received - raw value:', value);
+          console.log('Value type:', value.constructor.name);
+          console.log('Value buffer:', Array.from(new Uint8Array(value.buffer)));
+          
+          try {
+            const results = new TextDecoder().decode(value);
+            console.log('Decoded scan results:', results);
+            this.parseAndUpdateNetworks(results);
+          } catch (error) {
+            console.error('Error decoding scan results:', error);
+            // Try alternative decoding if the value is a DataView
+            if (value instanceof DataView) {
+              const bytes = new Uint8Array(value.buffer);
+              const results = new TextDecoder().decode(bytes);
+              console.log('Decoded scan results from DataView:', results);
+              this.parseAndUpdateNetworks(results);
+            }
+          }
         }
       );
 
@@ -104,6 +151,7 @@ export class BleWifiProvisioningService {
     );
 
     this.updateStatus('Triggering connection...');
+    console.log('this.connectedDevice:', this.connectedDevice);
     // Write to trigger connection
     await BleClient.write(
       this.connectedDevice.deviceId,
@@ -140,13 +188,25 @@ export class BleWifiProvisioningService {
     }
 
     // Write any value to trigger scan
-    const result = await BleClient.write(
+    await BleClient.write(
       this.connectedDevice.deviceId,
       PROVISIONING_SERVICE,
       SCAN_CHARACTERISTIC,
       numbersToDataView([1])
     );
-    console.log('Scan triggered, result:', result);
+
+    // const result = BleClient.read(
+    //   this.connectedDevice.deviceId,
+    //   PROVISIONING_SERVICE,
+    //   SCAN_CHARACTERISTIC
+    // ).then(value => {
+    //   const results = new TextDecoder().decode(value);
+    //   console.log('Decoded scan results from read():', results);
+    //   this.parseAndUpdateNetworks(results);
+    // }).catch(error => {
+    //   console.error('Error reading scan results:', error);
+    // });
+    // console.log('Scan triggered, result:', result);
   }
 
   private parseAndUpdateNetworks(results: string): void {
@@ -177,6 +237,36 @@ export class BleWifiProvisioningService {
       this.ngZone.run(() => {
         this.scanResults.next(this.scanResultsArray);
       });
+    });
+  }
+
+  readWifiNetworks(): void {
+    BleClient.read(
+      this.connectedDevice.deviceId,
+      PROVISIONING_SERVICE,
+      SCAN_CHARACTERISTIC
+    ).then(value => {
+      const results = new TextDecoder().decode(value);
+      console.log('Decoded scan results from read():', results);
+      this.parseAndUpdateNetworks(results);
+    }).catch(error => {
+      console.error('Error reading scan results:', error);
+    });
+  }
+
+  readConnectionStatus(): void {
+    BleClient.read(
+      this.connectedDevice.deviceId,
+      PROVISIONING_SERVICE,
+      STATUS_CHARACTERISTIC
+    ).then(value => {
+      const status = new TextDecoder().decode(value);
+      console.log('Decoded connection status from read():', status);
+      this.updateStatus(status);
+    }).catch(error => {
+      console.error('Error reading connection status:', error);
+
+
     });
   }
 }
