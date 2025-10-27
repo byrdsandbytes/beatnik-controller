@@ -2,15 +2,11 @@
 // http://ionicframework.com/docs/theming/
 
 :root {
-    --ion-font-family: 'IBM Plex Mono',
-   monospace;
-  --ion-font-family-base: 'IBM Plex Mono',
-   monospace;
+  --ion-font-family: "IBM Plex Mono", monospace;
+  --ion-font-family-base: "IBM Plex Mono", monospace;
 
   //  background
   --ion-background-color: #f5f3e8; /* Light background color */
-
-
 
   --ion-color-secondary: #3ea3dc; /* Blue */
   --ion-color-secondary-rgb: 62, 163, 220;
@@ -82,6 +78,19 @@
   --ion-color-white-shade: #e0e0e0;
   --ion-color-white-tint: #ffffff;
 
+  // Buttons
+  ion-button {
+    --border-radius: 0;
+  }
 
-  
+  // Underline text for clear buttons
+  .button-clear {
+    text-decoration: underline;
+  }
+
+  // toolbar in light color
+  ion-toolbar {
+    --background: var(--ion-color-light);
+    --color: var(--ion-color-dark);
+  }
 }

@@ -1,0 +1,112 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="menu"></ion-back-button>
+    </ion-buttons>
+    <ion-title>camilla-dsp</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-header collapse="condense">
+    <ion-toolbar>
+      <ion-title size="large">camilla-dsp</ion-title>
+    </ion-toolbar>
+  </ion-header>
+
+  <div class="p-4">
+    <h1 class="text-2xl font-bold mb-4">CamillaDSP Control</h1>
+    <ion-input placeholder="WebSocket URL" [(ngModel)]="CAMILLA_URL"></ion-input>
+    <p class="mb-2">Connection Status: <strong>{{ connectionStatus }}</strong></p>
+    <ion-button (click)="connect()">Connect</ion-button>
+    <ion-button (click)="disconnect()">Disconnect</ion-button>
+    <ion-button (click)="getState()">Get State</ion-button>
+    <ion-button (click)="getConfigJson()">Get Config JSON</ion-button>
+    <ion-button (click)="getConfigYaml()">Get Config YAML</ion-button>
+    <ion-button (click)="getUpdateInterval()">Get Update Interval</ion-button>
+    <ion-button (click)="getCaptureSignalLevels()">Get Capture Signal Levels</ion-button>
+    <ion-button (click)="setUpdateInterval(100)">Set update Interval</ion-button>
+    <ion-button (click)="getVolume()">Get Volume</ion-button>
+     <ion-range  min="-150" max="50" step="1" [(ngModel)]="currentVolume" (ionChange)="setVolume(currentVolume)">
+      <ion-label slot="start">Volume: {{ currentVolume }}</ion-label>
+    </ion-range>
+"
+   
+    <pre class="bg-gray-100 p-4 rounded mt-4 overflow-auto">{{ lastMessage | json }}</pre>
+    <pre class="bg-gray-100 p-4 rounded mt-4 overflow-auto">{{ parsedConfig | json }}</pre>
+  </div>
+
+  <div *ngIf="levels" class="ion-margin">
+    <h2 class="text-xl font-bold mb-2">Signal Levels</h2>
+    <div *ngIf="levels" class="ion-margin">
+      <h2>Capture (Snapcast Signal)</h2>
+      <p>Capture RMS 0{{ levels.capture_rms[0] }} dB</p>
+      <div class="bar" [style.width]="levels.capture_rms[0] + 600+ 'px'"></div>
+      <p>Capture RMS 1{{ levels.capture_rms[1] }} dB</p>
+      <div class="bar" [style.width]="levels.capture_rms[1] + 600+ 'px'"></div>
+      <p>Capture Peak 0{{ levels.capture_peak[0] }} dB</p>
+      <div class="bar" [style.width]="levels.capture_peak[0] + 600+ 'px'"></div>
+      <p>Capture Peak 1 {{ levels.capture_peak[1] }} dB</p>
+      <div class="bar" [style.width]="levels.capture_peak[1] + 600+ 'px'"></div>
+
+      <h2>Playback</h2>
+
+      <p>Playback RMS 0{{ levels.playback_rms[0] }} dB</p>
+      <div class="bar" [style.width]="levels.playback_rms[0] + 600+ 'px'"></div>
+      <p>Playback RMS 1{{ levels.playback_rms[1] }} dB</p>
+      <div class="bar" [style.width]="levels.playback_rms[1] + 600+ 'px'"></div>
+      <p>Playback Peak 0{{ levels.playback_peak[0] }} dB</p>
+      <div class="bar" [style.width]="levels.playback_peak[0] + 600+ 'px'"></div>
+      <p>Playback Peak 1 {{ levels.playback_peak[1] }} dB</p>
+      <div class="bar" [style.width]="levels.playback_peak[1] + 600+ 'px'"></div>
+    </div>
+  </div>
+  <div *ngIf="parsedConfig" class="ion-margin">
+    <h2 class="text-xl font-bold mb-2">Parsed Configuration</h2>
+    <div *ngFor="let filter of parsedConfig.filters | keyvalue">
+      {{ filter.key }}:
+      <ion-item>
+        Type: {{ filter.value.type }}
+      </ion-item>
+      <ion-item>
+        Gain: {{ filter.value.parameters.gain }}
+        <ion-range min="-24" max="24" step="0.1" [(ngModel)]="filter.value.parameters.gain"
+          (ionChange)="updateFilterParameter(filter.key, 'gain', filter.value.parameters.gain)"></ion-range>
+      </ion-item>
+      <ion-item>
+        Frequency: {{ filter.value.parameters.freq }}
+      </ion-item>
+      <ion-item>
+        Q: {{ filter.value.parameters.q }}
+      </ion-item>
+      <!-- <ion-item *ngFor="let param of filter.value.parameters | keyvalue">
+       {{ param.key }}: {{ param.value }}
+       <ion-range min="0" max="1" step="0.01" [(ngModel)]="param.value" (ionChange)="updateFilterParameter(filter.key, param.key, param.value)"></ion-range>
+        <ion-input type="number" [(ngModel)]="param.value" (ionChange)="updateFilterParameter(filter.key, param.key, param.value)"></ion-input>
+     </ion-item>   -->
+    </div>
+    <div *ngFor="let mixer of parsedConfig.mixers | keyvalue">
+      {{ mixer.key }}:
+      <ion-item>
+        Channels: {{ mixer.value.channels }}
+      </ion-item>
+      <div *ngFor="let mapping of mixer.value.mapping, let i = index">
+        <p>Destination {{ mapping.dest }}
+          <span *ngIf="i === 0"> (Left)</span>
+          <span *ngIf="i === 1"> (Right)</span>
+        </p>
+        <div *ngFor="let source of mapping.sources">
+          <p>Source {{ source.channel }} - Gain: {{ source.gain }}</p>
+          <ion-range min="-24" max="24" step="0.1" [(ngModel)]="source.gain"
+            (ionChange)="updateMixerMapping(source, mixer.key)"></ion-range>
+          <p>Inverted: {{ source.inverted}}</p>
+          <ion-toggle [(ngModel)]="source.inverted" (ionChange)="updateMixerMapping(source, mixer.key)"></ion-toggle>
+          <p>Muted: {{ source.mute}}</p>
+          <ion-toggle [(ngModel)]="source.mute" (ionChange)="updateMixerMapping(source, mixer.key)"></ion-toggle>
+        </div>
+
+      </div>
+    </div>
+
+
+  </div>

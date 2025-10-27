@@ -66,6 +66,18 @@ const routes: Routes = [
     path: 'settings',
     loadChildren: () => import('./pages/settings/settings.module').then(m => m.SettingsPageModule)
   },
+  {
+    path: 'zeroconf',
+    loadChildren: () => import('./pages/zeroconf/zeroconf.module').then( m => m.ZeroconfPageModule)
+  },
+  {
+    path: 'setup-server',
+    loadChildren: () => import('./pages/setup/setup-server/setup-server.module').then( m => m.SetupServerPageModule)
+  },
+  {
+    path: 'camilla-dsp',
+    loadChildren: () => import('./pages/camilla-dsp/camilla-dsp.module').then( m => m.CamillaDspPageModule)
+  },
 
 
 ];
