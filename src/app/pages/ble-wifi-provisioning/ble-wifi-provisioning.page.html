@@ -6,39 +6,40 @@
 
 <ion-content class="ion-padding">
   <div class="status-banner">
-    <strong>Status:</strong> {{ bleService.status$ | async }}
+    <div>
+      <strong>Device Connection Status:</strong> {{ deviceConnectionStatus$ | async }}
+    </div>
+    <!-- <strong>Status:</strong> {{ bleService.status$ | async }} -->
+    <div *ngIf="blenoDeviceId |async as deviceId">
+      <strong>Connected Device ID:</strong> {{ deviceId }}
+    </div>
+
+    <div *ngIf="wifiConnectionStatus | async as connStatus">
+      <strong>Wifi Connection Status:</strong> {{ connStatus }}
+    </div>
   </div>
 
-  <ion-button expand="block" (click)="scan()" [disabled]="(bleService.status$ | async) !== 'Disconnected'">
-    Scan & Connect
+  <ion-button expand="block" (click)="scanForDevices()">
+    Scan for Devices
   </ion-button>
 
-  <ion-button (click)="bleService.scanForDevices()">
-    Scan for devices
-  </ion-button>
-
-  <ion-button (click)="bleService.scanWifiNetworks()">
-    Scan available networks
-  </ion-button>
-
-  <!-- read wifi networks  -->
-  <ion-button (click)="bleService.readWifiNetworks()">
-    Read Wi-Fi networks
-  </ion-button>
-
-
-
-  <ng-container *ngIf="network$">
-    <ng-container *ngFor="let network of network$ | async">
-      <p>SSID: {{ network.ssid }}</p>
-      <p>Signal Strength: {{ network.signalStrength }}</p>
-      <p>Security: {{ network.security }}</p>
-    </ng-container>
+  <ng-container *ngIf="availableNetworks$|async as networks">
+    <h2>Available Wi-Fi Networks</h2>
+    <ion-list>
+      <ion-item *ngFor="let network of networks">
+        <ion-label>
+          <h3>{{ network.ssid }}</h3>
+          <p>Quality: {{ network.quality }} | Security: {{ network.security }}</p>
+        </ion-label>
+        <!-- <ion-radio slot="start" [value]="network.ssid" (ionSelect)="selectNetwork(network.ssid)"></ion-radio> -->
+      </ion-item>
+    </ion-list>
   </ng-container>
+
 
   <ng-container *ngIf="scanResults">
     <ion-item *ngFor="let result of scanResults |async">
-      
+
       <p>Device Name: {{ result.device.name || 'Unknown' }}</p>
       <!-- <p>Device ID: {{ result.device.id }}</p> -->
       <hr />
@@ -46,33 +47,7 @@
     </ion-item>
   </ng-container>
 
-  <div *ngIf="(bleService.status$ | async) !== 'Disconnected'">
-    <ion-list>
-      <!-- selection dropdown of SSIDs -->
-      <ion-item>
-        <ion-label>Available Networks</ion-label>
-        <ion-select [(ngModel)]="ssid" placeholder="Select SSID">
-          <ion-select-option *ngFor="let network of network$ | async" [value]="network.ssid">
-            {{ network.ssid }} ({{ network.signalStrength }} dBm)
-          </ion-select-option>
-        </ion-select>
-      </ion-item>
-      <ion-item>
-        <ion-label position="floating">Wi-Fi SSID</ion-label>
-        <ion-input type="text" [(ngModel)]="ssid"></ion-input>
-      </ion-item>
-      <ion-item>
-        <ion-label position="floating">Password</ion-label>
-        <ion-input type="password" [(ngModel)]="password"></ion-input>
-      </ion-item>
-    </ion-list>
-
-    <ion-button expand="block" (click)="startProvisioning()" [disabled]="!ssid">
-      Provision Device
-    </ion-button>
-
-    <ion-button expand="block" color="danger" (click)="disconnect()">
-      Disconnect
-    </ion-button>
-  </div>
+  <ion-button expand="block" color="danger" (click)="disconnect()">
+    Disconnect
+  </ion-button>
 </ion-content>

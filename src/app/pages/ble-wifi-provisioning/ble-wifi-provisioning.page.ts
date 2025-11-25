@@ -1,8 +1,9 @@
 import { Component } from '@angular/core';
-import { BleWifiProvisioningService, WifiNetwork } from 'src/app/services/ble-wifi-provisioning.service';
+// import { BleWifiProvisioningService, WifiNetwork } from 'src/app/services/ble-wifi-provisioning.service';
 import { AlertController } from '@ionic/angular';
 import { ScanResult } from '@capacitor-community/bluetooth-le';
 import { Observable } from 'rxjs';
+import { BeatnikBlenoService, BleNetwork } from 'src/app/services/beatnik-bleno.service';
 
 @Component({
   selector: 'app-ble-wifi-provisioning',
@@ -15,30 +16,27 @@ export class BleWifiProvisioningPage {
   password = '';
 
   scanResults: Observable<ScanResult[]>;
-  network$: Observable<WifiNetwork[]>;
+
+
+  blenoDeviceId: Observable<string | null> = this.beatikBlenoService.deviceId$;
+
+  deviceConnectionStatus$: Observable<'Disconnected' | 'Scanning' | 'Connecting' | 'Connected'> = this.beatikBlenoService.deviceConnectionStatus$;
+  wifiConnectionStatus: Observable<string> = this.beatikBlenoService.wifiStatus$;
+  availableNetworks$: Observable<BleNetwork[]> = this.beatikBlenoService.availableNetworks$;
 
   constructor(
-    public bleService: BleWifiProvisioningService,
-    private alertCtrl: AlertController
+    // public bleService: BleWifiProvisioningService,
+    private alertCtrl: AlertController,
+    private beatikBlenoService: BeatnikBlenoService
   ) {
-    this.scanResults = this.bleService.scanResults;
-    this.network$ = this.bleService.networks$;
+    // this.scanResults = this.bleService.scanResults;
+    // this.network$ = this.bleService.networks$;
   }
 
-  async scan(): Promise<void> {
-    await this.bleService.scanAndConnect();
-  }
 
-  async startProvisioning(): Promise<void> {
-    try {
-      await this.bleService.provision(this.ssid, this.password);
-    } catch (error) {
-      this.showAlert('Error', (error as Error).message);
-    }
-  }
 
   async disconnect(): Promise<void> {
-    await this.bleService.disconnect();
+    // await this.bleService.disconnect();
   }
 
 
@@ -52,10 +50,19 @@ export class BleWifiProvisioningPage {
   }
 
   // async scanForDevices(): Promise<void> {
-    
+
   //   const result = await this.bleService.requestLeScan();
   //   console.log('Scan result:', result);
   //   this.scanResult = result as ScanResult;
-    
+
+  // }
+
+  async scanForDevices(): Promise<void> {
+    const result = await this.beatikBlenoService.findAndConnect();
+    console.log('Scan result:', result);
+  }
+
+  // async provisionWifi(deviceId: string, ssid: string, password: string): Promise<void> {
+  //   await this.beatikBlenoService.provisionWifi(deviceId, ssid, password);
   // }
 }
