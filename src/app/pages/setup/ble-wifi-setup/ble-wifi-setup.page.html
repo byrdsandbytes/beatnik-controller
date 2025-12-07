@@ -1,0 +1,251 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="tabs"></ion-back-button>
+    </ion-buttons>
+    <ion-title>ble-wifi-setup</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+
+
+
+  <div class="container">
+    <swiper class="swiper" (swiper)="onSwiper($event)" (slideChange)="onSlideChange($event)" [config]="swiperConfig">
+      <ng-container>
+        <ng-template swiperSlide>
+
+          <ion-header collapse="condense">
+            <ion-toolbar>
+              <ion-title size="large">Add Device</ion-title>
+            </ion-toolbar>
+          </ion-header>
+
+          <div class="ion-margin">
+            <ion-text color="medium">
+              <p>
+                Plug in your Beatnik. Hold the setup button for 5 seconds until the LED pulses blue. Then tap "Scan
+                for
+                Devices".
+              </p>
+            </ion-text>
+          </div>
+          <div class="animation-container">
+
+            <div [class]="isScanning? 'animation-container active':'animation-container'">
+
+              <div class="icon-container">
+                <ion-icon color="light" [class]="isScanning?'custom-icon active':'custom-icon'"
+                  name="bluetooth"></ion-icon>
+                <div [class]="isScanning ? 'outer-ring active' : 'outer-ring'">
+                  <div [class]="isScanning ? 'inner-ring active' : 'inner-ring'">
+                  </div>
+                </div>
+
+              </div>
+
+            </div>
+
+          </div>
+          <div class="status-text">
+            <p>{{statusText}}</p>
+          </div>
+        </ng-template>
+      </ng-container>
+      <ng-container>
+        <ng-template swiperSlide>
+          <ng-container *ngIf="availableNetworks$|async as networks">
+
+            <ion-list>
+              <ion-text color="medium">
+                <h1 class="ion-margin-horizontal">Available Wi-Fi Networks</h1>
+                <p class="ion-margin-horizontal">Your Beatnik Pi has found the following Wi-Fi networks. Please select
+                  one to connect to:</p>
+              </ion-text>
+
+
+
+              <ion-radio-group [(ngModel)]="selectedNetwork">
+                <ion-item *ngFor="let network of networks">
+                  <ion-radio [value]="network">
+                    <ion-label>
+                      <h3>{{ network.ssid }}</h3>
+                      <p>Quality: {{ network.quality }} | Security: {{ network.security }}</p>
+                    </ion-label>
+                  </ion-radio>
+                </ion-item>
+
+
+              </ion-radio-group>
+            </ion-list>
+
+          </ng-container>
+
+        </ng-template>
+      </ng-container>
+      <ng-container>
+        <ng-template swiperSlide>
+          <ng-container *ngIf="selectedNetwork">
+
+            <ion-list>
+              <ion-text color="medium">
+                <h1 class="ion-margin-horizontal">Connect to {{selectedNetwork.ssid}}</h1>
+                <p class="ion-margin-horizontal">Please enter the password for the Wi-Fi network
+                  "{{selectedNetwork.ssid}}":</p>
+              </ion-text>
+              <ion-item>
+                <ion-label>Network</ion-label>
+                <ion-select *ngIf="(availableNetworks$|async) as networks" placeholder="Network"
+                  [(ngModel)]="selectedNetwork">
+                  <ion-select-option *ngFor="let network of networks" [value]="network">
+                    {{ network.ssid }}
+                  </ion-select-option>
+                </ion-select>
+              </ion-item>
+
+              <ion-item>
+                <!-- <ion-label position="floating">Password</ion-label> -->
+                <ion-input [type]="passwordVisible ? 'text' : 'password'" [(ngModel)]="networkPassword"
+                  placeholder="Enter Password"></ion-input>
+                <!-- <ion-icon size="small" slot="end" [name]="passwordVisible ? 'eye-off' : 'eye'"
+                  (click)="passwordVisible = !passwordVisible"></ion-icon> -->
+                <ion-button fill="clear" slot="end" (click)="passwordVisible = !passwordVisible">
+                  <ion-icon [name]="passwordVisible ? 'eye-off' : 'eye'"></ion-icon>
+                </ion-button>
+              </ion-item>
+
+            </ion-list>
+            <ion-item *ngIf="wifiConnectionStatus|async as wifiState">
+              <ion-label>
+                <h2 class="ion-margin-horizontal">Connection Status:</h2>
+                <p class="ion-margin-horizontal">{{wifiState.message}}</p>
+                <p *ngIf="wifiState.connected && wifiState.ip" class="ion-margin-horizontal">
+                  IP: {{wifiState.ip}} <br>
+                  Hostname: {{wifiState.hostname}}
+              </ion-label>
+            </ion-item>
+
+          </ng-container>
+        </ng-template>
+      </ng-container>
+      <ng-container>
+        <ng-template swiperSlide>
+          <ion-header collapse="condense">
+            <ion-toolbar>
+              <ion-title size="large">Wifi Connection</ion-title>
+            </ion-toolbar>
+          </ion-header>
+          <div class="ion-margin" *ngIf="selectedNetwork">
+            <ion-text color="medium">
+              <p *ngIf="!isNetworkSetupComplete else completeText">
+                Your Beatnik Pi is attempting to connect to the Wi-Fi network
+                "{{selectedNetwork.ssid}}". Please wait...
+              </p>
+              <ng-template #completeText>
+                <p>
+                  Your Beatnik Pi has successfully connected to the Wi-Fi network
+                  "{{selectedNetwork.ssid}}".
+                </p>
+              </ng-template>
+            </ion-text>
+          </div>
+
+          <div class="animation-container">
+
+            <div [class]="isScanning? 'animation-container active':'animation-container'">
+
+              <div class="icon-container">
+                <ion-icon color="light" [class]="isWifiVerifying?'custom-icon active':'custom-icon'"
+                  [name]="isNetworkSetupComplete ? 'checkmark-circle' : 'wifi'"></ion-icon>
+                <div [class]="isWifiVerifying ? 'outer-ring active' : 'outer-ring'">
+                  <div [class]="isWifiVerifying ? 'inner-ring active' : 'inner-ring'">
+                  </div>
+                </div>
+
+              </div>
+
+            </div>
+
+          </div>
+          <ion-item *ngIf="wifiConnectionStatus|async as wifiState">
+            <ion-label class="ion-text-center">
+              <h2 class="ion-margin-horizontal">Connection Status:</h2>
+              <p class="ion-margin-horizontal">{{wifiState.message}}</p>
+              <p *ngIf="wifiState.connected && wifiState.ip" class="ion-margin-horizontal">
+                IP: {{wifiState.ip}} <br>
+                Hostname: {{wifiState.hostname}} <br>
+                Device ID: {{wifiState.deviceId}}
+            </ion-label>
+          </ion-item>
+
+
+
+        </ng-template>
+
+      </ng-container>
+    </swiper>
+  </div>
+
+
+
+
+
+</ion-content>
+
+<ion-footer>
+  <ion-toolbar class="ion-no-lines ion-padding-horizontal">
+    <div [ngSwitch]="slideIndex">
+      <div *ngSwitchCase="0">
+        <div>
+          <ion-button (click)="scanForServices()" *ngIf="!isScanning" expand="block">
+            <ion-icon slot="start" name="bluetooth-outline"></ion-icon> Scan for Devices
+          </ion-button>
+        </div>
+        <div>
+          <ion-button (click)="stopScan()" *ngIf="isScanning" expand="block" color="danger">
+            <ion-icon slot="start" name="stop-circle-outline"></ion-icon> Stop Scan
+          </ion-button>
+        </div>
+      </div>
+      <div *ngSwitchCase="1">
+        <div>
+          <ion-button (click)="slideNext()" expand="block" [disabled]="!selectedNetwork">
+            <ion-icon slot="start" name="bluetooth-outline"></ion-icon> Select Network
+          </ion-button>
+        </div>
+
+      </div>
+      <div *ngSwitchCase="2">
+        <div *ngIf="selectedNetwork">
+
+          <ion-button (click)="provisionWifi()" expand="block" [disabled]="!networkPassword">
+            <ion-icon slot="start" name="wifi-outline"></ion-icon> Connect to Network
+          </ion-button>
+        </div>
+      </div>
+      <div *ngSwitchCase="3">
+        <div>
+          <ion-button [disabled]="!isNetworkSetupComplete" (click)="completeSetup()" expand="block">
+            <ion-icon slot="start" name="checkmark-circle-outline"></ion-icon> Finish
+          </ion-button>
+        </div>
+      </div>
+    </div>
+
+    <!-- <div>
+      <ion-button expand="block" fill="clear">
+        Cancel
+      </ion-button>
+    </div> -->
+    <div class="ion-margin-top">
+      <ion-button fill="clear" (click)="slidePrev()">
+        Previous
+      </ion-button>
+      <ion-button fill="clear" (click)="slideNext()">
+        Next
+      </ion-button>
+    </div>
+
+  </ion-toolbar>
+</ion-footer>

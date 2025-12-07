@@ -8,6 +8,15 @@ export interface BleNetwork {
   security: string;
 }
 
+export interface WifiStatus {
+  connected: boolean;
+  ssid?: string;
+  ip?: string;
+  hostname?: string;
+  deviceId?: string;
+  message: string;
+}
+
 
 @Injectable({
   providedIn: 'root'
@@ -23,7 +32,7 @@ export class BeatnikBlenoService {
   private readonly NETWORK_LIST_CHAR = '6e400007-b5a3-f393-e0a9-e50e24dcca9e';
 
   // Observables for state management
-  public readonly wifiStatus$ = new BehaviorSubject<string>('Not Connected');
+  public readonly wifiStatus$ = new BehaviorSubject<WifiStatus>({ connected: false, message: 'Not Connected' });
   public readonly deviceConnectionStatus$ = new BehaviorSubject<'Disconnected' | 'Scanning' | 'Connecting' | 'Connected'>('Disconnected');
   public readonly deviceId$ = new BehaviorSubject<string | null>(null);
   public readonly availableNetworks$ = new BehaviorSubject<BleNetwork[]>([]);
@@ -33,15 +42,6 @@ export class BeatnikBlenoService {
 
   constructor() { }
 
-  /**
-   * Converts an array of numbers to a DataView.
-   */
-  // private numbersToDataView(numbers: number[]): DataView {
-  //   const buffer = new ArrayBuffer(numbers.length);
-  //   const uint8 = new Uint8Array(buffer);
-  //   uint8.set(numbers);
-  //   return new DataView(buffer);
-  // }
 
   private sleep(ms: number): Promise<void> {
     return new Promise(resolve => setTimeout(resolve, ms));
@@ -71,6 +71,37 @@ export class BeatnikBlenoService {
       } else {
         throw new Error('No device found');
       }
+    } catch (error) {
+      console.error('Error during scan/connect:', error);
+      this.deviceConnectionStatus$.next('Disconnected');
+    }
+  }
+
+  async findAndConnectWithouhtDialog(): Promise<void> {
+    try {
+      console.log('Initializing BLE...');
+      await BleClient.initialize();
+      this.deviceConnectionStatus$.next('Scanning');
+      console.log('Scanning for BLE devices...');
+      // use requestLeScan instead of requestDevice to avoid dialog
+      const scanResult = await BleClient.requestLEScan({
+        services: [this.SERVICE, '0000180a-0000-1000-8000-00805f9b34fb'],
+        allowDuplicates: false
+      }, (result) => {
+        console.log('Scan result:', result);
+        if (result.device) {
+          console.log('Found device during scan:', result.device);
+          this.handleFoundDevice(result);
+        }
+      });
+
+      // Wait for a short period to gather scan results
+      await this.sleep(5000);
+
+      // Stop scanning
+      await BleClient.stopLEScan();
+      console.log('Stopped scanning.');
+
     } catch (error) {
       console.error('Error during scan/connect:', error);
       this.deviceConnectionStatus$.next('Disconnected');
@@ -189,9 +220,19 @@ export class BeatnikBlenoService {
           });
 
           try {
-            const status = dataViewToText(dataView);
-            console.log('Decoded status:', status);
-            this.wifiStatus$.next(status);
+            const statusString = dataViewToText(dataView);
+            console.log('Decoded status:', statusString);
+
+            try {
+              const status: WifiStatus = JSON.parse(statusString);
+              this.wifiStatus$.next(status);
+            } catch (e) {
+              // Fallback for plain text
+              this.wifiStatus$.next({
+                connected: false,
+                message: statusString
+              });
+            }
           } catch (error) {
             console.error('Error decoding status notification:', error);
           }
@@ -218,14 +259,17 @@ export class BeatnikBlenoService {
     try {
       console.log('Writing SSID:', ssid);
       // Use the textToDataView helper for encoding
-      await BleClient.write(this.deviceId, this.SSID_CHAR, this.SSID_CHAR, textToDataView(ssid));
+      await BleClient.write(this.deviceId, this.SERVICE, this.SSID_CHAR, textToDataView(ssid));
+      await this.sleep(500); // Wait for server to process
 
       console.log('Writing password');
-      await BleClient.write(this.deviceId, this.PASS_CHAR, this.PASS_CHAR, textToDataView(password));
+      await BleClient.write(this.deviceId, this.SERVICE, this.PASS_CHAR, textToDataView(password));
+      await this.sleep(500); // Wait for server to process
 
       console.log('Triggering connection');
       // Use numbersToDataView for the trigger command
-      await BleClient.write(this.deviceId, this.CONNECT_CHAR, this.CONNECT_CHAR, numbersToDataView([1]));
+      // The characteristic seems to prefer WriteWithoutResponse based on logs
+      await BleClient.writeWithoutResponse(this.deviceId, this.SERVICE, this.CONNECT_CHAR, numbersToDataView([1]));
 
       console.log('WiFi credentials sent successfully');
     } catch (error) {
@@ -236,10 +280,42 @@ export class BeatnikBlenoService {
     console.log('WiFi credentials sent.');
   }
 
+  // async subscribeToNetworkList(): Promise<void> {
+  //   if (!this.deviceId) {
+  //     throw new Error('Device not connected');
+  //   }
+
+  //   try {
+  //     console.log('Subscribing to network list notifications...');
+  //     await BleClient.startNotifications(
+  //       this.deviceId,
+  //       this.SERVICE,
+  //       this.NETWORK_LIST_CHAR,
+  //       (dataView) => {
+  //         const jsonString = dataViewToText(dataView);
+  //         try {
+  //           const networks: BleNetwork[] = JSON.parse(jsonString);
+  //           console.log('Received network list:', networks);
+  //           this.availableNetworks$.next(networks);
+  //         } catch (error) {
+  //           console.error('Error parsing network list JSON:', error);
+  //         }
+  //       }
+  //     );
+  //     console.log('Successfully subscribed to network list.');
+  //   } catch (error) {
+  //     console.error('Error subscribing to network list:', error);
+  //   }
+  // }
+
+  // try to get network list in chunks
+
   async subscribeToNetworkList(): Promise<void> {
     if (!this.deviceId) {
       throw new Error('Device not connected');
     }
+
+    let accumulatedData = ''; // Buffer to store chunks
 
     try {
       console.log('Subscribing to network list notifications...');
@@ -248,13 +324,21 @@ export class BeatnikBlenoService {
         this.SERVICE,
         this.NETWORK_LIST_CHAR,
         (dataView) => {
-          const jsonString = dataViewToText(dataView);
+          const chunk = dataViewToText(dataView);
+          accumulatedData += chunk;
+
+          // Try to parse the accumulated data
           try {
-            const networks: BleNetwork[] = JSON.parse(jsonString);
-            console.log('Received network list:', networks);
-            this.availableNetworks$.next(networks);
+            // Check if it looks like a complete JSON array (starts with [ and ends with ])
+            if (accumulatedData.trim().startsWith('[') && accumulatedData.trim().endsWith(']')) {
+              const networks: BleNetwork[] = JSON.parse(accumulatedData);
+              console.log('Received network list:', networks);
+              this.availableNetworks$.next(networks);
+              accumulatedData = ''; // Reset buffer after successful parse
+            }
           } catch (error) {
-            console.error('Error parsing network list JSON:', error);
+            // It's expected to fail while we are still receiving chunks
+            // console.debug('Waiting for more chunks...');
           }
         }
       );

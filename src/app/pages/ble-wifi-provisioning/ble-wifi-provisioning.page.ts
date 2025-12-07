@@ -3,7 +3,7 @@ import { Component } from '@angular/core';
 import { AlertController } from '@ionic/angular';
 import { ScanResult } from '@capacitor-community/bluetooth-le';
 import { Observable } from 'rxjs';
-import { BeatnikBlenoService, BleNetwork } from 'src/app/services/beatnik-bleno.service';
+import { BeatnikBlenoService, BleNetwork, WifiStatus } from 'src/app/services/beatnik-bleno.service';
 
 @Component({
   selector: 'app-ble-wifi-provisioning',
@@ -21,7 +21,7 @@ export class BleWifiProvisioningPage {
   blenoDeviceId: Observable<string | null> = this.beatikBlenoService.deviceId$;
 
   deviceConnectionStatus$: Observable<'Disconnected' | 'Scanning' | 'Connecting' | 'Connected'> = this.beatikBlenoService.deviceConnectionStatus$;
-  wifiConnectionStatus: Observable<string> = this.beatikBlenoService.wifiStatus$;
+  wifiConnectionStatus: Observable<WifiStatus> = this.beatikBlenoService.wifiStatus$;
   availableNetworks$: Observable<BleNetwork[]> = this.beatikBlenoService.availableNetworks$;
 
   constructor(
