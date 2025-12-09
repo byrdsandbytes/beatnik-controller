@@ -29,11 +29,12 @@
         <ng-container *ngFor="let client of group.clients">
           <ion-item [routerLink]="['/clients', client.id]">
             <ion-label>
-              <h2> {{ client.config.name || client.id }}
+              <h2> {{ client.host.name || client.config.name || client.id }}
               </h2>
+              <p>Client ID: {{ client.id }}</p>
               <p>Group: {{ group.name || group.id }}</p>
               <p>Volume: {{ client.config.volume.percent || 'N/A' }}%</p>
-              <p>Last Seen: {{ client.lastSeen.sec *1000 | date }}</p>
+              <p>Last Seen: {{ client.lastSeen.sec *1000 | date : 'short' }}</p>
               <p>Connected: {{ client.connected }}</p>
             </ion-label>
           </ion-item>

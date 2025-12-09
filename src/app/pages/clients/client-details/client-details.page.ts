@@ -4,6 +4,7 @@ import { ModalController } from '@ionic/angular';
 import { Observable } from 'rxjs';
 import { ChooseSpeakersComponent } from 'src/app/components/choose-speakers/choose-speakers.component';
 import { Client, SnapCastServerStatusResponse } from 'src/app/model/snapcast.model';
+import { BeatnikHardwareService, HardwareStatus } from 'src/app/services/beatnik-hardware.service';
 import { SnapcastService } from 'src/app/services/snapcast.service';
 
 @Component({
@@ -18,13 +19,18 @@ export class ClientDetailsPage implements OnInit {
   id?: string;
 
   serverState?: Observable<SnapCastServerStatusResponse>;
-  public client?: Client;
+  client?: Client;
+  segment: 'details' | 'soundcard' | 'settings' = 'details';
+
+  hardwareStatus$: Observable<HardwareStatus>;
+
 
 
   constructor(
     private avtivateRoute: ActivatedRoute,
     private snapcastService: SnapcastService,
-    private modalController: ModalController
+    private modalController: ModalController,
+    private beatnikHardwareService: BeatnikHardwareService
   ) { }
 
   async ngOnInit() {
@@ -44,6 +50,10 @@ export class ClientDetailsPage implements OnInit {
       return;
     }
     this.serverState.subscribe((state) => {
+      if (!state || !state.server) {
+        console.warn('ClientDetailsPage: Invalid server state received', state);
+        return;
+      }
       this.client = state.server.groups.flatMap(group => group.clients).find(client => client.id === this.id);
       if (!this.client) {
         console.error(`ClientDetailsPage: Client with ID ${this.id} not found in server state`);
@@ -126,6 +136,47 @@ export class ClientDetailsPage implements OnInit {
       modal.present();
     }).catch(err => {
       console.error('Error opening speaker selection modal:', err);
+    });
+  }
+
+  cleanIpAddress(ip: string): string {
+    return ip.replace('::ffff:', '');
+  }
+
+  getHardwareInfo() {
+    if (!this.client) {
+      console.error('ClientDetailsPage: No client available to get hardware info');
+      return;
+    }
+    const localHostName = this.client.host.name + '.local';
+    this.hardwareStatus$ = this.beatnikHardwareService.getStatus(localHostName);
+  }
+
+  applySoundcardConfig(hatId: string) {
+    if (!this.client) {
+      console.error('ClientDetailsPage: No client available to apply hardware configuration');
+      return;
+    }
+    console.log(`ClientDetailsPage: Applying hardware configuration ${hatId} to client ${this.client.id}`);
+    const localHostName = this.client.host.name + '.local';
+    this.beatnikHardwareService.applyConfiguration(hatId, localHostName).subscribe({
+      next: (response) => {
+        console.log(`ClientDetailsPage: Successfully applied hardware configuration ${hatId} to client ${this.client?.id}`, response);
+        if (response.rebootRequired) {
+          console.log('ClientDetailsPage: Reboot required. Triggering reboot...');
+          this.beatnikHardwareService.reboot(localHostName).subscribe({
+            next: () => {
+              console.log(`ClientDetailsPage: Successfully triggered reboot for client ${this.client?.id}`);
+            },
+            error: (err) => {
+              console.error(`ClientDetailsPage: Failed to trigger reboot for client ${this.client?.id}`, err);
+            }
+          });
+        }
+      },
+      error: (err) => {
+        console.error(`ClientDetailsPage: Failed to apply hardware configuration ${hatId} to client ${this.client?.id}`, err);
+      }
     });
   }
 
