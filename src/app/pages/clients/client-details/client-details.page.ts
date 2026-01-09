@@ -3,6 +3,7 @@ import { ActivatedRoute } from '@angular/router';
 import { ModalController } from '@ionic/angular';
 import { Observable } from 'rxjs';
 import { ChooseSpeakersComponent } from 'src/app/components/choose-speakers/choose-speakers.component';
+import { HatEnum } from 'src/app/enum/hat.enum';
 import { Client, SnapCastServerStatusResponse } from 'src/app/model/snapcast.model';
 import { BeatnikHardwareService, HardwareStatus } from 'src/app/services/beatnik-hardware.service';
 import { SnapcastService } from 'src/app/services/snapcast.service';
@@ -20,9 +21,15 @@ export class ClientDetailsPage implements OnInit {
 
   serverState?: Observable<SnapCastServerStatusResponse>;
   client?: Client;
-  segment: 'details' | 'soundcard' | 'settings' = 'details';
+  segment: 'details' | 'soundcard' |'camilla-dsp' |'settings' = 'details';
 
   hardwareStatus$: Observable<HardwareStatus>;
+
+  hatEnum = HatEnum;
+
+  manualHatId: string = '';
+
+  camillaDspUrl: string;
 
 
 
@@ -59,6 +66,7 @@ export class ClientDetailsPage implements OnInit {
         console.error(`ClientDetailsPage: Client with ID ${this.id} not found in server state`);
       } else {
         console.log('ClientDetailsPage: Found client:', this.client);
+        this.camillaDspUrl = this.getCamillaDspUrl();
       }
     });
   }
@@ -178,6 +186,15 @@ export class ClientDetailsPage implements OnInit {
         console.error(`ClientDetailsPage: Failed to apply hardware configuration ${hatId} to client ${this.client?.id}`, err);
       }
     });
+  }
+
+
+  getCamillaDspUrl(): string {
+    if (!this.client) {
+      console.error('ClientDetailsPage: No client available to get Camilla DSP URL');
+      return '';
+    }
+    return `ws://${this.client.host.name}.local:1234`;
   }
 
 

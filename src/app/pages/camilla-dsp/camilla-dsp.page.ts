@@ -1,157 +1,18 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
-import { set } from 'lodash-es';
-import { Subscription } from 'rxjs';
-import { CamillaDspConfig, MixerSource, SignalLevels } from 'src/app/model/camilla-dsp.model';
-import { CamillaDspService, ConnectionStatus } from 'src/app/services/camilla-dsp.service';
+import { Component, OnInit } from '@angular/core';
 
 @Component({
-  selector: 'app-camilla-dsp',
+  selector: 'app-camilla-dsp-page',
   templateUrl: './camilla-dsp.page.html',
   styleUrls: ['./camilla-dsp.page.scss'],
   standalone: false
 })
-export class CamillaDspPage implements OnInit, OnDestroy {
+export class CamillaDspPage implements OnInit {
 
-  connectionStatus: ConnectionStatus = 'Disconnected';
-  lastMessage: any = { message: 'No messages received yet.' };
-  private subscriptions = new Subscription();
-  private configJson: any = null;
-  parsedConfig: CamillaDspConfig | null = null;
-  // Your CamillaDSP URL
-  CAMILLA_URL = 'ws://beatnik-server.local:1234';
-  levels: SignalLevels | null = null;
-  currentVolume: number = 0;
+  url = 'ws://beatnik-server.local:1234';
 
-  private levelSubscription: Subscription | undefined;
-
-  constructor(private camillaService: CamillaDspService) { }
+  constructor() { }
 
   ngOnInit() {
-    // Subscribe to connection status changes
-    this.subscriptions.add(
-      this.camillaService.connectionStatus$.subscribe(status => {
-        this.connectionStatus = status;
-      })
-    );
-
-    // Subscribe to incoming messages
-    this.subscriptions.add(
-      this.camillaService.messages$.subscribe(message => {
-        console.log('Received message in component:', message);
-        this.lastMessage = message;
-        if (message.GetConfigJson) {
-          console.log('Config JSON received:', message.GetConfigJson);
-          this.configJson = message.GetConfigJson.value;
-          console.log('Unparsed Config JSON:', this.configJson);
-          try {
-            this.configJson = JSON.parse(this.configJson);
-            console.log('Parsed Config JSON:', this.configJson);
-            this.parsedConfig = this.configJson;
-          } catch (error) {
-            console.error('Error parsing Config JSON:', error);
-          }
-        } else if (message.GetSignalLevels) {
-          this.levels = message.GetSignalLevels.value;
-          console.log('Signal Levels received:', this.levels);
-        }
-      })
-    );
-
-    this.levelSubscription = this.camillaService.signalLevels$.subscribe(message => {
-      console.log('Received message in component:', message);
-      this.levels = message.SignalLevels.value;
-      console.log('Signal Levels received:', this.levels);
-    });
   }
 
-  connect() {
-    this.camillaService.connect(this.CAMILLA_URL);
-  }
-
-  disconnect() {
-    this.camillaService.disconnect();
-  }
-
-  getState() {
-    this.camillaService.sendCommand('GetState');
-  }
-
-  getConfigJson() {
-    this.camillaService.sendCommand('GetConfigJson');
-  }
-
-  getConfigYaml() {
-    this.camillaService.sendCommand('GetConfig');
-  }
-
-  // onParameterChange(filter.key, param.key, param.value)
-  updateFilterParameter(filterKey: string, paramKey: string, newValue: any) {
-    if (!this.parsedConfig) {
-      console.error('No configuration loaded.');
-      return;
-    }
-
-    const filter = this.parsedConfig.filters[filterKey];
-    if (!filter) {
-      console.error(`Filter with key ${filterKey} not found.`);
-      return;
-    }
-
-    // Update the parameter locally
-    (filter.parameters as any)[paramKey] = newValue;
-
-    // format the conffigJson to send to CamillaDSP
-    console.log('Updated filter parameter:', filterKey, paramKey, newValue);
-    console.log('Updated configuration to send:', this.parsedConfig);
-
-
-
-    // send the full configJson back to CamillaDSP
-    this.camillaService.sendCommand('SetConfigJson', JSON.stringify(this.parsedConfig));
-
-  }
-
-  updateMixerMapping(mixerSource:MixerSource, mixerKey: string) {
-    if (!this.parsedConfig) {
-      console.error('No configuration loaded.');
-      return;
-    }
-    
-
-    // Send the full configJson back to CamillaDSP
-    this.camillaService.sendCommand('SetConfigJson', JSON.stringify(this.parsedConfig));
-
-
-  }
-
-  getUpdateInterval() {
-    this.camillaService.sendCommand('GetUpdateInterval');
-  }
-
-  getCaptureSignalLevels() {
-    const interval = 50; // e.g., 100 ms
-    setInterval(() => {
-      this.camillaService.sendCommand('GetSignalLevels');
-    }, interval);
-  }
-
-  setUpdateInterval(interval: number) {
-    this.camillaService.startLevelUpdates(interval);
-  }
-
-  getVolume() {
-    this.camillaService.sendCommand('GetVolume');
-    this.currentVolume = this.lastMessage.GetVolume?.value ?? this.currentVolume;
-    console.log('Current volume:', this.currentVolume);
-  }
-
-  setVolume(volume: number) {
-    this.camillaService.sendCommand('SetVolume', volume);
-  }
-
-  ngOnDestroy() {
-    // Clean up subscriptions to prevent memory leaks
-    this.subscriptions.unsubscribe();
-    this.camillaService.disconnect();
-  }
 }

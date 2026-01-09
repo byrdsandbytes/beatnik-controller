@@ -7,13 +7,15 @@ import { IonicModule } from '@ionic/angular';
 import { ClientDetailsPageRoutingModule } from './client-details-routing.module';
 
 import { ClientDetailsPage } from './client-details.page';
+import { CamillaDspModule } from 'src/app/components/camilla-dsp/camilla-dsp.module';
 
 @NgModule({
   imports: [
     CommonModule,
     FormsModule,
     IonicModule,
-    ClientDetailsPageRoutingModule
+    ClientDetailsPageRoutingModule,
+    CamillaDspModule
   ],
   declarations: [ClientDetailsPage]
 })
