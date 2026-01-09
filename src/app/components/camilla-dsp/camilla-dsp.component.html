@@ -1,24 +1,4 @@
-<div class="p-4">
-    <h1 class="text-2xl font-bold mb-4">CamillaDSP Control</h1>
-    <ion-input placeholder="WebSocket URL" [(ngModel)]="url"></ion-input>
-    <p class="mb-2">
-        Connection Status: <strong>{{ connectionStatus }}</strong>
-    </p>
-    <ion-button (click)="connect()">Connect</ion-button>
-    <ion-button (click)="disconnect()">Disconnect</ion-button>
-    <ion-button (click)="getState()">Get State</ion-button>
-    <ion-button (click)="getConfigJson()">Get Config JSON</ion-button>
-    <ion-button (click)="getConfigYaml()">Get Config YAML</ion-button>
-    <ion-button (click)="getUpdateInterval()">Get Update Interval</ion-button>
-    <ion-button (click)="getCaptureSignalLevels()">Get Capture Signal Levels</ion-button>
-    <ion-button (click)="setUpdateInterval(100)">Set update Interval</ion-button>
-    <ion-button (click)="getVolume()">Get Volume</ion-button>
-    <ion-range min="-150" max="50" step="1" [(ngModel)]="currentVolume" (ionChange)="setVolume(currentVolume)">
-        <ion-label slot="start">Volume: {{ currentVolume }}</ion-label>
-    </ion-range>
 
-   
-</div>
 
 <div *ngIf="levels" class="ion-margin meters-section">
     <h2 class="text-xl font-bold mb-4">Signal Levels</h2>
@@ -174,6 +154,29 @@
             </div>
         </div>
     </div>
+</div>
+
+
+<div class="p-4">
+    <h1 class="text-2xl font-bold mb-4">CamillaDSP Control</h1>
+    <ion-input placeholder="WebSocket URL" [(ngModel)]="url"></ion-input>
+    <p class="mb-2">
+        Connection Status: <strong>{{ connectionStatus }}</strong>
+    </p>
+    <ion-button (click)="connect()">Connect</ion-button>
+    <ion-button (click)="disconnect()">Disconnect</ion-button>
+    <ion-button (click)="getState()">Get State</ion-button>
+    <ion-button (click)="getConfigJson()">Get Config JSON</ion-button>
+    <ion-button (click)="getConfigYaml()">Get Config YAML</ion-button>
+    <ion-button (click)="getUpdateInterval()">Get Update Interval</ion-button>
+    <ion-button (click)="getCaptureSignalLevels()">Get Capture Signal Levels</ion-button>
+    <ion-button (click)="setUpdateInterval(100)">Set update Interval</ion-button>
+    <ion-button (click)="getVolume()">Get Volume</ion-button>
+    <ion-range min="-150" max="50" step="1" [(ngModel)]="currentVolume" (ionChange)="setVolume(currentVolume)">
+        <ion-label slot="start">Volume: {{ currentVolume }}</ion-label>
+    </ion-range>
+
+   
 </div>
 
  <pre class="bg-gray-100 p-4 rounded mt-4 overflow-auto">

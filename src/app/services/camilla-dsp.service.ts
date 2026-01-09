@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { webSocket, WebSocketSubject } from 'rxjs/webSocket';
 import { Subject, Observable, BehaviorSubject, timer, of } from 'rxjs';
-import { retryWhen, switchMap, tap, delayWhen, filter } from 'rxjs/operators';
+import { retryWhen, switchMap, tap, delayWhen, filter, map } from 'rxjs/operators';
 
 // Defines the possible connection states
 export type ConnectionStatus = 'Connected' | 'Connecting' | 'Disconnected' | 'Error';
@@ -25,10 +25,12 @@ export class CamillaDspService {
   public messages$: Observable<any> = this.messagesSubject.asObservable();
   public connectionStatus$: Observable<ConnectionStatus> = this.connectionStatusSubject.asObservable();
   public signalLevels$: Observable<any>;
+  private levelUpdateIntervalId: any;
 
   constructor() {
     this.signalLevels$ = this.messages$.pipe(
-      filter(msg => msg && msg.SignalLevels)
+      filter(msg => (msg && msg.SignalLevels) || (msg && (msg.GetSignalLevels && msg.GetSignalLevels.value))),
+      map(msg => msg.SignalLevels ? msg.SignalLevels : msg.GetSignalLevels.value)
     );
   }
 
@@ -105,11 +107,20 @@ export class CamillaDspService {
 
   /**
    * Tells CamillaDSP to start sending SignalLevels messages periodically.
+   * Uses polling via 'GetSignalLevels' as reliable fallback if push is not available.
    * @param intervalMs The update interval in milliseconds.
    */
   public startLevelUpdates(intervalMs: number): void {
+    this.stopLevelUpdates(); // Clear any existing interval
+    
+    // Also set the calculation interval on the server just in case
     if (intervalMs > 0) {
       this.sendCommand('SetUpdateInterval', intervalMs);
+      
+      // Setup client-side polling
+      this.levelUpdateIntervalId = setInterval(() => {
+          this.sendCommand('GetSignalLevels');
+      }, intervalMs);
     }
   }
 
@@ -117,7 +128,11 @@ export class CamillaDspService {
    * Tells CamillaDSP to stop sending SignalLevels messages.
    */
   public stopLevelUpdates(): void {
-    this.sendCommand('SetUpdateInterval', { value: 0 });
+    if (this.levelUpdateIntervalId) {
+        clearInterval(this.levelUpdateIntervalId);
+        this.levelUpdateIntervalId = null;
+    }
+    this.sendCommand('SetUpdateInterval', 0);
   }
 
   /**

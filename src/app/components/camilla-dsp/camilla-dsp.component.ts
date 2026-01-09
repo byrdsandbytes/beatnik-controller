@@ -23,13 +23,11 @@ export class CamillaDspComponent implements OnInit, OnDestroy {
     currentVolume: number = 0;
 
     private levelSubscription: Subscription | undefined;
-    private signalLevelsInterval: any;
 
     constructor(private camillaService: CamillaDspService) { }
 
     ngOnInit() {
         this.connect();
-        // this.getCaptureSignalLevels();
         // Subscribe to connection status changes
         this.subscriptions.add(
             this.camillaService.connectionStatus$.subscribe(status => {
@@ -62,11 +60,16 @@ export class CamillaDspComponent implements OnInit, OnDestroy {
             })
         );
 
-        this.levelSubscription = this.camillaService.signalLevels$.subscribe(message => {
-            console.log('Received message in component:', message);
-            this.levels = message.SignalLevels.value;
-            console.log('Signal Levels received:', this.levels);
+        this.levelSubscription = this.camillaService.signalLevels$.subscribe(levels => {
+            // Service handles normalization, so we get the raw levels object directly
+            this.levels = levels;
         });
+
+        // timeout to allow UI to update
+        setTimeout(() => {
+            this.getCaptureSignalLevels();
+
+        }, 400);
     }
 
     connect() {
@@ -129,11 +132,8 @@ export class CamillaDspComponent implements OnInit, OnDestroy {
     }
 
     getCaptureSignalLevels() {
-        const interval = 100; // e.g., 100 ms
-        this.signalLevelsInterval =
-            setInterval(() => {
-                this.camillaService.sendCommand('GetSignalLevels');
-            }, interval);
+        // Use the server-side push mechanism instead of polling
+        this.camillaService.startLevelUpdates(50);
     }
 
     setUpdateInterval(interval: number) {
@@ -153,9 +153,8 @@ export class CamillaDspComponent implements OnInit, OnDestroy {
     ngOnDestroy() {
         // Clean up subscriptions to prevent memory leaks
         this.subscriptions.unsubscribe();
+        // Tell server to stop sending updates
+        this.camillaService.stopLevelUpdates();
         this.camillaService.disconnect();
-        if (this.signalLevelsInterval) {
-            clearInterval(this.signalLevelsInterval);
-        }
     }
 }
