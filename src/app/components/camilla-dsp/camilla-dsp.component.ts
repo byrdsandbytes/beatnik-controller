@@ -26,13 +26,18 @@ export class CamillaDspComponent implements OnInit, OnDestroy {
 
     constructor(private camillaService: CamillaDspService) { }
 
-    ngOnInit() {
+    async ngOnInit() {
         this.connect();
         // Subscribe to connection status changes
         this.subscriptions.add(
             this.camillaService.connectionStatus$.subscribe(status => {
                 this.connectionStatus = status;
-                this.getConfigJson();
+                if (status === 'Connected') {
+                    // Fetch initial state and config upon connection
+                    this.getConfigJson();
+                    this.getCaptureSignalLevels();
+
+                }
 
             })
         );
@@ -40,7 +45,7 @@ export class CamillaDspComponent implements OnInit, OnDestroy {
         // Subscribe to incoming messages
         this.subscriptions.add(
             this.camillaService.messages$.subscribe(message => {
-                console.log('Received message in component:', message);
+                // console.log('Received message in component:', message);
                 this.lastMessage = message;
                 if (message.GetConfigJson) {
                     console.log('Config JSON received:', message.GetConfigJson);
@@ -54,8 +59,8 @@ export class CamillaDspComponent implements OnInit, OnDestroy {
                         console.error('Error parsing Config JSON:', error);
                     }
                 } else if (message.GetSignalLevels) {
-                    this.levels = message.GetSignalLevels.value;
-                    console.log('Signal Levels received:', this.levels);
+                    // this.levels = message.GetSignalLevels.value;
+                    // console.log('Signal Levels received:', this.levels);
                 }
             })
         );
@@ -66,14 +71,16 @@ export class CamillaDspComponent implements OnInit, OnDestroy {
         });
 
         // timeout to allow UI to update
-        setTimeout(() => {
-            this.getCaptureSignalLevels();
+        // setTimeout(() => {
+        //     this.getCaptureSignalLevels();
 
-        }, 400);
+        // }, 800);
     }
 
-    connect() {
-        this.camillaService.connect(this.url);
+
+
+     connect() {
+        return this.camillaService.connect(this.url);
     }
 
     disconnect() {

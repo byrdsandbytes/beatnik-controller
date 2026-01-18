@@ -89,10 +89,10 @@
   }
 
   // toolbar in light color
-  ion-toolbar {
-    --background: var(--ion-color-light);
-    --color: var(--ion-color-dark);
-  }
+  // ion-toolbar {
+  //   --background: var(--ion-color-light);
+  //   --color: var(--ion-color-dark);
+  // }
 
   ion-title, ion-list-header {
     font-weight: 600;

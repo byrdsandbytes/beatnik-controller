@@ -13,27 +13,29 @@
       <ion-title size="large">Client Details</ion-title>
     </ion-toolbar>
   </ion-header>
-  <ion-segment [(ngModel)]="segment" class="ion-margin">
-    <ion-segment-button value="details">
-      <ion-label>Details</ion-label>
-    </ion-segment-button>
-    <ion-segment-button value="soundcard">
-      <ion-label>
-        Soundcard</ion-label>
-    </ion-segment-button>
-    <ion-segment-button value="settings">
-      <ion-label>Settings</ion-label>
-    </ion-segment-button>
-    <ion-segment-button value="camilla-dsp">
-      <ion-label>Camilla DSP</ion-label>
-    </ion-segment-button>
-  </ion-segment>
+  <ion-toolbar color="light">
+    <ion-segment [(ngModel)]="segment" [scrollable]="true">
+      <ion-segment-button value="camilla-dsp">
+        <ion-label>Camilla DSP</ion-label>
+      </ion-segment-button>
+
+      <ion-segment-button value="soundcard">
+        <ion-label>
+          Soundcard</ion-label>
+      </ion-segment-button>
+
+
+      <ion-segment-button value="details">
+        <ion-label>Info</ion-label>
+      </ion-segment-button>
+    </ion-segment>
+  </ion-toolbar>
 
   <ng-container *ngIf="segment === 'details'">
     <ion-list *ngIf="serverState | async as state">
       <ion-item>
         <ion-label>
-          <h2>Client Information</h2>
+          <h2>Snap Client Information</h2>
           <p>Id: {{client.id}}</p>
           <p *ngIf="client.lastSeen">{{client.lastSeen.sec * 1000 | date: 'long'}}</p>
           <hr />
@@ -55,6 +57,25 @@
           <p></p>
         </ion-label>
       </ion-item>
+      <ion-accordion-group *ngIf="client">
+        <ion-accordion value="{{ client.id }}">
+          <ion-item slot="header">
+            <ion-label>
+              <h2>{{ client.id }}</h2>
+              <p>Raw json</p>
+            </ion-label>
+          </ion-item>
+          <ion-item slot="content" lines="none" color="dark">
+            <pre>{{ client| json }}</pre>
+          </ion-item>
+        </ion-accordion>
+      </ion-accordion-group>
+      <!-- <ion-item>
+        <ion-label>
+          <h2>Camilla DSP Information</h2> -->
+
+
+
     </ion-list>
   </ng-container>
 
@@ -113,7 +134,7 @@
   <ng-container *ngIf="segment === 'settings'">
   </ng-container>
   <ng-container *ngIf="segment === 'camilla-dsp'">
-    <app-camilla-dsp [url]="camillaDspUrl"></app-camilla-dsp>
+    <app-camilla-dsp *ngIf="camillaDspUrl" [url]="camillaDspUrl"></app-camilla-dsp>
   </ng-container>
 
 
@@ -168,17 +189,5 @@
  
   </ion-list> -->
 
-  <ion-accordion-group *ngIf="client">
-    <ion-accordion value="{{ client.id }}">
-      <ion-item slot="header">
-        <ion-label>
-          <h2>{{ client.id }}</h2>
-          <p>Raw json</p>
-        </ion-label>
-      </ion-item>
-      <ion-item slot="content" lines="none" color="dark">
-        <pre>{{ client| json }}</pre>
-      </ion-item>
-    </ion-accordion>
-  </ion-accordion-group>
+
 </ion-content>

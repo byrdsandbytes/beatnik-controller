@@ -1,9 +1,7 @@
+<div *ngIf="levels" class="meters-section">
+    <!-- <h2 class="text-xl ion-margin">Signal Levels</h2> -->
 
-
-<div *ngIf="levels" class="ion-margin meters-section">
-    <h2 class="text-xl font-bold mb-4">Signal Levels</h2>
-
-    <div class="meters-container">
+    <ion-card class="meters-container">
 
         <!-- Capture Group -->
         <div class="meter-group">
@@ -110,50 +108,75 @@
                         </div>
                     </div>
                 </div>
+
             </div>
         </div>
 
-    </div>
+    </ion-card>
 </div>
-<div *ngIf="parsedConfig" class="ion-margin">
-    <h2 class="text-xl font-bold mb-2">Parsed Configuration</h2>
-    <div *ngFor="let filter of parsedConfig.filters | keyvalue">
-        {{ filter.key }}:
-        <ion-item> Type: {{ filter.value.type }} </ion-item>
-        <ion-item>
+<div *ngIf="parsedConfig">
+
+    <ion-item lines="none" c>
+        <ion-label slot="start">Master Volume:</ion-label>
+        <ion-input type="number" slot="end" [(ngModel)]="currentVolume"
+            (ionChange)="setVolume(currentVolume)"></ion-input>
+        <ion-label slot="end">dB</ion-label>
+    </ion-item>
+    <ion-item lass="ion-no-padding ion-no-margin">
+        <ion-range min="-24" max="24" step="1" [(ngModel)]="currentVolume" (ionChange)="setVolume(currentVolume)">
+        </ion-range>
+    </ion-item>
+
+    <ion-list-header>
+        <ion-label>
+            Filters
+        </ion-label>
+    </ion-list-header>
+
+    <ion-card color="primary" *ngFor="let filter of parsedConfig.filters | keyvalue">
+        <ion-card-header lines="none">
+            {{ filter.key }}
+        </ion-card-header>
+        <ion-item color="primary"> Type: {{ filter.value.type }} </ion-item>
+        <ion-item color="primary">
             Gain: {{ filter.value.parameters.gain }}
             <ion-range min="-24" max="24" step="0.1" [(ngModel)]="filter.value.parameters.gain"
                 (ionChange)="updateFilterParameter(filter.key, 'gain', filter.value.parameters.gain)"></ion-range>
         </ion-item>
-        <ion-item> Frequency: {{ filter.value.parameters.freq }} </ion-item>
-        <ion-item> Q: {{ filter.value.parameters.q }} </ion-item>
-        <!-- <ion-item *ngFor="let param of filter.value.parameters | keyvalue">
-       {{ param.key }}: {{ param.value }}
-       <ion-range min="0" max="1" step="0.01" [(ngModel)]="param.value" (ionChange)="updateFilterParameter(filter.key, param.key, param.value)"></ion-range>
-        <ion-input type="number" [(ngModel)]="param.value" (ionChange)="updateFilterParameter(filter.key, param.key, param.value)"></ion-input>
-     </ion-item>   -->
-    </div>
-    <div *ngFor="let mixer of parsedConfig.mixers | keyvalue">
-        {{ mixer.key }}:
-        <ion-item> Channels: {{ mixer.value.channels }} </ion-item>
+        <ion-item color="primary"> Frequency: {{ filter.value.parameters.freq }} </ion-item>
+        <ion-item color="primary"> Q: {{ filter.value.parameters.q }} </ion-item>
+    </ion-card>
+
+    <ion-list-header>
+        <ion-label>
+            Mixers
+        </ion-label>
+    </ion-list-header>
+    <ion-card color="primary" *ngFor="let mixer of parsedConfig.mixers | keyvalue">
+        <ion-card-header>
+            {{ mixer.key }}
+        </ion-card-header>
+        <ion-item color="primary"> Channels: {{ mixer.value.channels.out }} </ion-item>
         <div *ngFor="let mapping of mixer.value.mapping; let i = index">
-            <p>
-                Destination {{ mapping.dest }}
-                <span *ngIf="i === 0"> (Left)</span>
-                <span *ngIf="i === 1"> (Right)</span>
-            </p>
-            <div *ngFor="let source of mapping.sources">
-                <p>Source {{ source.channel }} - Gain: {{ source.gain }}</p>
+            <ion-item color="primary">
+                <ion-label>
+                    Destination {{ mapping.dest }}
+                    <span *ngIf="i === 0"> (Left)</span>
+                    <span *ngIf="i === 1"> (Right)</span>
+                </ion-label>
+            </ion-item>
+            <ion-item color="primary" *ngFor="let source of mapping.sources">
+                <ion-label>Source {{ source.channel }} - Gain: {{ source.gain }}</ion-label>
                 <ion-range min="-24" max="24" step="0.1" [(ngModel)]="source.gain"
                     (ionChange)="updateMixerMapping(source, mixer.key)"></ion-range>
                 <p>Inverted: {{ source.inverted }}</p>
-                <ion-toggle [(ngModel)]="source.inverted"
+                <ion-toggle color="light" [(ngModel)]="source.inverted"
                     (ionChange)="updateMixerMapping(source, mixer.key)"></ion-toggle>
                 <p>Muted: {{ source.mute }}</p>
                 <ion-toggle [(ngModel)]="source.mute" (ionChange)="updateMixerMapping(source, mixer.key)"></ion-toggle>
-            </div>
+            </ion-item>
         </div>
-    </div>
+    </ion-card>
 </div>
 
 
@@ -163,7 +186,7 @@
     <p class="mb-2">
         Connection Status: <strong>{{ connectionStatus }}</strong>
     </p>
-    <ion-button (click)="connect()">Connect</ion-button>
+    <!-- <ion-button (click)="connect()">Connect</ion-button>
     <ion-button (click)="disconnect()">Disconnect</ion-button>
     <ion-button (click)="getState()">Get State</ion-button>
     <ion-button (click)="getConfigJson()">Get Config JSON</ion-button>
@@ -171,15 +194,13 @@
     <ion-button (click)="getUpdateInterval()">Get Update Interval</ion-button>
     <ion-button (click)="getCaptureSignalLevels()">Get Capture Signal Levels</ion-button>
     <ion-button (click)="setUpdateInterval(100)">Set update Interval</ion-button>
-    <ion-button (click)="getVolume()">Get Volume</ion-button>
-    <ion-range min="-150" max="50" step="1" [(ngModel)]="currentVolume" (ionChange)="setVolume(currentVolume)">
-        <ion-label slot="start">Volume: {{ currentVolume }}</ion-label>
-    </ion-range>
+    <ion-button (click)="getVolume()">Get Volume</ion-button> -->
 
-   
+
+
 </div>
 
- <pre class="bg-gray-100 p-4 rounded mt-4 overflow-auto">
+<!-- <pre class="bg-gray-100 p-4 rounded mt-4 overflow-auto">
 {{ lastMessage | json }}</pre>
-    <pre class="bg-gray-100 p-4 rounded mt-4 overflow-auto">
-{{ parsedConfig | json }}</pre>
+<pre class="bg-gray-100 p-4 rounded mt-4 overflow-auto">
+{{ parsedConfig | json }}</pre> -->

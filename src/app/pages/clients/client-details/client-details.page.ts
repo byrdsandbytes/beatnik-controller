@@ -1,9 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+import { Preferences } from '@capacitor/preferences';
 import { ModalController } from '@ionic/angular';
-import { Observable } from 'rxjs';
+import { firstValueFrom, Observable } from 'rxjs';
 import { ChooseSpeakersComponent } from 'src/app/components/choose-speakers/choose-speakers.component';
 import { HatEnum } from 'src/app/enum/hat.enum';
+import { UserPreference } from 'src/app/enum/user-preference.enum';
 import { Client, SnapCastServerStatusResponse } from 'src/app/model/snapcast.model';
 import { BeatnikHardwareService, HardwareStatus } from 'src/app/services/beatnik-hardware.service';
 import { SnapcastService } from 'src/app/services/snapcast.service';
@@ -21,7 +23,7 @@ export class ClientDetailsPage implements OnInit {
 
   serverState?: Observable<SnapCastServerStatusResponse>;
   client?: Client;
-  segment: 'details' | 'soundcard' |'camilla-dsp' |'settings' = 'details';
+  segment: 'details' | 'soundcard' | 'camilla-dsp' | 'settings' = 'camilla-dsp';
 
   hardwareStatus$: Observable<HardwareStatus>;
 
@@ -56,7 +58,7 @@ export class ClientDetailsPage implements OnInit {
       console.error('ClientDetailsPage: No ID available to subscribe to client');
       return;
     }
-    this.serverState.subscribe((state) => {
+    this.serverState.subscribe(async (state) => {
       if (!state || !state.server) {
         console.warn('ClientDetailsPage: Invalid server state received', state);
         return;
@@ -66,7 +68,7 @@ export class ClientDetailsPage implements OnInit {
         console.error(`ClientDetailsPage: Client with ID ${this.id} not found in server state`);
       } else {
         console.log('ClientDetailsPage: Found client:', this.client);
-        this.camillaDspUrl = this.getCamillaDspUrl();
+        this.camillaDspUrl = await this.getCamillaDspUrl();
       }
     });
   }
@@ -189,12 +191,20 @@ export class ClientDetailsPage implements OnInit {
   }
 
 
-  getCamillaDspUrl(): string {
+  async getCamillaDspUrl(): Promise<string> {
     if (!this.client) {
       console.error('ClientDetailsPage: No client available to get Camilla DSP URL');
       return '';
     }
-    return `ws://${this.client.host.name}.local:1234`;
+    var ipAddress = this.cleanIpAddress(this.client.host.ip);
+    // if ip adress is 127.0.0.1 or localhost, it's the client running on the server so we get the server ip from user preferences
+    if (ipAddress === '127.0.0.1' || ipAddress === 'localhost') {
+      await Preferences.get({ key: UserPreference.SERVER_URL }).then((result) => {
+        ipAddress = result.value;
+      });
+      console.log('ClientDetailsPage: Using server IP address for Camilla DSP URL:', ipAddress);
+    }
+    return `ws://${ipAddress}:1234`;
   }
 
 

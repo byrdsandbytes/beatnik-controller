@@ -1,22 +1,21 @@
 .meters-section {
-  font-family: 'Courier New', Courier, monospace;
-  padding: 10px;
+  // padding: 10px;
 
   .meters-container {
     display: flex;
     flex-wrap: wrap;
     gap: 2rem;
     justify-content: center;
-    background-color: #2b2b2b; /* Dark metallic housing */
-    background-image: linear-gradient(45deg, #2b2b2b 25%, #262626 25%, #262626 50%, #2b2b2b 50%, #2b2b2b 75%, #262626 75%, #262626 100%);
-    background-size: 4px 4px; /* Subtle texture */
+    background-color: var(--ion-color-primary);
+    // background-image: linear-gradient(45deg, #2b2b2b 25%, #262626 25%, #262626 50%, #2b2b2b 50%, #2b2b2b 75%, #262626 75%, #262626 100%);
+    // background-size: 4px 4px; /* Subtle texture */
     padding: 2rem;
-    border-radius: 8px;
-    box-shadow: 
-      inset 1px 1px 0 rgba(255,255,255,0.1),
-      inset -1px -1px 0 rgba(0,0,0,0.5),
-      0 10px 20px rgba(0,0,0,0.5);
-    border: 1px solid #1a1a1a;
+    // border-radius: 8px;
+    // box-shadow:
+    //   inset 1px 1px 0 rgba(255,255,255,0.1),
+    //   inset -1px -1px 0 rgba(0,0,0,0.5),
+    //   0 10px 20px rgba(0,0,0,0.5);
+    // border: 1px solid #1a1a1a;
   }
 
   .meter-group {
@@ -24,7 +23,7 @@
     padding: 1.5rem;
     border: 1px solid #000;
     border-radius: 4px;
-    box-shadow: inset 0 0 15px rgba(0,0,0,0.8);
+    box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.8);
     position: relative;
 
     h3 {
@@ -34,7 +33,7 @@
       margin-bottom: 1.5rem;
       color: #ccc;
       text-align: center;
-      text-shadow: 0 2px 4px rgba(0,0,0,1);
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 1);
       background-color: #111;
       display: inline-block;
       padding: 4px 12px;
@@ -70,7 +69,7 @@
     padding: 12px;
     background: #0d0d0d;
     border-radius: 2px;
-    box-shadow: inset 0 0 5px rgba(255,255,255,0.05);
+    box-shadow: inset 0 0 5px rgba(255, 255, 255, 0.05);
     border: 1px solid #333;
   }
 
@@ -92,10 +91,10 @@
     align-items: flex-end;
     overflow: hidden;
     margin-bottom: 8px;
-    
+
     /* LED Segment lines overlay */
     &::after {
-      content: '';
+      content: "";
       position: absolute;
       top: 0;
       left: 0;
@@ -104,9 +103,9 @@
       background: repeating-linear-gradient(
         to bottom,
         transparent 0px,
-        transparent 2px, /* Gap size */
-        rgba(0,0,0,0.8) 2px,
-        rgba(0,0,0,0.8) 4px /* Line Thickness + Gap */
+        transparent 2px,
+        /* Gap size */ rgba(0, 0, 0, 0.8) 2px,
+        rgba(0, 0, 0, 0.8) 4px /* Line Thickness + Gap */
       );
       pointer-events: none;
       z-index: 10;
@@ -117,15 +116,15 @@
     width: 100%;
     /* Retro LED Colors: Green -> Yellow -> Red */
     background: linear-gradient(
-      to top, 
-      #35ff35 0%, 
-      #35ff35 60%, 
-      #ffcc00 60%, 
-      #ffcc00 85%, 
-      #ff3333 85%, 
+      to top,
+      #35ff35 0%,
+      #35ff35 60%,
+      #ffcc00 60%,
+      #ffcc00 85%,
+      #ff3333 85%,
       #ff3333 100%
     );
-    transition: height 0.08s ease-out; 
+    transition: height 0.08s ease-out;
     min-height: 0px;
     box-shadow: 0 0 8px rgba(53, 255, 53, 0.4); /* Subtle ambient glow */
     border-radius: 1px 1px 0 0;
@@ -145,13 +144,13 @@
     min-width: 3ch;
     text-align: center;
   }
-  
+
   .type-label {
-      font-size: 0.55rem;
-      text-transform: uppercase;
-      color: #666;
-      margin-bottom: 4px;
-      letter-spacing: 1px;
-      font-weight: bold;
+    font-size: 0.55rem;
+    text-transform: uppercase;
+    color: #666;
+    margin-bottom: 4px;
+    letter-spacing: 1px;
+    font-weight: bold;
   }
 }
