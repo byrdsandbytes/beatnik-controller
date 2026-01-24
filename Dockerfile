@@ -6,8 +6,9 @@ RUN npm ci
 COPY . .
 RUN npm run build
 
-# Stage 2: Serve the application from a lightweight Nginx server
-FROM nginx:alpine
-COPY nginx.conf /etc/nginx/conf.d/default.conf
-COPY --from=build /usr/src/app/www /usr/share/nginx/html
+# Stage 2: Serve the application from a lightweight Caddy server
+FROM caddy:alpine
+COPY Caddyfile /etc/caddy/Caddyfile
+COPY --from=build /usr/src/app/www /usr/share/caddy
 EXPOSE 80
+EXPOSE 443

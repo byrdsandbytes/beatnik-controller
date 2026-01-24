@@ -4,3 +4,4 @@ services:
     container_name: beatnik-controller-local
     ports:
       - "8181:80"
+      - "8443:443"
