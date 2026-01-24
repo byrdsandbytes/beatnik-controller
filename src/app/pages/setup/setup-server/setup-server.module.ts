@@ -7,13 +7,15 @@ import { IonicModule } from '@ionic/angular';
 import { SetupServerPageRoutingModule } from './setup-server-routing.module';
 
 import { SetupServerPage } from './setup-server.page';
+import { SwiperModule } from 'swiper/angular';
 
 @NgModule({
   imports: [
     CommonModule,
     FormsModule,
     IonicModule,
-    SetupServerPageRoutingModule
+    SetupServerPageRoutingModule,
+    SwiperModule
   ],
   declarations: [SetupServerPage]
 })
