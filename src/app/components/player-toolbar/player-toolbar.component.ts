@@ -4,6 +4,7 @@ import { Observable, Subscription, tap, firstValueFrom } from 'rxjs'; // firstVa
 import { Group, Stream, ServerDetail, Client, SnapCastServerStatusResponse } from 'src/app/model/snapcast.model'; // Client importiert für Typisierung
 import { SnapcastService } from 'src/app/services/snapcast.service';
 import { Haptics, ImpactStyle, NotificationType } from '@capacitor/haptics';
+import { toImageDataUrl } from 'src/app/utils/image.utils';
 
 
 @Component({
@@ -130,13 +131,7 @@ export class PlayerToolbarComponent implements OnInit, OnChanges, OnDestroy {
   }
 
 
-  convertCoverDataBase64(coverData: string, extension: string): string {
-    if (!coverData) {
-      return '';
-    }
-    // Convert base64 data to a data URL
-    return `data:image/${extension};base64,${coverData}`;
-  }
+  convertCoverDataBase64 = toImageDataUrl;
 
   knobMoveStartEvent(event: any): void {
     console.log('Knob move started:', event);
