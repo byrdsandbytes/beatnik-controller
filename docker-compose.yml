@@ -3,5 +3,5 @@ services:
     image: ghcr.io/byrdsandbytes/beatnik-controller:latest
     container_name: beatnik-controller
     ports:
-      - "8181:80"
+      - "80:80"
       - "8443:443"
