@@ -17,6 +17,9 @@ export class AppComponent {
   }
 
   initializeApp() {
+    // Connect immediately on app start
+    this.snapcastService.connect();
+
     App.addListener('appStateChange', (state) => {
       // NOTE: This is my backup plan if state is still not refreshed
       this.ngZone.run(() => {
