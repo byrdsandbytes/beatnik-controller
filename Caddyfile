@@ -4,7 +4,7 @@
 	file_server
 }
 
-:443 {
+beatnik.local, localhost, 127.0.0.1, ::1, :443 {
 	root * /usr/share/caddy
 	try_files {path} /index.html
 	file_server
