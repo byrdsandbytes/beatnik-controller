@@ -1,105 +1,239 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
     <ion-buttons slot="start">
-      <ion-back-button defaultHref="tabs"></ion-back-button>
+      <ion-button (click)="handleBack()">
+        <ion-icon slot="icon-only" name="chevron-back"></ion-icon>
+      </ion-button>
     </ion-buttons>
-    <ion-title></ion-title>
+    <ion-title>Configure Device</ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">Add Device</ion-title>
-    </ion-toolbar>
-  </ion-header>
-  <ion-card-content>
-    Turn on your Beatnik device and ensure it is connected to the same network as this app. Click the scan button to
-    discover devices or enter the IP address manually.
-  </ion-card-content>
-  <ion-card-content *ngIf="!isScanning && (services$ | async).length  === 0">
-    No devices found. Try scanning again or enter the IP address manually.
-  </ion-card-content>
+  <div class="container">
+    <swiper class="swiper" (swiper)="onSwiper($event)" (slideChange)="onSlideChange($event)" [config]="swiperConfig">
+      <ng-container>
+        <ng-template swiperSlide>
 
-  <div [class]="isScanning? 'animation-container active':'animation-container'">
+          <ion-header collapse="condense">
+            <ion-toolbar>
+              <ion-title size="large">Setup Server</ion-title>
+            </ion-toolbar>
+          </ion-header>
 
-    <div class="icon-container">
-      <ion-icon color="light" [class]="isScanning?'custom-icon active':'custom-icon'" name="wifi"></ion-icon>
-      <div [class]="isScanning ? 'outer-ring active' : 'outer-ring'">
-        <div [class]="isScanning ? 'inner-ring active' : 'inner-ring'">
-        </div>
-      </div>
-    </div>
-  </div>
-  <div [ngSwitch]="state" class="ion-text-center ion-padding">
-    <div *ngSwitchCase="'scanning'">
-      <p>Scanning for devices...</p>
-      <div *ngIf="(services$ | async) as services">
-        <ion-list-header>
-          <ion-label>Discovered Devices ({{ services.length }})</ion-label>
-        </ion-list-header>
-        <ion-item *ngFor="let service of services" (click)="selectService(service)">
-          <ion-label>
-            <h2>Beatnik / {{ service.name }} Server</h2>
-            <p>Host: {{ service.hostname }}</p>
-            <p>IP: {{ service.ipv4Addresses[0] }}:{{ service.port }}</p>
-          </ion-label>
-        </ion-item>
-      </div>
+          <div class="ion-margin">
+            <ion-text color="medium">
+              <p>
+                Were searching for existing Snapcast Servers on your network. If we find one, you can set this device up
+                as a Snapcast Client. If not, we will set this device up as your Snapcast Server.
+              </p>
+            </ion-text>
+          </div>
+          <div class="animation-container">
 
+            <div [class]="isScanning? 'animation-container active':'animation-container'">
 
-    </div>
-    <div *ngSwitchCase="'deviceFound'">
-      <p>Device Found. Checking Server Connection...</p>
-      <div *ngIf="(services$ | async) as services">
-        <ion-list-header>
-          <ion-label>Discovered Devices ({{ services.length }})</ion-label>
-        </ion-list-header>
-        <ion-item *ngFor="let service of services" (click)="selectService(service)">
-          <ion-label>
-            <h2>Beatnik / {{ service.name }} Server</h2>
-            <p>Host: {{ service.hostname }}</p>
-            <p>IP: {{ service.ipv4Addresses[0] }}:{{ service.port }}</p>
-          </ion-label>
-        </ion-item>
-        <ion-item *ngIf="(snapcastServerStatus | async) as serverStatus">
-          <!-- {{ serverStatus | json }} -->
-          <ion-label>
-            <h2>Server Status: {{ serverStatus.server.server.snapserver.version }}</h2>
-            <p>Clients: {{ serverStatus.server.groups[0] }} </p>
+              <div class="icon-container">
+                <ion-icon color="light" [class]="isScanning?'custom-icon active':'custom-icon'" name="radio"></ion-icon>
+                <div [class]="isScanning ? 'outer-ring active' : 'outer-ring'">
+                  <div [class]="isScanning ? 'inner-ring active' : 'inner-ring'">
+                  </div>
+                </div>
 
-          </ion-label>
-        </ion-item>
-      </div>
-    </div>
+              </div>
 
-    <div *ngSwitchDefault>
-      <p>Waiting for user to start scan.</p>
-    </div>
-  </div>
-  <div class="ion-text-center ion-padding">
+            </div>
 
+          </div>
+          <div class="status-text">
+            <p>{{statusText}}</p>
+          </div>
+        </ng-template>
+      </ng-container>
+      <ng-container>
+        <ng-template swiperSlide>
+          <ion-header collapse="condense">
+            <ion-toolbar>
+              <ion-title size="large">Server Setup</ion-title>
+            </ion-toolbar>
+          </ion-header>
+          <ion-card-content>
+            <p *ngIf="isFirstDevice">
+              It looks like this is your first Beatnik device. So we configured it to be your Snapcast Server.
+            </p>
+            <p *ngIf="!isFirstDevice">
+              Looks like you already have a Snapcast Server on your network. Do you want to set this device up as a
+              Snapcast Client?
+            </p>
+          </ion-card-content>
+
+          <div [ngSwitch]="isFirstDevice" class="ion-padding">
+            <div *ngSwitchCase="true">
+              <div *ngIf="(services$ | async) as services">
+                <ion-list-header>
+                  <ion-label>Discovered Servers ({{ services.length }})</ion-label>
+                </ion-list-header>
+                <ion-item *ngFor="let service of services" (click)="selectService(service)">
+                  <ion-label>
+                    <h2>Beatnik / {{ service.name }} Server</h2>
+                    <p>Host: {{ service.hostname }}</p>
+                    <p>IP: {{ service.ipv4Addresses[0] }}:{{ service.port }}</p>
+                  </ion-label>
+                </ion-item>
+              </div>
+            </div>
+          </div>
+          <div class="ion-text-center ion-padding">
+
+          </div>
+        </ng-template>
+      </ng-container>
+      <ng-container>
+        <ng-template swiperSlide>
+
+          <ion-header collapse="condense">
+            <ion-toolbar>
+              <ion-title size="large">Checking Server Connection</ion-title>
+            </ion-toolbar>
+          </ion-header>
+
+          <div class="ion-margin">
+            <ion-text color="medium">
+              <p>
+                We're validating the connection to the Snapcast Server. This may take a moment.
+              </p>
+            </ion-text>
+          </div>
+          <div class="animation-container">
+
+            <div [class]="isScanning? 'animation-container active':'animation-container'">
+
+              <div class="icon-container">
+                <ion-icon color="light" [class]="isScanning?'custom-icon active':'custom-icon'"
+                  [name]="statusIcon"></ion-icon>
+                <div [class]="isScanning ? 'outer-ring active' : 'outer-ring'">
+                  <div [class]="isScanning ? 'inner-ring active' : 'inner-ring'">
+                  </div>
+                </div>
+
+              </div>
+
+            </div>
+
+          </div>
+          <div *ngIf="(snapcastServerStatus|async) as snap" class="status-text">
+            <div class="status-text">
+              <p>{{statusText}}</p>
+            </div>
+          </div>
+        </ng-template>
+      </ng-container>
+      <ng-container>
+        <ng-template swiperSlide>
+          <ion-header collapse="condense">
+            <ion-toolbar>
+              <ion-title size="large">Audio Setup</ion-title>
+            </ion-toolbar>
+          </ion-header>
+           <div class="ion-margin">
+            <ion-text color="medium">
+              <p>
+                Which configuration would you like to use for audio output on this device?
+              </p>
+            </ion-text>
+          </div>
+          <ion-segment [(ngModel)]="segment">
+            <ion-segment-button value="detected">
+              Detected Soundcard
+            </ion-segment-button>
+            <ion-segment-button value="manual">
+              Manual Selection
+            </ion-segment-button>
+          </ion-segment>
+          <ng-container *ngIf="segment ==='detected'">
+            <ion-button expand="full" color="primary" (click)="getHardwareInfo()">
+              Refresh Soundcard Info
+            </ion-button>
+            <ion-list *ngIf="hardwareStatus$ | async as hardwareStatus">
+              <ion-item>
+                <ion-label>
+
+                  <h3>Config Status </h3>
+                  <ng-container *ngIf="hardwareStatus.currentConfig; else noConfig">
+                    <p>Name: {{ hardwareStatus.currentConfig.name}}</p>
+                    <p>Id: {{ hardwareStatus.currentConfig.id}}</p>
+                    <!-- <p>isMatched: {{ hardwareStatus.isMatch}}</p> -->
+                  </ng-container>
+                  <ng-template #noConfig>
+                    <p>No current configuration available.</p>
+                  </ng-template>
+                </ion-label>
+              </ion-item>
+              <ion-item>
+                <ion-label>
+                  <h2>Soundcard Information</h2>
+                  <hr />
+                  <h3>Automatic Detected Hardware </h3>
+                  <ng-container *ngIf="hardwareStatus.detectedHardware; else noHardware">
+
+                    <p>Name: {{ hardwareStatus.detectedHardware.name}}</p>
+                    <p>Id: {{ hardwareStatus.detectedHardware.id}}</p>
+                    <!-- <p>isMatched: {{ hardwareStatus.isMatch}}</p> -->
+                  </ng-container>
+                  <ng-template #noHardware>
+                    <p>No hardware detected. NOTE: Some soundcards may not be detected automatically and need to be configured manually.</p>
+                  </ng-template>
+                  </ion-label>
+              </ion-item>
+              
+            </ion-list>
+          </ng-container>
+          <ng-container *ngIf="segment === 'manual'">
+            <ion-item>
+              Manual Soundcard Config ID:
+              <ion-select placeholder="Select Soundcard" [(ngModel)]="manualHatId">
+                <ion-select-option *ngFor="let hat of hats" [value]="hat.id">
+                  {{ hat.name }}
+                </ion-select-option>
+              </ion-select>
+
+            </ion-item>
+            <ion-button expand="full" color="secondary" (click)="applyManualHatConfig()">
+              Apply Manual Soundcard Config
+            </ion-button>
+          </ng-container>
+        </ng-template>
+      </ng-container>
+    </swiper>
   </div>
 </ion-content>
 
 <ion-footer class="ion-padding">
-  <ion-toolbar>
-  <div>
-    <ion-button (click)="scanForServices()" *ngIf="!isScanning" expand="block">
-      <ion-icon slot="start" name="scan-outline"></ion-icon> Scan for Devices
-    </ion-button>
-  </div>
-  <div>
-    <ion-button (click)="stopScan()" *ngIf="isScanning" expand="block" color="danger">
-      <ion-icon slot="start" name="stop-circle-outline"></ion-icon> Stop Scan
-    </ion-button>
-  </div>
-  <div>
-    <ion-button (click)="openManualEntry()" expand="block" fill="clear">
-      <ion-icon slot="start" name="pencil-outline"></ion-icon> Enter URL or IP Manually
+  <ion-toolbar color="light">
+    <div [ngSwitch]="slideIndex">
+      <div *ngSwitchCase="0">
+        <ion-button *ngIf="this.state === 'deviceFound'" (click)="slideNext()" expand="block" color="primary">
+          Next
+        </ion-button>
 
+        <ion-button fill="clear" (click)="handleBack()" expand="block" color="medium">
+          Cancel
+        </ion-button>
 
-    </ion-button>
-  </div>
+      </div>
+      <div *ngSwitchCase="1">
+        <ion-button *ngIf="isFirstDevice" (click)="setupAsSnapcastServer()" expand="block" color="primary">
+          Continue
+        </ion-button>
+        <ion-button fill="clear" (click)="setupAsSnapcastClient()" expand="block" color="medium">
+          Setup as Client
+        </ion-button>
+      </div>
+      <div *ngSwitchCase="2">
+        <ion-button *ngIf="state=='selected'" expand="block" color="primary" (click)="finishServerSetup()">
+          Continue
+        </ion-button>
+      </div>
+    </div>
   </ion-toolbar>
 </ion-footer>

@@ -28,6 +28,10 @@
       <ion-segment-button value="details">
         <ion-label>Info</ion-label>
       </ion-segment-button>
+
+      <ion-segment-button value="settings">
+        <ion-label>Settings</ion-label>
+      </ion-segment-button>
     </ion-segment>
   </ion-toolbar>
 
@@ -119,8 +123,8 @@
       <ion-item>
         Manual Soundcard Config ID:
         <ion-select placeholder="Select Soundcard" [(ngModel)]="manualHatId">
-          <ion-select-option *ngFor="let sc of hatEnum | keyvalue" [value]="sc.value">
-            {{ sc.key }} ({{ sc.value }})
+          <ion-select-option *ngFor="let hat of hats" [value]="hat.id">
+            {{ hat.name }}
           </ion-select-option>
         </ion-select>
 
@@ -132,6 +136,27 @@
   </ng-container>
 
   <ng-container *ngIf="segment === 'settings'">
+    <div>
+      <h2>Settings</h2>
+      <!-- get snapcast server status -->
+      <div *ngIf="snapcastServerStatus">
+        <h3>Snapcast Server Status</h3>
+        <p>{{ snapcastServerStatus.message}}</p>
+        <pre>{{ snapcastServerStatus | json }}</pre>
+      </div>
+      <ion-button expand="full" color="primary" (click)="refreshSnapcastStatus()">
+        Refresh Snapcast Server Status
+      </ion-button>
+
+      <ion-button expand="full" color="danger" (click)="disableSnapcastServer()">
+        Disable Snapcast Server
+      </ion-button>
+
+      <ion-button expand="full" color="secondary" (click)="enableSnapcastServer()">
+        Enable Snapcast Server
+      </ion-button>
+
+    </div>
   </ng-container>
   <ng-container *ngIf="segment === 'camilla-dsp'">
     <app-camilla-dsp *ngIf="camillaDspUrl" [url]="camillaDspUrl"></app-camilla-dsp>

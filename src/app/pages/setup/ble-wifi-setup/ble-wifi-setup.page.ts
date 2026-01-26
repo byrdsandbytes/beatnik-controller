@@ -1,6 +1,7 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
-import { Observable } from 'rxjs';
+import { NavController } from '@ionic/angular';
+import { firstValueFrom, Observable } from 'rxjs';
 import { BeatnikBlenoService, BleNetwork, WifiStatus } from 'src/app/services/beatnik-bleno.service';
 import Swiper, { SwiperOptions } from 'swiper';
 
@@ -36,7 +37,8 @@ export class BleWifiSetupPage implements OnInit {
 
   constructor(
     private beatikBlenoService: BeatnikBlenoService,
-    private router: Router
+    private router: Router,
+    private navCtrl: NavController
   ) { }
 
   ngOnInit() {
@@ -87,7 +89,7 @@ export class BleWifiSetupPage implements OnInit {
           this.statusText = 'No Wi-Fi networks found. Please try again.';
         }
         this.isScanning = false;
-        this.slideNext()
+        this.slideTo(1);
 
       });
     }, 2000);
@@ -108,6 +110,11 @@ export class BleWifiSetupPage implements OnInit {
     this.slideIndex = this.swiperInstance?.activeIndex || 0;
   }
 
+  async slideTo(index: number) {
+    this.swiperInstance?.slideTo(index);
+    this.slideIndex = this.swiperInstance?.activeIndex || 0;
+  }
+
   slidePrev() {
     this.swiperInstance?.slidePrev();
     this.slideIndex = this.swiperInstance?.activeIndex || 0;
@@ -124,7 +131,7 @@ export class BleWifiSetupPage implements OnInit {
       this.networkPassword
     );
     this.statusText = `Wi-Fi network ${this.selectedNetwork.ssid} provisioned. Please wait for connection status.`;
-    this.slideNext();
+    this.slideTo(3);
     this.isWifiVerifying = true;
     this.subscribeToWifiStatus();
   }
@@ -146,7 +153,20 @@ export class BleWifiSetupPage implements OnInit {
 
   async completeSetup() {
     // Navigate to home and reset navigation stack
-    await this.router.navigate(['/tabs'], { replaceUrl: true });
+    // await this.router.navigate(['/tabs'], { replaceUrl: true });
+    // navigate to server setup page and add IP address to url params
+    const wifiConnectionStatus = await firstValueFrom(this.wifiConnectionStatus)
+    const ip = wifiConnectionStatus.ip || '';
+    await this.router.navigate([`/setup-server/${ip}`], { replaceUrl: true });
+
+  }
+
+  handleBack() {
+    if (this.slideIndex > 0) {
+      this.slidePrev();
+    } else {
+      this.navCtrl.navigateBack('/tabs');
+    }
   }
 
 

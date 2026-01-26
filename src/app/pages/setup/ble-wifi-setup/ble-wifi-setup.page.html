@@ -1,7 +1,10 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
     <ion-buttons slot="start">
-      <ion-back-button defaultHref="tabs"></ion-back-button>
+      <ion-button (click)="handleBack()">
+        <ion-icon slot="start" name="chevron-back"></ion-icon>
+        Back
+      </ion-button>
     </ion-buttons>
     <ion-title>ble-wifi-setup</ion-title>
   </ion-toolbar>
@@ -116,7 +119,7 @@
               </ion-item>
 
             </ion-list>
-            <ion-item *ngIf="wifiConnectionStatus|async as wifiState">
+            <!-- <ion-item *ngIf="wifiConnectionStatus|async as wifiState">
               <ion-label>
                 <h2 class="ion-margin-horizontal">Connection Status:</h2>
                 <p class="ion-margin-horizontal">{{wifiState.message}}</p>
@@ -124,7 +127,7 @@
                   IP: {{wifiState.ip}} <br>
                   Hostname: {{wifiState.hostname}}
               </ion-label>
-            </ion-item>
+            </ion-item> -->
 
           </ng-container>
         </ng-template>
@@ -238,14 +241,14 @@
         Cancel
       </ion-button>
     </div> -->
-    <div class="ion-margin-top">
+    <!-- <div class="ion-margin-top">
       <ion-button fill="clear" (click)="slidePrev()">
         Previous
       </ion-button>
       <ion-button fill="clear" (click)="slideNext()">
         Next
       </ion-button>
-    </div>
+    </div> -->
 
   </ion-toolbar>
 </ion-footer>

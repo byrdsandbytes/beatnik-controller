@@ -4,10 +4,11 @@ import { Preferences } from '@capacitor/preferences';
 import { ModalController } from '@ionic/angular';
 import { firstValueFrom, Observable } from 'rxjs';
 import { ChooseSpeakersComponent } from 'src/app/components/choose-speakers/choose-speakers.component';
-import { HatEnum } from 'src/app/enum/hat.enum';
+import { SUPPORTED_HATS } from 'src/app/constant/hat.constant';
 import { UserPreference } from 'src/app/enum/user-preference.enum';
 import { Client, SnapCastServerStatusResponse } from 'src/app/model/snapcast.model';
 import { BeatnikHardwareService, HardwareStatus } from 'src/app/services/beatnik-hardware.service';
+import { BeatnikSnapcastService, SnapcastActionResponse } from 'src/app/services/beatnik-snapcast.service';
 import { SnapcastService } from 'src/app/services/snapcast.service';
 
 @Component({
@@ -23,15 +24,17 @@ export class ClientDetailsPage implements OnInit {
 
   serverState?: Observable<SnapCastServerStatusResponse>;
   client?: Client;
-  segment: 'details' | 'soundcard' | 'camilla-dsp' | 'settings' = 'camilla-dsp';
+  segment: 'details' | 'soundcard' | 'camilla-dsp' | 'settings' = 'soundcard';
 
   hardwareStatus$: Observable<HardwareStatus>;
 
-  hatEnum = HatEnum;
+  hats = Object.values(SUPPORTED_HATS);
 
   manualHatId: string = '';
 
   camillaDspUrl: string;
+
+  snapcastServerStatus?: SnapcastActionResponse;
 
 
 
@@ -39,7 +42,8 @@ export class ClientDetailsPage implements OnInit {
     private avtivateRoute: ActivatedRoute,
     private snapcastService: SnapcastService,
     private modalController: ModalController,
-    private beatnikHardwareService: BeatnikHardwareService
+    private beatnikHardwareService: BeatnikHardwareService,
+    private beatnikSnapcastService: BeatnikSnapcastService
   ) { }
 
   async ngOnInit() {
@@ -205,6 +209,51 @@ export class ClientDetailsPage implements OnInit {
       console.log('ClientDetailsPage: Using server IP address for Camilla DSP URL:', ipAddress);
     }
     return `ws://${ipAddress}:1234`;
+  }
+
+  async refreshSnapcastStatus() {
+    if (!this.client) {
+      console.error('ClientDetailsPage: No client available to refresh Snapcast status');
+      return;
+    }
+    const localHostName = this.client.host.name + '.local';
+    try {
+      const status = await firstValueFrom(this.beatnikSnapcastService.getStatus(localHostName));
+      console.log(`ClientDetailsPage: Snapcast status for client ${this.client.id}:`, status);
+      this.snapcastServerStatus = { ...status, success: true, message: 'Status retrieved successfully' };
+    } catch (error) {
+      console.error(`ClientDetailsPage: Failed to get Snapcast status for client ${this.client.id}`, error);
+    }
+  }
+
+  async disableSnapcastServer() {
+    if (!this.client) {
+      console.error('ClientDetailsPage: No client available to disable Snapcast server');
+      return;
+    }
+    const localHostName = this.client.host.name + '.local';
+    try {
+      const response = await firstValueFrom(this.beatnikSnapcastService.disable(localHostName));
+      console.log(`ClientDetailsPage: Disabled Snapcast server for client ${this.client.id}:`, response);
+      this.snapcastServerStatus = response;
+    } catch (error) {
+      console.error(`ClientDetailsPage: Failed to disable Snapcast server for client ${this.client.id}`, error);
+    }
+  }
+
+  async enableSnapcastServer() {
+    if (!this.client) {
+      console.error('ClientDetailsPage: No client available to enable Snapcast server');
+      return;
+    }
+    const localHostName = this.client.host.name + '.local';
+    try {
+      const response = await firstValueFrom(this.beatnikSnapcastService.enable(localHostName));
+      console.log(`ClientDetailsPage: Enabled Snapcast server for client ${this.client.id}:`, response);
+      this.snapcastServerStatus = response;
+    } catch (error) {
+      console.error(`ClientDetailsPage: Failed to enable Snapcast server for client ${this.client.id}`, error);
+    }
   }
 
 
