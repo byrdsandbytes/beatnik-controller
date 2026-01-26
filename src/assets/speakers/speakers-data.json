@@ -15,6 +15,13 @@
       "year": 1980
     },
     {
+      "id": "rc.1",
+      "image": "assets/speakers/img/Meridian_F80.webp",
+      "manufacturer": "Meridian",
+      "model": "F80",
+      "year": 2005
+    },
+    {
       "id": "sp.3",
       "image": "assets/speakers/klipsch_kg4.jpg",
       "manufacturer": "Pioneer",

@@ -7,13 +7,15 @@ import { IonicModule } from '@ionic/angular';
 import { CamillaDspPageRoutingModule } from './camilla-dsp-routing.module';
 
 import { CamillaDspPage } from './camilla-dsp.page';
+import { CamillaDspModule } from 'src/app/components/camilla-dsp/camilla-dsp.module';
 
 @NgModule({
   imports: [
     CommonModule,
     FormsModule,
     IonicModule,
-    CamillaDspPageRoutingModule
+    CamillaDspPageRoutingModule,
+    CamillaDspModule
   ],
   declarations: [CamillaDspPage]
 })

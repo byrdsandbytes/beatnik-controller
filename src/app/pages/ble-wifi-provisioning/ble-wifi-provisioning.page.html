@@ -13,7 +13,6 @@
     <div>
       <strong>Device Connection Status:</strong> {{ deviceConnectionStatus$ | async }}
     </div>
-    <!-- <strong>Status:</strong> {{ bleService.status$ | async }} -->
     <div *ngIf="blenoDeviceId |async as deviceId">
       <strong>Connected Device ID:</strong> {{ deviceId }}
     </div>
@@ -35,17 +34,14 @@
           <h3>{{ network.ssid }}</h3>
           <p>Quality: {{ network.quality }} | Security: {{ network.security }}</p>
         </ion-label>
-        <!-- <ion-radio slot="start" [value]="network.ssid" (ionSelect)="selectNetwork(network.ssid)"></ion-radio> -->
       </ion-item>
     </ion-list>
   </ng-container>
-
 
   <ng-container *ngIf="scanResults">
     <ion-item *ngFor="let result of scanResults |async">
 
       <p>Device Name: {{ result.device.name || 'Unknown' }}</p>
-      <!-- <p>Device ID: {{ result.device.id }}</p> -->
       <hr />
       <pre>{{ result | json }}</pre>
     </ion-item>
