@@ -78,6 +78,14 @@ const routes: Routes = [
     path: 'camilla-dsp',
     loadChildren: () => import('./pages/camilla-dsp/camilla-dsp.module').then( m => m.CamillaDspPageModule)
   },
+  {
+    path: 'ble-wifi-provisioning',
+    loadChildren: () => import('./pages/ble-wifi-provisioning/ble-wifi-provisioning.module').then( m => m.BleWifiProvisioningPageModule)
+  },
+  {
+    path: 'ble-wifi-setup',
+    loadChildren: () => import('./pages/setup/ble-wifi-setup/ble-wifi-setup.module').then( m => m.BleWifiSetupPageModule)
+  },
 
 
 ];

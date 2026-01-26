@@ -1,0 +1,57 @@
+<ion-header>
+
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="tabs/dashboard"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Wi-Fi Provisioning</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <div class="status-banner">
+    <div>
+      <strong>Device Connection Status:</strong> {{ deviceConnectionStatus$ | async }}
+    </div>
+    <!-- <strong>Status:</strong> {{ bleService.status$ | async }} -->
+    <div *ngIf="blenoDeviceId |async as deviceId">
+      <strong>Connected Device ID:</strong> {{ deviceId }}
+    </div>
+
+    <div *ngIf="wifiConnectionStatus | async as connStatus">
+      <strong>Wifi Connection Status:</strong> {{ connStatus }}
+    </div>
+  </div>
+
+  <ion-button expand="block" (click)="scanForDevices()">
+    Scan for Devices
+  </ion-button>
+
+  <ng-container *ngIf="availableNetworks$|async as networks">
+    <h2>Available Wi-Fi Networks</h2>
+    <ion-list>
+      <ion-item *ngFor="let network of networks">
+        <ion-label>
+          <h3>{{ network.ssid }}</h3>
+          <p>Quality: {{ network.quality }} | Security: {{ network.security }}</p>
+        </ion-label>
+        <!-- <ion-radio slot="start" [value]="network.ssid" (ionSelect)="selectNetwork(network.ssid)"></ion-radio> -->
+      </ion-item>
+    </ion-list>
+  </ng-container>
+
+
+  <ng-container *ngIf="scanResults">
+    <ion-item *ngFor="let result of scanResults |async">
+
+      <p>Device Name: {{ result.device.name || 'Unknown' }}</p>
+      <!-- <p>Device ID: {{ result.device.id }}</p> -->
+      <hr />
+      <pre>{{ result | json }}</pre>
+    </ion-item>
+  </ng-container>
+
+  <ion-button expand="block" color="danger" (click)="disconnect()">
+    Disconnect
+  </ion-button>
+</ion-content>

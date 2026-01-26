@@ -57,7 +57,7 @@
   --ion-color-light-shade: #e0dccc;
   --ion-color-light-tint: #fffbea;
 
-  --ion-color-medium: #c7c7c7;
+  --ion-color-medium: #505050;
   --ion-color-medium-rgb: 95, 95, 95;
   --ion-color-medium-contrast: #ffffff;
   --ion-color-medium-contrast-rgb: 255, 255, 255;
@@ -92,5 +92,9 @@
   ion-toolbar {
     --background: var(--ion-color-light);
     --color: var(--ion-color-dark);
+  }
+
+  ion-title, ion-list-header {
+    font-weight: 600;
   }
 }
