@@ -1,0 +1,12 @@
+:80 {
+	root * /usr/share/caddy
+	try_files {path} /index.html
+	file_server
+}
+
+beatnik.local, beatnik-server.local, localhost, 127.0.0.1, ::1, :443 {
+	root * /usr/share/caddy
+	try_files {path} /index.html
+	file_server
+	tls internal
+}
