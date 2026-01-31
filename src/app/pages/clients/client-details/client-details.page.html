@@ -113,6 +113,10 @@
             <p>No current configuration available.</p>
           </ng-template>
 
+          <ion-button expand="full" color="tertiary"
+            (click)="openSoundcardPicker()">
+            Open Soundcard Picker
+          </ion-button>
 
           <ion-button expand="full" color="secondary"
             (click)="applySoundcardConfig(hardwareStatus.detectedHardware.id)">

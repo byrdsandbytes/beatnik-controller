@@ -8,6 +8,7 @@ import { ClientDetailsPageRoutingModule } from './client-details-routing.module'
 
 import { ClientDetailsPage } from './client-details.page';
 import { CamillaDspModule } from 'src/app/components/camilla-dsp/camilla-dsp.module';
+import { SoundcardPickerModule } from 'src/app/components/soundcard-picker/soundcard-picker.module';
 
 @NgModule({
   imports: [
@@ -15,7 +16,8 @@ import { CamillaDspModule } from 'src/app/components/camilla-dsp/camilla-dsp.mod
     FormsModule,
     IonicModule,
     ClientDetailsPageRoutingModule,
-    CamillaDspModule
+    CamillaDspModule,
+    SoundcardPickerModule
   ],
   declarations: [ClientDetailsPage]
 })

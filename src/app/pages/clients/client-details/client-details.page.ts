@@ -4,6 +4,7 @@ import { Preferences } from '@capacitor/preferences';
 import { ModalController } from '@ionic/angular';
 import { firstValueFrom, Observable } from 'rxjs';
 import { ChooseSpeakersComponent } from 'src/app/components/choose-speakers/choose-speakers.component';
+import { SoundcardPickerComponent } from 'src/app/components/soundcard-picker/soundcard-picker.component';
 import { SUPPORTED_HATS } from 'src/app/constant/hat.constant';
 import { UserPreference } from 'src/app/enum/user-preference.enum';
 import { Client, SnapCastServerStatusResponse } from 'src/app/model/snapcast.model';
@@ -157,22 +158,31 @@ export class ClientDetailsPage implements OnInit {
     return ip.replace('::ffff:', '');
   }
 
-  getHardwareInfo() {
+  async getHardwareInfo() {
     if (!this.client) {
       console.error('ClientDetailsPage: No client available to get hardware info');
       return;
     }
-    const localHostName = this.client.host.name + '.local';
+    const localHostName = await this.getUrl();
+
     this.hardwareStatus$ = this.beatnikHardwareService.getStatus(localHostName);
+    this.hardwareStatus$.subscribe({
+      next: (status) => {
+        console.log(`ClientDetailsPage: Hardware status for client ${this.client?.id}:`, status);
+      },
+      error: (err) => {
+        console.error(`ClientDetailsPage: Failed to get hardware status for client ${this.client?.id}`, err);
+      }
+    });
   }
 
-  applySoundcardConfig(hatId: string) {
+  async applySoundcardConfig(hatId: string) {
     if (!this.client) {
       console.error('ClientDetailsPage: No client available to apply hardware configuration');
       return;
     }
     console.log(`ClientDetailsPage: Applying hardware configuration ${hatId} to client ${this.client.id}`);
-    const localHostName = this.client.host.name + '.local';
+    const localHostName = await this.getUrl();
     this.beatnikHardwareService.applyConfiguration(hatId, localHostName).subscribe({
       next: (response) => {
         console.log(`ClientDetailsPage: Successfully applied hardware configuration ${hatId} to client ${this.client?.id}`, response);
@@ -209,6 +219,22 @@ export class ClientDetailsPage implements OnInit {
       console.log('ClientDetailsPage: Using server IP address for Camilla DSP URL:', ipAddress);
     }
     return `ws://${ipAddress}:1234`;
+  }
+
+  async getUrl(): Promise<string> {
+    if (!this.client) {
+      console.error('ClientDetailsPage: No client available to get Camilla DSP URL');
+      return '';
+    }
+    var ipAddress = this.cleanIpAddress(this.client.host.ip);
+    // if ip adress is 127.0.0.1 or localhost, it's the client running on the server so we get the server ip from user preferences
+    if (ipAddress === '127.0.0.1' || ipAddress === 'localhost') {
+      await Preferences.get({ key: UserPreference.SERVER_URL }).then((result) => {
+        ipAddress = result.value;
+      });
+      console.log('ClientDetailsPage: Using server IP address for Camilla DSP URL:', ipAddress);
+    }
+    return ipAddress;
   }
 
   async refreshSnapcastStatus() {
@@ -256,6 +282,25 @@ export class ClientDetailsPage implements OnInit {
     }
   }
 
+
+  async openSoundcardPicker() {
+    console.log('Open Soundcard Picker for client:', this.client?.id);
+    // Here you would typically open a modal to select soundcards
+    const modal = await this.modalController.create({
+      component: SoundcardPickerComponent,
+      id: 'soundcard-picker-modal',
+      componentProps: { clientId: this.client?.id }
+    });
+    await modal.present();
+
+    const { data } = await modal.onDidDismiss();
+    if (data && data.selectedHatId) {
+      console.log('ClientDetailsPage: Soundcard selected:', data.selectedHatId);
+      this.applySoundcardConfig(data.selectedHatId);
+    } else {
+      console.log('ClientDetailsPage: Soundcard selection cancelled or no selection made');
+    }
+  }
 
 
 }
