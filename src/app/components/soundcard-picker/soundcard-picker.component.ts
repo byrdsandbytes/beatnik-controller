@@ -14,7 +14,9 @@ export class SoundcardPickerComponent  implements OnInit {
 
   constructor() { }
 
-  ngOnInit() {}
+  ngOnInit() {
+    this.initAndSortHats();
+  }
 
   filterHats(searchTerm: string) {
     if (!searchTerm) {
@@ -26,6 +28,21 @@ export class SoundcardPickerComponent  implements OnInit {
       hat.name.toLowerCase().includes(lowerTerm) ||
       hat.id.toLowerCase().includes(lowerTerm)
     );
+  }
+
+
+  initAndSortHats() {
+  //  sort hats by supported by Beatnik first, then by community tested, then hifiberry first, then alphabetically
+    this.hats.sort((a, b) => {
+      if (a.testedbyBeatnik && !b.testedbyBeatnik) return -1;
+      if (!a.testedbyBeatnik && b.testedbyBeatnik) return 1;
+      if (a.testedByCommunity && !b.testedByCommunity) return -1;
+      if (!a.testedByCommunity && b.testedByCommunity) return 1;
+      if (a.id.startsWith('hifiberry') && !b.id.startsWith('hifiberry')) return -1;
+      if (!a.id.startsWith('hifiberry') && b.id.startsWith('hifiberry')) return 1;
+      return a.name.localeCompare(b.name);
+    });
+    this.filteredHats = this.hats;
   }
 
 }
