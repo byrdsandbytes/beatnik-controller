@@ -33,6 +33,7 @@
 
 
 <ion-content>
+  
   <!-- <ion-list>
     <ion-list-header>
       <ion-label>Discovered Devices</ion-label>
@@ -71,6 +72,10 @@
           <p>{{ service.type }}</p>
           <p>{{ service.ipv4Addresses[0] }}:{{ service.port }}</p>
         </ion-label>
+        <ng-container *ngIf="service.type === SERVICE_BEATNIK">
+          <p>{{service.hostname}}</p>
+          <!-- <ion-button fill="outline" slot="end" [routerLink]="['/clients', service.txtRecord['mac']]">View Device</ion-button> -->
+        </ng-container>
       </ion-item>
     </ion-list>
     <ion-item *ngIf="isScanning && services.length === 0">
@@ -87,4 +92,5 @@
     </ion-item>
   </div>
   <ion-button expand="full" (click)="scanForServices()">Scan for Services</ion-button>
+  
 </ion-content>

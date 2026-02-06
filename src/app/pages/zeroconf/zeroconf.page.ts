@@ -12,7 +12,8 @@ import { ZeroconfService } from '../../services/zero-conf.service';
 })
 export class ZeroconfPage implements OnDestroy {
   services$: Observable<ZeroConfServiceModel[]>;
-  private readonly SERVICE_TYPE = '_snapcast._tcp.';
+  readonly SERVICE_SNAPCAST = '_snapcast._tcp.';
+  readonly SERVICE_BEATNIK = '_beatnik._tcp.';
   isScanning = false;
 
   constructor(private zeroconf: ZeroconfService) {
@@ -20,14 +21,17 @@ export class ZeroconfPage implements OnDestroy {
   }
 
   async ngOnInit() {
-   
+
   }
 
   async scanForServices(): Promise<void> {
     this.isScanning = true;
     try {
-      await this.zeroconf.watch(this.SERVICE_TYPE);
-      console.log(`Started scanning for services of type: ${this.SERVICE_TYPE}`);
+     
+      await this.zeroconf.watch(this.SERVICE_SNAPCAST);
+      console.log(`Started scanning for services of type: ${this.SERVICE_SNAPCAST}`);
+      await this.zeroconf.watch(this.SERVICE_BEATNIK);
+      console.log(`Started scanning for services of type: ${this.SERVICE_BEATNIK}`);
     }
     catch (error) {
       console.error('Error starting service scan:', error);
@@ -52,15 +56,15 @@ export class ZeroconfPage implements OnDestroy {
       console.error('Error stopping service scan:', error);
     }
   }
-    
-    // Example of publishing a service
-    // this.zeroconf.publish({
-    //   type: '_my-app._tcp.',
-    //   name: 'My Angular App',
-    //   port: 8080
-    // });
-  
-  
+
+  // Example of publishing a service
+  // this.zeroconf.publish({
+  //   type: '_my-app._tcp.',
+  //   name: 'My Angular App',
+  //   port: 8080
+  // });
+
+
   // Clean up when the component is destroyed
   ngOnDestroy() {
     this.stopScan();
