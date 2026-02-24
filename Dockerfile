@@ -5,6 +5,8 @@ WORKDIR /usr/src/app
 COPY package*.json ./
 RUN npm ci
 COPY . .
+# Increase memory limit for Angular build if needed
+ENV NODE_OPTIONS="--max-old-space-size=4096"
 RUN npm run build
 
 # Stage 2: Serve the application from a lightweight Caddy server
