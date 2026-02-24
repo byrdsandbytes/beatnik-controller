@@ -18,7 +18,7 @@ services:
       - ICECAST_RELAY_PASSWORD=beatnik
 
   snapcast-to-icecast:
-    image: ghcr.io/linuxserver/ffmpeg
+    image: alpine:latest
     container_name: snapcast-to-icecast
     restart: always
     depends_on:
@@ -26,7 +26,7 @@ services:
       - icecast
     entrypoint: /bin/sh -c
     command: >
-      apk add --no-cache snapcast-client &&
+      apk add --no-cache ffmpeg snapcast-client &&
       mkfifo /tmp/stream_fifo || true;
       snapclient -h host.docker.internal -s 1 --player file:name=/tmp/stream_fifo &
       sleep 5;
