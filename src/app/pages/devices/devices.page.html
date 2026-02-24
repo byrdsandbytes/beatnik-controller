@@ -12,15 +12,6 @@
       </ion-toolbar>
     </ion-header>
     <ion-list>
-      <ion-list-header>
-        <ion-label>Device Groups</ion-label>
-      </ion-list-header>
-      <ion-item *ngFor="let group of state.server.groups" [routerLink]="['/devices', group.id]">
-        <ion-label>
-          <h2>{{ group.name || group.id }}</h2>
-          <p>Clients: {{ group.clients.length }}</p>
-        </ion-label>
-      </ion-item>
 
       <ion-list-header>
         <ion-label>Clients</ion-label>
@@ -41,6 +32,18 @@
         </ng-container>
 
       </ng-container>
+
+
+      <ion-list-header>
+        <ion-label>Device Groups</ion-label>
+      </ion-list-header>
+      <ion-item *ngFor="let group of state.server.groups" [routerLink]="['/devices', group.id]">
+        <ion-label>
+          <h2>{{ group.name || group.id }}</h2>
+          <p>Clients: {{ group.clients.length }}</p>
+        </ion-label>
+      </ion-item>
+
 
     </ion-list>
   </div>

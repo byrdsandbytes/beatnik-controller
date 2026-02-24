@@ -1,0 +1,32 @@
+<ion-header>
+  <ion-toolbar color="light">
+    <ion-title>Soundcard Picker</ion-title>
+  </ion-toolbar>
+  <ion-toolbar color="light">
+    <ion-searchbar (ionInput)="filterHats($event.target.value)"></ion-searchbar>
+
+  </ion-toolbar>
+</ion-header>
+<ion-content>
+
+
+  <div class="row">
+    <div class="col-6" *ngFor="let hat of filteredHats">
+
+      <ion-img [src]="'assets/soundcards/' + hat.id + '.webp'" />
+      <!-- make sure image source is valid -->
+      <ion-card-header>
+        <ion-card-subtitle>{{ hat.name }}</ion-card-subtitle>
+
+      </ion-card-header>
+      <ion-card-content>
+        <ion-badge color="primary" *ngIf="hat.testedbyBeatnik">Tested by Beatnik</ion-badge>
+        <ion-badge color="secondary" *ngIf="hat.testedByCommunity">Tested by Community</ion-badge>
+        <p>ID: {{ hat.id }}</p>
+        <p>dt Overlay: {{ hat.overlay}}</p>
+        <p>Format: {{hat.camilla.format}}</p>
+      </ion-card-content>
+    </div>
+
+  </div>
+</ion-content>

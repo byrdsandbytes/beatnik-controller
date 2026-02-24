@@ -46,7 +46,8 @@ export class TabsPage implements OnInit, AfterViewInit {
       showBackdrop: false,
       backdropDismiss: false,
       initialBreakpoint: 0.25,
-      breakpoints: [0.05, 0.25, 0.5, 0.75],
+      breakpoints: [0.05, 0.25, 0.5, 0.75,1
+      ],
       backdropBreakpoint: 0.75,
 
     });
