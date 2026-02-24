@@ -1,5 +1,6 @@
 # Stage 1: Build the Angular application
 FROM node:20-alpine as build
+RUN apk add --no-cache python3 make g++ git
 WORKDIR /usr/src/app
 COPY package*.json ./
 RUN npm ci
