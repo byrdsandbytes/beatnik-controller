@@ -37,7 +37,7 @@ services:
       mkfifo /tmp/stream_fifo || true
 
       # Start snapclient (-h points to beatnik container as snapserver)
-      snapclient -h beatnik-controller -s 1 --player file:name=/tmp/stream_fifo &
+      snapclient -h host.docker.internal -s 1 --player file:name=/tmp/stream_fifo &
 
       sleep 5
 
