@@ -27,20 +27,8 @@ services:
       - icecast
     entrypoint: /bin/sh -c
     command: >
-      "
-      # Install snapclient
-      apk add --no-cache snapcast-client
-
-      # Create pipe
-      mkfifo /tmp/stream_fifo || true
-
-      # Start snapclient
+      apk add --no-cache snapcast-client &&
+      mkfifo /tmp/stream_fifo || true;
       snapclient -h host.docker.internal -s 1 --player file:name=/tmp/stream_fifo &
-
-      sleep 5
-
-      # Encode and push to Icecast
-      ffmpeg -re -f s16le -ar 48000 -ac 2 -i /tmp/stream_fifo \
-             -acodec libmp3lame -b:a 192k -content_type audio/mpeg \
-             icecast://source:beatnik@icecast:8000/stream
-      "
+      sleep 5;
+      ffmpeg -re -f s16le -ar 48000 -ac 2 -i /tmp/stream_fifo -acodec libmp3lame -b:a 192k -content_type audio/mpeg icecast://source:beatnik@icecast:8000/stream
