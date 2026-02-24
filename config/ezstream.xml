@@ -1,0 +1,15 @@
+<ezstream>
+  <url>http://icecast:8000/stream</url>
+  <sourcepassword>hackme</sourcepassword>
+  <format>MP3</format>
+  <filename>stdin</filename>
+  <stream_once>1</stream_once>
+  <svrinfoname>Snapcast Stream</svrinfoname>
+  <svrinfourl>http://icecast:8000/</svrinfourl>
+  <svrinfogenre>Live</svrinfogenre>
+  <svrinfodescription>Stream from Snapcast</svrinfodescription>
+  <svrinfobitrate>128</svrinfobitrate>
+  <svrinfochannels>2</svrinfochannels>
+  <svrinfosamplerate>44100</svrinfosamplerate>
+  <svrinfopublic>0</svrinfopublic>
+</ezstream>

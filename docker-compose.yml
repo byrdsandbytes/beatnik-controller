@@ -5,3 +5,33 @@ services:
     ports:
       - "80:80"
       - "8443:443"
+      - "1704:1704"
+      - "1705:1705"
+      - "1780:1780"
+
+  icecast:
+    image: infiniteproject/icecast-alpine
+    container_name: icecast
+    ports:
+      - "8000:8000"
+    environment:
+      - ICECAST_SOURCE_PASSWORD=hackme
+      - ICECAST_ADMIN_PASSWORD=hackme
+      - ICECAST_PASSWORD=hackme
+      - ICECAST_RELAY_PASSWORD=hackme
+
+  snapcast-to-icecast:
+    image: alpine:latest
+    container_name: snapcast-to-icecast
+    restart: unless-stopped
+    depends_on:
+      - beatnik
+      - icecast
+    entrypoint: /bin/sh
+    command: >
+      -c "apk add --no-cache snapcast lame ezstream &&
+      until nc -z beatnik 1704; do echo 'Waiting for snapserver...'; sleep 5; done &&
+      until nc -z icecast 8000; do echo 'Waiting for icecast...'; sleep 5; done &&
+      snapclient -h beatnik -s 1 -o - | lame -b 128 - - | ezstream -c /etc/ezstream.xml"
+    volumes:
+      - ./config/ezstream.xml:/etc/ezstream.xml
