@@ -10,6 +10,7 @@ import { NavController } from '@ionic/angular';
 import { BeatnikHardwareService, HardwareStatus } from 'src/app/services/beatnik-hardware.service';
 import { BeatnikHardware } from 'src/app/model/beatnik-hardware.model';
 import { SUPPORTED_HATS } from 'src/app/constant/hat.constant';
+import { BeatnikSnapcastService } from 'src/app/services/beatnik-snapcast.service';
 
 
 @Component({
@@ -52,7 +53,8 @@ export class SetupServerPage implements OnInit {
     private snapcastService: SnapcastService,
     private activatedRoute: ActivatedRoute,
     private navCtrl: NavController,
-    private beatnikHardwareService: BeatnikHardwareService
+    private beatnikHardwareService: BeatnikHardwareService,
+    private beatnikSnapcastService: BeatnikSnapcastService
   ) {
     this.services$ = this.zeroconf.services$;
   }
@@ -213,7 +215,20 @@ export class SetupServerPage implements OnInit {
   }
 
   async setupAsSnapcastClient(): Promise<void> {
+    if (!this.ip) {
+      console.error('No IP address provided for Snapcast server.');
+      return;
+    }
     console.log('Setting up this device as Snapcast client...');
+    const result =  this.beatnikSnapcastService.disable(this.ip).subscribe({
+      next: (response) => {
+        console.log('Successfully disabled Snapserver on server at IP', this.ip, response);
+        this.slideTo(3);
+      },
+      error: (err) => {
+        console.error('Failed to disable Snapserver on server at IP', this.ip, err);
+      }
+    });
   }
 
   async finishServerSetup(): Promise<void> {

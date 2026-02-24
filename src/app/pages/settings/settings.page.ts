@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Preferences } from '@capacitor/preferences';
 import { UserPreference } from '../../enum/user-preference.enum';
+import { SnapcastService } from 'src/app/services/snapcast.service';
 
 @Component({
   selector: 'app-settings',
@@ -15,7 +16,9 @@ export class SettingsPage implements OnInit {
 
   
 
-  constructor() { }
+  constructor(
+    private snapcastService: SnapcastService
+  ) { }
 
   ngOnInit() {
     this.getUserPreferences();
@@ -47,5 +50,11 @@ export class SettingsPage implements OnInit {
     }).then(() => {
       console.log('Server URL set to:', this.serverUrl);
     });
+  }
+
+  connectToServer() {
+    // Logic to connect to the server using the serverUrl
+    console.log('Connecting to server at:', this.serverUrl);
+    this.snapcastService.connect(this.serverUrl || '');
   }
 }

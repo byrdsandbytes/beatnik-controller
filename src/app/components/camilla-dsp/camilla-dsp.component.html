@@ -1,182 +1,233 @@
-<div *ngIf="levels" class="meters-section">
-    <!-- <h2 class="text-xl ion-margin">Signal Levels</h2> -->
+<div class="row g-0">
+    <div class="col col-12 col-lg-12">
 
-    <ion-card class="meters-container">
-
-        <!-- Capture Group -->
-        <div class="meter-group">
-            <h3>Capture (Snapcast)</h3>
-            <div class="channels">
-                <!-- Left Channel -->
-                <div class="channel">
-                    <span class="channel-name">Left</span>
-                    <div class="sub-channel">
-                        <!-- RMS -->
-                        <div class="meter-column">
-                            <span class="type-label">RMS</span>
-                            <div class="meter-track">
-                                <div class="meter-bar" [style.height.px]="(levels.capture_rms[0] + 100) * 2"></div>
-                            </div>
-                            <span class="db-label">{{ levels.capture_rms[0] | number:'1.0-1' }}</span>
-                        </div>
-                        <!-- Peak -->
-                        <div class="meter-column">
-                            <span class="type-label">Peak</span>
-                            <div class="meter-track">
-                                <div class="meter-bar peak" [style.height.px]="(levels.capture_peak[0] + 100) * 2">
-                                </div>
-                            </div>
-                            <span class="db-label">{{ levels.capture_peak[0] | number:'1.0-1' }}</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Right Channel -->
-                <div class="channel">
-                    <span class="channel-name">Right</span>
-                    <div class="sub-channel">
-                        <!-- RMS -->
-                        <div class="meter-column">
-                            <span class="type-label">RMS</span>
-                            <div class="meter-track">
-                                <div class="meter-bar" [style.height.px]="(levels.capture_rms[1] + 100) * 2"></div>
-                            </div>
-                            <span class="db-label">{{ levels.capture_rms[1] | number:'1.0-1' }}</span>
-                        </div>
-                        <!-- Peak -->
-                        <div class="meter-column">
-                            <span class="type-label">Peak</span>
-                            <div class="meter-track">
-                                <div class="meter-bar peak" [style.height.px]="(levels.capture_peak[1] + 100) * 2">
-                                </div>
-                            </div>
-                            <span class="db-label">{{ levels.capture_peak[1] | number:'2.1-1' }}</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Playback Group -->
-        <div class="meter-group">
-            <h3>Playback</h3>
-            <div class="channels">
-                <!-- Left Channel -->
-                <div class="channel">
-                    <span class="channel-name">Left</span>
-                    <div class="sub-channel">
-                        <!-- RMS -->
-                        <div class="meter-column">
-                            <span class="type-label">RMS</span>
-                            <div class="meter-track">
-                                <div class="meter-bar" [style.height.px]="(levels.playback_rms[0] + 100) * 2"></div>
-                            </div>
-                            <span class="db-label">{{ levels.playback_rms[0] | number:'1.0-1' }}</span>
-                        </div>
-                        <!-- Peak -->
-                        <div class="meter-column">
-                            <span class="type-label">Peak</span>
-                            <div class="meter-track">
-                                <div class="meter-bar peak" [style.height.px]="(levels.playback_peak[0] + 100) * 2">
-                                </div>
-                            </div>
-                            <span class="db-label">{{ levels.playback_peak[0] | number:'1.0-1' }}</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Right Channel -->
-                <div class="channel">
-                    <span class="channel-name">Right</span>
-                    <div class="sub-channel">
-                        <!-- RMS -->
-                        <div class="meter-column">
-                            <span class="type-label">RMS</span>
-                            <div class="meter-track">
-                                <div class="meter-bar" [style.height.px]="(levels.playback_rms[1] + 100) * 2"></div>
-                            </div>
-                            <span class="db-label">{{ levels.playback_rms[1] | number:'1.0-1' }}</span>
-                        </div>
-                        <!-- Peak -->
-                        <div class="meter-column">
-                            <span class="type-label">Peak</span>
-                            <div class="meter-track">
-                                <div class="meter-bar peak" [style.height.px]="(levels.playback_peak[1] + 100) * 2">
-                                </div>
-                            </div>
-                            <span class="db-label">{{ levels.playback_peak[1] | number:'1.0-1' }}</span>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-        </div>
-
-    </ion-card>
-</div>
-<div *ngIf="parsedConfig">
-
-    <ion-item lines="none" c>
-        <ion-label slot="start">Master Volume:</ion-label>
-        <ion-input type="number" slot="end" [(ngModel)]="currentVolume"
-            (ionChange)="setVolume(currentVolume)"></ion-input>
-        <ion-label slot="end">dB</ion-label>
-    </ion-item>
-    <ion-item lass="ion-no-padding ion-no-margin">
-        <ion-range min="-24" max="24" step="1" [(ngModel)]="currentVolume" (ionChange)="setVolume(currentVolume)">
-        </ion-range>
-    </ion-item>
-
-    <ion-list-header>
-        <ion-label>
-            Filters
-        </ion-label>
-    </ion-list-header>
-
-    <ion-card color="primary" *ngFor="let filter of parsedConfig.filters | keyvalue">
-        <ion-card-header lines="none">
-            {{ filter.key }}
-        </ion-card-header>
-        <ion-item color="primary"> Type: {{ filter.value.type }} </ion-item>
-        <ion-item color="primary">
-            Gain: {{ filter.value.parameters.gain }}
-            <ion-range min="-24" max="24" step="0.1" [(ngModel)]="filter.value.parameters.gain"
-                (ionChange)="updateFilterParameter(filter.key, 'gain', filter.value.parameters.gain)"></ion-range>
-        </ion-item>
-        <ion-item color="primary"> Frequency: {{ filter.value.parameters.freq }} </ion-item>
-        <ion-item color="primary"> Q: {{ filter.value.parameters.q }} </ion-item>
-    </ion-card>
-
-    <ion-list-header>
-        <ion-label>
-            Mixers
-        </ion-label>
-    </ion-list-header>
-    <ion-card color="primary" *ngFor="let mixer of parsedConfig.mixers | keyvalue">
-        <ion-card-header>
-            {{ mixer.key }}
-        </ion-card-header>
-        <ion-item color="primary"> Channels: {{ mixer.value.channels.out }} </ion-item>
-        <div *ngFor="let mapping of mixer.value.mapping; let i = index">
-            <ion-item color="primary">
+        <div *ngIf="levels" class="meters-section">
+            <ion-list-header color="primary">
                 <ion-label>
-                    Destination {{ mapping.dest }}
-                    <span *ngIf="i === 0"> (Left)</span>
-                    <span *ngIf="i === 1"> (Right)</span>
+                    Signal Levels
                 </ion-label>
-            </ion-item>
-            <ion-item color="primary" *ngFor="let source of mapping.sources">
-                <ion-label>Source {{ source.channel }} - Gain: {{ source.gain }}</ion-label>
-                <ion-range min="-24" max="24" step="0.1" [(ngModel)]="source.gain"
-                    (ionChange)="updateMixerMapping(source, mixer.key)"></ion-range>
-                <p>Inverted: {{ source.inverted }}</p>
-                <ion-toggle color="light" [(ngModel)]="source.inverted"
-                    (ionChange)="updateMixerMapping(source, mixer.key)"></ion-toggle>
-                <p>Muted: {{ source.mute }}</p>
-                <ion-toggle [(ngModel)]="source.mute" (ionChange)="updateMixerMapping(source, mixer.key)"></ion-toggle>
-            </ion-item>
+            </ion-list-header>
+
+            <ion-card class="meters-container ion-no-margin">
+
+                <!-- Capture Group -->
+                <div class="meter-group">
+                    <h3>Capture (Snapcast)</h3>
+                    <div class="channels">
+                        <!-- Left Channel -->
+                        <div class="channel">
+                            <span class="channel-name">Left</span>
+                            <div class="sub-channel">
+                                <!-- RMS -->
+                                <div class="meter-column">
+                                    <span class="type-label">RMS</span>
+                                    <div class="meter-track">
+                                        <div class="meter-bar" [style.height.px]="(levels.capture_rms[0] + 100) * 2">
+                                        </div>
+                                    </div>
+                                    <span class="db-label">{{ levels.capture_rms[0] | number:'1.0-1' }}</span>
+                                </div>
+                                <!-- Peak -->
+                                <div class="meter-column">
+                                    <span class="type-label">Peak</span>
+                                    <div class="meter-track">
+                                        <div class="meter-bar peak"
+                                            [style.height.px]="(levels.capture_peak[0] + 100) * 2">
+                                        </div>
+                                    </div>
+                                    <span class="db-label">{{ levels.capture_peak[0] | number:'1.0-1' }}</span>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <!-- Right Channel -->
+                        <div class="channel">
+                            <span class="channel-name">Right</span>
+                            <div class="sub-channel">
+                                <!-- RMS -->
+                                <div class="meter-column">
+                                    <span class="type-label">RMS</span>
+                                    <div class="meter-track">
+                                        <div class="meter-bar" [style.height.px]="(levels.capture_rms[1] + 100) * 2">
+                                        </div>
+                                    </div>
+                                    <span class="db-label">{{ levels.capture_rms[1] | number:'1.0-1' }}</span>
+                                </div>
+                                <!-- Peak -->
+                                <div class="meter-column">
+                                    <span class="type-label">Peak</span>
+                                    <div class="meter-track">
+                                        <div class="meter-bar peak"
+                                            [style.height.px]="(levels.capture_peak[1] + 100) * 2">
+                                        </div>
+                                    </div>
+                                    <span class="db-label">{{ levels.capture_peak[1] | number:'2.1-1' }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Playback Group -->
+                <div class="meter-group">
+                    <h3>Playback</h3>
+                    <div class="channels">
+                        <!-- Left Channel -->
+                        <div class="channel">
+                            <span class="channel-name">Left</span>
+                            <div class="sub-channel">
+                                <!-- RMS -->
+                                <div class="meter-column">
+                                    <span class="type-label">RMS</span>
+                                    <div class="meter-track">
+                                        <div class="meter-bar" [style.height.px]="(levels.playback_rms[0] + 100) * 2">
+                                        </div>
+                                    </div>
+                                    <span class="db-label">{{ levels.playback_rms[0] | number:'1.0-1' }}</span>
+                                </div>
+                                <!-- Peak -->
+                                <div class="meter-column">
+                                    <span class="type-label">Peak</span>
+                                    <div class="meter-track">
+                                        <div class="meter-bar peak"
+                                            [style.height.px]="(levels.playback_peak[0] + 100) * 2">
+                                        </div>
+                                    </div>
+                                    <span class="db-label">{{ levels.playback_peak[0] | number:'1.0-1' }}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Right Channel -->
+                        <div class="channel">
+                            <span class="channel-name">Right</span>
+                            <div class="sub-channel">
+                                <!-- RMS -->
+                                <div class="meter-column">
+                                    <span class="type-label">RMS</span>
+                                    <div class="meter-track">
+                                        <div class="meter-bar" [style.height.px]="(levels.playback_rms[1] + 100) * 2">
+                                        </div>
+                                    </div>
+                                    <span class="db-label">{{ levels.playback_rms[1] | number:'1.0-1' }}</span>
+                                </div>
+                                <!-- Peak -->
+                                <div class="meter-column">
+                                    <span class="type-label">Peak</span>
+                                    <div class="meter-track">
+                                        <div class="meter-bar peak"
+                                            [style.height.px]="(levels.playback_peak[1] + 100) * 2">
+                                        </div>
+                                    </div>
+                                    <span class="db-label">{{ levels.playback_peak[1] | number:'1.0-1' }}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+            </ion-card>
         </div>
-    </ion-card>
+    </div>
+    <div class="col col-12 col-lg-6">
+        <div *ngIf="parsedConfig">
+            <ion-list-header color="primary">
+                <ion-label>
+                    Master
+                </ion-label>
+            </ion-list-header>
+            <ion-card color="primary" class="ion-no-margin">
+
+                <ion-item lines="none" color="primary">
+                    <ion-label slot="start">Master Volume:</ion-label>
+                    <ion-input type="number" slot="end" [(ngModel)]="currentVolume"
+                        (ionChange)="setVolume(currentVolume)"></ion-input>
+                    <ion-label slot="end">dB</ion-label>
+                </ion-item>
+                <ion-item color="primary">
+                    <ion-range color="medium" [ticks]="true" [snaps]="true" min="-12" max="12" step="1"
+                        [(ngModel)]="currentVolume" (ionChange)="setVolume(currentVolume)">
+                    </ion-range>
+                </ion-item>
+            </ion-card>
+
+            <ion-list-header color="primary">
+                <ion-label>
+                    Filters
+                </ion-label>
+            </ion-list-header>
+
+            <ion-card class="ion-no-margin ion-padding" color="primary"
+                *ngFor="let filter of parsedConfig.filters | keyvalue">
+                <ion-card-header lines="none">
+                    <ion-card-subtitle>
+                    {{ filter.key }}
+                    </ion-card-subtitle>
+                </ion-card-header>
+                <ion-item color="primary"> Type: {{ filter.value.type }} </ion-item>
+                <ion-item color="primary">
+                    <ion-label slot="start">Gain:</ion-label>
+                    <ion-input type="number" slot="end" [(ngModel)]="filter.value.parameters.gain"
+                        (ionChange)="updateFilterParameter(filter.key, 'gain', filter.value.parameters.gain)"></ion-input>
+                    <ion-label slot="end">dB</ion-label>
+                </ion-item>
+                <ion-item color="primary">
+                    <ion-range [ticks]="true" [snaps]="true" color="medium" min="-12" max="12" step="1"
+                        [(ngModel)]="filter.value.parameters.gain"
+                        (ionChange)="updateFilterParameter(filter.key, 'gain', filter.value.parameters.gain)"></ion-range>
+                </ion-item>
+                <ion-item color="primary"> Frequency: {{ filter.value.parameters.freq }} </ion-item>
+                <ion-item color="primary"> Q: {{ filter.value.parameters.q }} </ion-item>
+            </ion-card>
+        </div>
+    </div>
+    <div class="col col-12 col-lg-6">
+        <div *ngIf="parsedConfig">
+            <ion-list-header color="primary">
+                <ion-label>
+                    Mixers
+                </ion-label>
+            </ion-list-header>
+            <ion-card class="ion-no-margin ion-padding" color="primary"
+                *ngFor="let mixer of parsedConfig.mixers | keyvalue">
+                <ion-card-header>
+                    <ion-card-subtitle>
+                        {{ mixer.key }}
+                    </ion-card-subtitle>
+                </ion-card-header>
+                <ion-item color="primary"> Channels: {{ mixer.value.channels.out }} </ion-item>
+                <div *ngFor="let mapping of mixer.value.mapping; let i = index">
+                    <ion-item color="primary">
+                        <ion-label>
+                            Destination {{ mapping.dest }}
+                            <span *ngIf="i === 0"> (Left)</span>
+                            <span *ngIf="i === 1"> (Right)</span>
+                        </ion-label>
+                    </ion-item>
+                    <ng-container *ngFor="let source of mapping.sources">
+                        <ion-item color="primary">
+                            <ion-label>Source {{ source.channel }} - Gain: {{ source.gain }}</ion-label>
+                            <ion-range [ticks]="true" [snaps]="true" color="medium" min="-12" max="12" step="1"
+                                [(ngModel)]="source.gain"
+                                (ionChange)="updateMixerMapping(source, mixer.key)"></ion-range>
+                        </ion-item>
+                        <ion-item color="primary">
+                            <p>Inverted: {{ source.inverted }}</p>
+                            <ion-toggle color="light" [(ngModel)]="source.inverted"
+                                (ionChange)="updateMixerMapping(source, mixer.key)"></ion-toggle>
+                        </ion-item>
+                        <ion-item color="primary">
+                            <p>Muted: {{ source.mute }}</p>
+                            <ion-toggle [(ngModel)]="source.mute"
+                                (ionChange)="updateMixerMapping(source, mixer.key)"></ion-toggle>
+                        </ion-item>
+                    </ng-container>
+                </div>
+            </ion-card>
+        </div>
+    </div>
 </div>
 
 
