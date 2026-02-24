@@ -10,15 +10,16 @@ services:
       - "1780:1780"
 
   icecast:
-    image: infiniteproject/icecast
+    image: ghcr.io/libretime/icecast:2.4.4
+    container_name: icecast
     restart: always
     ports:
       - "8000:8000"
     environment:
-      - ICECAST_SOURCE_PASSWORD=hackme
-      - ICECAST_ADMIN_PASSWORD=hackme
-      - ICECAST_PASSWORD=hackme
-      - ICECAST_RELAY_PASSWORD=hackme
+      - ICECAST_SOURCE_PASSWORD=beatnik
+      - ICECAST_ADMIN_PASSWORD=beatnik
+      - ICECAST_PASSWORD=beatnik
+      - ICECAST_RELAY_PASSWORD=beatnik
 
   snapcast-to-icecast:
     image: ghcr.io/linuxserver/ffmpeg
@@ -37,29 +38,12 @@ services:
       mkfifo /tmp/stream_fifo || true
 
       # Start snapclient (-h points to beatnik container as snapserver)
-      snapclient -h host.docker.internal -s 1 --player file:name=/tmp/stream_fifo &
+      snapclient -h beatnik-controller -s 1 --player file:name=/tmp/stream_fifo &
 
       sleep 5
 
       # Encode and push to Icecast
       ffmpeg -re -f s16le -ar 48000 -ac 2 -i /tmp/stream_fifo \
              -acodec libmp3lame -b:a 192k -content_type audio/mpeg \
-             icecast://source:hackme@icecast:8000/stream
+             icecast://source:beatnik@icecast:8000/stream
       "
-      - ICECAST_RELAY_PASSWORD=hackme
-
-  snapcast-to-icecast:
-    image: alpine:latest
-    container_name: snapcast-to-icecast
-    restart: unless-stopped
-    depends_on:
-      - beatnik
-      - icecast
-    entrypoint: /bin/sh
-    command: >
-      -c "apk add --no-cache snapcast lame ezstream &&
-      until nc -z beatnik 1704; do echo 'Waiting for snapserver...'; sleep 5; done &&
-      until nc -z icecast 8000; do echo 'Waiting for icecast...'; sleep 5; done &&
-      snapclient -h beatnik -s 1 -o - | lame -b 128 - - | ezstream -c /etc/ezstream.xml"
-    volumes:
-      - ./config/ezstream.xml:/etc/ezstream.xml

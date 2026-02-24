@@ -7,15 +7,16 @@ services:
       - "8443:443"
 
   icecast:
-    image: infiniteproject/icecast
+    image: ghcr.io/libretime/icecast:2.4.4
+    container_name: icecast
     restart: always
     ports:
       - "8000:8000"
     environment:
-      - ICECAST_SOURCE_PASSWORD=hackme
-      - ICECAST_ADMIN_PASSWORD=hackme
-      - ICECAST_PASSWORD=hackme
-      - ICECAST_RELAY_PASSWORD=hackme
+      - ICECAST_SOURCE_PASSWORD=beatnik
+      - ICECAST_ADMIN_PASSWORD=beatnik
+      - ICECAST_PASSWORD=beatnik
+      - ICECAST_RELAY_PASSWORD=beatnik
 
   snapcast-to-icecast:
     image: ghcr.io/linuxserver/ffmpeg
@@ -41,5 +42,5 @@ services:
       # Encode and push to Icecast
       ffmpeg -re -f s16le -ar 48000 -ac 2 -i /tmp/stream_fifo \
              -acodec libmp3lame -b:a 192k -content_type audio/mpeg \
-             icecast://source:hackme@icecast:8000/stream
+             icecast://source:beatnik@icecast:8000/stream
       "
