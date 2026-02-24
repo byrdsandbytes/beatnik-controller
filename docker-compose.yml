@@ -10,14 +10,42 @@ services:
       - "1780:1780"
 
   icecast:
-    image: infiniteproject/icecast-alpine
-    container_name: icecast
+    image: infiniteproject/icecast
+    restart: always
     ports:
       - "8000:8000"
     environment:
       - ICECAST_SOURCE_PASSWORD=hackme
       - ICECAST_ADMIN_PASSWORD=hackme
       - ICECAST_PASSWORD=hackme
+      - ICECAST_RELAY_PASSWORD=hackme
+
+  snapcast-to-icecast:
+    image: ghcr.io/linuxserver/ffmpeg
+    container_name: snapcast-to-icecast
+    restart: always
+    depends_on:
+      - beatnik
+      - icecast
+    entrypoint: /bin/sh -c
+    command: >
+      "
+      # Install snapclient
+      apk add --no-cache snapcast-client
+
+      # Create pipe
+      mkfifo /tmp/stream_fifo || true
+
+      # Start snapclient (-h points to beatnik container as snapserver)
+      snapclient -h beatnik-controller -s 1 --player file:name=/tmp/stream_fifo &
+
+      sleep 5
+
+      # Encode and push to Icecast
+      ffmpeg -re -f s16le -ar 48000 -ac 2 -i /tmp/stream_fifo \
+             -acodec libmp3lame -b:a 192k -content_type audio/mpeg \
+             icecast://source:hackme@icecast:8000/stream
+      "
       - ICECAST_RELAY_PASSWORD=hackme
 
   snapcast-to-icecast:

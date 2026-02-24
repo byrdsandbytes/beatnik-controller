@@ -1,0 +1,36 @@
+version: '3'
+services:
+  beatnik:
+    image: ghcr.io/byrdsandbytes/beatnik-controller:latest
+    container_name: beatnik-controller
+    ports:
+      - "80:80"
+      - "8443:443"
+      - "1704:1704"
+      - "1705:1705"
+      - "1780:1780"
+
+  icecast:
+    image: infiniteproject/icecast
+    container_name: icecast
+    ports:
+      - "8000:8000"
+    environment:
+      - ICECAST_SOURCE_PASSWORD=hackme
+      - ICECAST_ADMIN_PASSWORD=hackme
+      - ICECAST_PASSWORD=hackme
+      - ICECAST_RELAY_PASSWORD=hackme
+
+  snapcast-to-icecast:
+    image: alpine:latest
+    container_name: snapcast-to-icecast
+    depends_on:
+      - beatnik
+      - icecast
+    entrypoint: /bin/sh
+    command: >
+      -c "apk add --no-cache snapcast lame ezstream &&
+      snapclient -h beatnik -s 1 -o - | lame -b 128 - - | ezstream -c /etc/ezstream.xml"
+    volumes:
+      - ./config/ezstream.xml:/etc/ezstream.xml
+
