@@ -1,16 +1,69 @@
 <div class="snapcast-container">
-  <h2>Snapcast Server Status</h2>
 
-  <h3>JSON Server Response:</h3>
+  <ng-container *ngIf="(displayState | async) as state; else loadingOrError">
+    <ion-list>
+      <ion-item>
+        <ion-label>
+          <h3>Host Name</h3>
+          <p>{{ state.server.server.host.name }}</p>
+        </ion-label>
+      </ion-item>
+      <ion-item>
+        <ion-label>
+          <h3>IP Address</h3>
+          <p>{{ state.server.server.host.ip }}</p>
+        </ion-label>
+      </ion-item>
+      <ion-item>
+        <ion-label>
+          <h3>OS / Arch</h3>
+          <p>{{ state.server.server.host.os }} / {{ state.server.server.host.arch }}</p>
+        </ion-label>
+      </ion-item>
+      <ion-item>
+        <ion-label>
+          <h3>Snapserver Version</h3>
+          <p>{{ state.server.server.snapserver.version }}</p>
+        </ion-label>
+      </ion-item>
+      <ion-item>
+        <ion-label>
+          <h3>Groups</h3>
+          <p>{{ state.server.groups.length }} Groups</p>
+        </ion-label>
+      </ion-item>
+      <ion-item>
+        <ion-label>
+          <h3>Clients</h3>
+          <p *ngIf="getClientStats(state) as stats">
+            {{ stats.total }} Total ({{ stats.online }} Online, {{ stats.offline }} Offline)
+          </p>
+        </ion-label>
+        <ion-button slot="end" fill="outline" (click)="cleanOfflineClients()">Clean Offline Clients</ion-button>
 
-  <div *ngIf="(displayState |async) as state" class="key-value-container">
+      </ion-item>
+      <ion-item>
+        <ion-label>
+          <h3>Streams</h3>
+          <p>{{ state.server.streams.length }} Streams</p>
+        </ion-label>
+      </ion-item>
+    </ion-list>
 
-    <pre>{{ state| json }}</pre>
-    
-  </div>
+    <ion-accordion-group>
+      <ion-accordion value="json">
+        <ion-item slot="header" color="light">
+          <ion-label>JSON Server Response</ion-label>
+        </ion-item>
+        <div class="ion-padding" slot="content" style="overflow-x: auto;">
+          <pre>{{ state | json }}</pre>
+        </div>
+      </ion-accordion>
+    </ion-accordion-group>
+  </ng-container>
 
   <ng-template #loadingOrError>
     <p>Loading Snapcast status or WebSocket not connected...</p>
-    <button type="button" (click)="snapcastService.connect()">Attempt to Connect</button>
+    <ion-button (click)="snapcastService.connect()">Attempt to Connect</ion-button>
   </ng-template>
 </div>

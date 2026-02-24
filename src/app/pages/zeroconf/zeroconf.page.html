@@ -71,10 +71,16 @@
           <p>{{ service.name }}</p>
           <p>{{ service.type }}</p>
           <p>{{ service.ipv4Addresses[0] }}:{{ service.port }}</p>
+           <ng-container *ngIf="service.type === SERVICE_BEATNIK">
+            <p>Beatnik Device - MAC: {{ service.txtRecord['mac'] }}</p>
+             <p>Beatnik Pi: {{ service.txtRecord['model'] }}</p>
+             <p>Beatnik Version: {{ service.txtRecord['version'] }}</p>
+             <p>RAM: {{ service.txtRecord['ram'] }}</p>
+           </ng-container>
         </ion-label>
         <ng-container *ngIf="service.type === SERVICE_BEATNIK">
-          <p>{{service.hostname}}</p>
-          <!-- <ion-button fill="outline" slot="end" [routerLink]="['/clients', service.txtRecord['mac']]">View Device</ion-button> -->
+          <!-- <p>{{service.hostname}}</p> -->
+          <ion-button fill="outline" slot="end" [routerLink]="['/clients', service.txtRecord['mac']]">View Device</ion-button>
         </ng-container>
       </ion-item>
     </ion-list>

@@ -13,8 +13,8 @@
       <ion-title size="large">Client Details</ion-title>
     </ion-toolbar>
   </ion-header>
-  <ion-toolbar color="light">
-    <ion-segment [(ngModel)]="segment" [scrollable]="true">
+  <!-- <ion-toolbar class="ion-no-padding ion-no-margin" color="light"> -->
+    <ion-segment color="primary"  [(ngModel)]="segment" [scrollable]="true">
       <ion-segment-button value="camilla-dsp">
         <ion-label>Camilla DSP</ion-label>
       </ion-segment-button>
@@ -33,7 +33,7 @@
         <ion-label>Settings</ion-label>
       </ion-segment-button>
     </ion-segment>
-  </ion-toolbar>
+  <!-- </ion-toolbar> -->
 
   <ng-container *ngIf="segment === 'details'">
     <ion-list *ngIf="serverState | async as state">

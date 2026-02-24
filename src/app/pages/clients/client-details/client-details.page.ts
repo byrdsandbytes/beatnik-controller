@@ -25,7 +25,7 @@ export class ClientDetailsPage implements OnInit {
 
   serverState?: Observable<SnapCastServerStatusResponse>;
   client?: Client;
-  segment: 'details' | 'soundcard' | 'camilla-dsp' | 'settings' = 'soundcard';
+  segment: 'details' | 'soundcard' | 'camilla-dsp' | 'settings' = 'camilla-dsp';
 
   hardwareStatus$: Observable<HardwareStatus>;
 
