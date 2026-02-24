@@ -6,10 +6,6 @@ services:
     ports:
       - "80:80"
       - "8443:443"
-      - "1704:1704"
-      - "1705:1705"
-      - "1780:1780"
-
   icecast:
     image: infiniteproject/icecast
     container_name: icecast
