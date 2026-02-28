@@ -79,7 +79,7 @@ export class CamillaDspComponent implements OnInit, OnDestroy {
 
 
 
-     connect() {
+    connect() {
         return this.camillaService.connect(this.url);
     }
 
@@ -163,5 +163,10 @@ export class CamillaDspComponent implements OnInit, OnDestroy {
         // Tell server to stop sending updates
         this.camillaService.stopLevelUpdates();
         this.camillaService.disconnect();
+    }
+
+    ionViewWillLeave() {
+        console.log('CamillaDspComponent: Leaving page, cleaning up resources if needed');
+        this.ngOnDestroy();
     }
 }

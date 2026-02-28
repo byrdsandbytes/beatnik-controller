@@ -1,0 +1,14 @@
+.selected {
+  border: 2px solid var(--ion-color-primary);
+  border-radius: 8px 8px 0 0;
+}
+
+.checkmark {
+  margin: 8px;
+  height: 40px;
+  text-align: end;
+}
+
+ion-badge{
+    font-size:12px;
+}
