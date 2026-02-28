@@ -54,6 +54,7 @@ export class SnapcastService implements OnDestroy {
   private readonly DEFAULT_HOSTNAME = environment.snapcastServerUrl;
   private readonly DEFAULT_PORT = 1780;
   private readonly RECONNECT_INTERVAL_MS = 5000;
+  private readonly SERVER_STATUS_REFRESH_INTERVAL_MS = 10000;
 
   private USERPREFERENCE_HOSTNAME?: string;
 
@@ -111,6 +112,12 @@ export class SnapcastService implements OnDestroy {
         next: () => {
           console.info('SnapcastService: WebSocket connection established.');
           this.fetchInitialServerStatus();
+
+          // Setup periodic refresh
+          const refreshSub = timer(this.SERVER_STATUS_REFRESH_INTERVAL_MS, this.SERVER_STATUS_REFRESH_INTERVAL_MS).subscribe(() => {
+            this.fetchInitialServerStatus();
+          });
+          this.serviceSubscriptions.add(refreshSub);
         },
       },
       closeObserver: {

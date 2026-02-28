@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
+import { ModalController } from '@ionic/angular';
 import { SUPPORTED_HATS } from 'src/app/constant/hat.constant';
 
 @Component({
@@ -8,11 +9,15 @@ import { SUPPORTED_HATS } from 'src/app/constant/hat.constant';
   standalone: false
 })
 export class SoundcardPickerComponent  implements OnInit {
+  @Input() clientId: string = '';
+  @Input() selectedHatId: string = '';
 
   hats = Object.values(SUPPORTED_HATS);
   filteredHats = this.hats;
 
-  constructor() { }
+  constructor(
+    private modalCtrl: ModalController
+  ) { }
 
   ngOnInit() {
     this.initAndSortHats();
@@ -44,5 +49,13 @@ export class SoundcardPickerComponent  implements OnInit {
     });
     this.filteredHats = this.hats;
   }
+
+  dismiss() {
+    // Pass the selected hat ID back to the parent component
+    console.log('Selected Hat ID:', this.selectedHatId);
+
+    this.modalCtrl.dismiss({
+      selectedHatId: this.selectedHatId
+    });}
 
 }

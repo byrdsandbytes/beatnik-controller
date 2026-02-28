@@ -27,7 +27,7 @@
           <ion-icon [name]="lastServerResponseDeltaInSeconds < 2400?'wifi':'wifi-outline'"></ion-icon>
         </ion-fab-button>
         <div class="fab-label">{{lastServerResponseDeltaInSeconds < 240?'Online':'Offline'}}: {{lastServerResponseTime |
-            date: 'dd.MM.yy HH:mm' }}</div>
+            date: 'dd.MM.yy HH:mm:ss' }}</div>
         </div>
         <div class="col col-4 col-lg-2 fab-container">
           <ion-fab-button class="custom-fab-button" color="light" (click)="getPlayerStatus()">
