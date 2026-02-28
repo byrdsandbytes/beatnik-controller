@@ -1,7 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Preferences } from '@capacitor/preferences';
-import { ModalController } from '@ionic/angular';
+import { AlertController, ModalController } from '@ionic/angular';
 import { firstValueFrom, Observable } from 'rxjs';
 import { ChooseSpeakersComponent } from 'src/app/components/choose-speakers/choose-speakers.component';
 import { SoundcardPickerComponent } from 'src/app/components/soundcard-picker/soundcard-picker.component';
@@ -10,6 +10,7 @@ import { UserPreference } from 'src/app/enum/user-preference.enum';
 import { Client, SnapCastServerStatusResponse } from 'src/app/model/snapcast.model';
 import { BeatnikHardwareService, HardwareStatus } from 'src/app/services/beatnik-hardware.service';
 import { BeatnikSnapcastService, SnapcastActionResponse } from 'src/app/services/beatnik-snapcast.service';
+import { CamillaDspService } from 'src/app/services/camilla-dsp.service';
 import { SnapcastService } from 'src/app/services/snapcast.service';
 
 @Component({
@@ -18,7 +19,7 @@ import { SnapcastService } from 'src/app/services/snapcast.service';
   styleUrls: ['./client-details.page.scss'],
   standalone: false
 })
-export class ClientDetailsPage implements OnInit {
+export class ClientDetailsPage implements OnInit, OnDestroy {
 
 
   id?: string;
@@ -44,7 +45,9 @@ export class ClientDetailsPage implements OnInit {
     private snapcastService: SnapcastService,
     private modalController: ModalController,
     private beatnikHardwareService: BeatnikHardwareService,
-    private beatnikSnapcastService: BeatnikSnapcastService
+    private beatnikSnapcastService: BeatnikSnapcastService,
+    private camillaService: CamillaDspService,
+    private alertController: AlertController
   ) { }
 
   async ngOnInit() {
@@ -74,6 +77,7 @@ export class ClientDetailsPage implements OnInit {
       } else {
         console.log('ClientDetailsPage: Found client:', this.client);
         this.camillaDspUrl = await this.getCamillaDspUrl();
+        this.getHardwareInfo();
       }
     });
   }
@@ -186,6 +190,7 @@ export class ClientDetailsPage implements OnInit {
     this.beatnikHardwareService.applyConfiguration(hatId, localHostName).subscribe({
       next: (response) => {
         console.log(`ClientDetailsPage: Successfully applied hardware configuration ${hatId} to client ${this.client?.id}`, response);
+        this.showRebootInfo();
         if (response.rebootRequired) {
           console.log('ClientDetailsPage: Reboot required. Triggering reboot...');
           this.beatnikHardwareService.reboot(localHostName).subscribe({
@@ -286,21 +291,78 @@ export class ClientDetailsPage implements OnInit {
   async openSoundcardPicker() {
     console.log('Open Soundcard Picker for client:', this.client?.id);
     // Here you would typically open a modal to select soundcards
+    const hardwareStatus = await firstValueFrom(this.hardwareStatus$);
     const modal = await this.modalController.create({
       component: SoundcardPickerComponent,
       id: 'soundcard-picker-modal',
-      componentProps: { clientId: this.client?.id }
+      componentProps: {
+        clientId: this.client?.id,
+        selectedHatId: hardwareStatus.currentConfig.id || ''
+      }
     });
     await modal.present();
 
     const { data } = await modal.onDidDismiss();
     if (data && data.selectedHatId) {
-      console.log('ClientDetailsPage: Soundcard selected:', data.selectedHatId);
-      this.applySoundcardConfig(data.selectedHatId);
+      if (hardwareStatus.currentConfig.id === data.selectedHatId) {
+        console.log('ClientDetailsPage: Selected hat is the same as current configuration, no changes needed');
+        return;
+      } else {
+        console.log('ClientDetailsPage: Soundcard selected:', data.selectedHatId);
+        this.showSoundCardWarning(data.selectedHatId);
+      }
     } else {
       console.log('ClientDetailsPage: Soundcard selection cancelled or no selection made');
     }
   }
 
+  ngOnDestroy(): void {
+  }
 
-}
+  ionViewWillLEave() {
+    console.log('ClientDetailsPage: Leaving page, cleaning up resources if needed');
+    this.camillaService.disconnect();
+  }
+
+  async showSoundCardWarning(hatId: string) {
+    const alert = await this.alertController.create({
+      header: 'Applying Soundcard Configuration',
+      message: 'You have selected a new soundcard, your Beatnik Pi may need to restart to apply the changes .',
+      buttons: [
+        {
+          text: 'Cancel',
+          role: 'cancel',
+          cssClass: 'secondary',
+          handler: () => {
+            console.log('ClientDetailsPage: Soundcard change cancelled by user');
+          }
+        },
+        {
+          text: 'Apply Now',
+          handler: () => {
+            console.log('ClientDetailsPage: User chose to apply soundcard changes');
+            this.applySoundcardConfig(hatId);
+          }
+        }
+      ]
+    });
+    await alert.present();
+  }
+
+  async showRebootInfo() {
+    // display alert to user that a reboot is required to apply changes, no options, just an OK button to dismiss
+    const alert = await this.alertController.create({
+      header: 'Rebooting now',
+      message: 'Your Beatnik Pi is rebooting now to apply the new soundcard configuration. Please wait a moment and then refresh this page to see the updated hardware status.',
+      buttons: [
+        {
+          text: 'OK',
+          handler: () => {
+            console.log('ClientDetailsPage: User acknowledged reboot requirement');
+          }
+        }
+      ]
+    });
+    await alert.present();
+  }
+} 

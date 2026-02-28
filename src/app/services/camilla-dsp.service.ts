@@ -39,10 +39,10 @@ export class CamillaDspService {
    * @param url The full WebSocket URL (e.g., 'ws://beatnik-client-amp.local:1234')
    */
   public connect(url: string): void {
-    if (this.socket$ && !this.socket$.closed) {
-      console.log('Already connected.');
-      return;
-    }
+    // if (this.socket$ && !this.socket$.closed) {
+    //   console.log('Already connected.');
+    //   return;
+    // }
 
     this.connectionStatusSubject.next('Connecting');
     console.log(`Connecting to ${url}...`);
