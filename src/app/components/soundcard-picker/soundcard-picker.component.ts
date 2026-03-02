@@ -9,7 +9,7 @@ import { SUPPORTED_HATS } from 'src/app/constant/hat.constant';
   standalone: false
 })
 export class SoundcardPickerComponent  implements OnInit {
-  @Input() clientId: string = '';
+  // @Input() clientId: string = '';
   @Input() selectedHatId: string = '';
 
   hats = Object.values(SUPPORTED_HATS);

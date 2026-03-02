@@ -1,0 +1,17 @@
+
+<div class="animation-container">
+
+  <div [class]="isPulsing? 'animation-container active':'animation-container'">
+
+    <div class="icon-container">
+      <ion-icon color="light" [class]="isPulsing?'custom-icon active':'custom-icon'" [name]="icon"></ion-icon>
+      <div [class]="isPulsing ? 'outer-ring active' : 'outer-ring'">
+        <div [class]="isPulsing ? 'inner-ring active' : 'inner-ring'">
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+</div>

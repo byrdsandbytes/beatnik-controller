@@ -67,22 +67,54 @@
             </p>
           </ion-card-content>
 
-          <div [ngSwitch]="isFirstDevice" class="ion-padding">
-            <div *ngSwitchCase="true">
-              <div *ngIf="(services$ | async) as services">
-                <ion-list-header>
-                  <ion-label>Discovered Servers ({{ services.length }})</ion-label>
-                </ion-list-header>
-                <ion-item *ngFor="let service of services" (click)="selectService(service)">
-                  <ion-label>
-                    <h2>Beatnik / {{ service.name }} Server</h2>
-                    <p>Host: {{ service.hostname }}</p>
-                    <p>IP: {{ service.ipv4Addresses[0] }}:{{ service.port }}</p>
-                  </ion-label>
-                </ion-item>
-              </div>
-            </div>
+          <!-- <div [ngSwitch]="isFirstDevice" class="ion-padding">
+            <div *ngSwitchCase="true"> -->
+          <div *ngIf="(services$ | async) as services">
+            <ion-list-header>
+              <ion-label>Discovered Servers</ion-label>
+            </ion-list-header>
+            <ng-container *ngFor="let service of services">
+              <ion-item *ngIf="service.type == SERVICE_SNAPCAST" button (click)="selectService(service)">
+                <ion-label>
+                  <h2>Beatnik / {{ service.name }} Server</h2>
+                  <p>Host: {{ service.hostname }}</p>
+                  <p>IP: {{ service.ipv4Addresses[0] }}:{{ service.port }}</p>
+                  <ion-badge *ngIf="ip == service.ipv4Addresses[0]" color="success">This Device</ion-badge>
+                  <!-- trim the last dot from the hostname if it exists -->
+                  <ion-badge
+                    *ngIf="userPreferenceServerAdress  == (service.hostname.endsWith('.') ? service.hostname.slice(0, -1) : service.hostname)"
+                    color="primary">Current Server</ion-badge>
+                  <!-- trim port from the IP if it exists -->
+                  <ion-badge
+                    *ngIf="userPreferenceServerAdress  == (service.ipv4Addresses[0].split(':')[0].trim() || service.hostname)"
+                    color="primary">Current Server</ion-badge>
+                </ion-label>
+              </ion-item>
+            </ng-container>
+            <ion-list-header>
+              <ion-label>Beatnik Devices</ion-label>
+            </ion-list-header>
+            <ng-container *ngFor="let service of services">
+              <ion-item *ngIf="service.type == SERVICE_BEATNIK" button (click)="selectService(service)">
+                <ion-label>
+                  <h2>Beatnik</h2>
+                  <p>Host: {{ service.hostname }}</p>
+                  <p>IP: {{ service.ipv4Addresses[0] }}:{{ service.port }}</p>
+                  <ion-badge *ngIf="ip == service.ipv4Addresses[0]" color="success">This Device</ion-badge>
+                  <!-- trim the last dot from the hostname if it exists -->
+                  <ion-badge
+                    *ngIf="userPreferenceServerAdress == (service.hostname.endsWith('.') ? service.hostname.slice(0, -1) : service.hostname)"
+                    color="primary">Current Server</ion-badge>
+                  <!-- trim port from the IP if it exists -->
+                  <ion-badge
+                    *ngIf="userPreferenceServerAdress == (service.ipv4Addresses[0].split(':')[0].trim() || service.hostname)"
+                    color="primary">Current Server</ion-badge>
+                </ion-label>
+              </ion-item>
+            </ng-container>
           </div>
+          <!-- </div>
+          </div> -->
           <div class="ion-text-center ion-padding">
 
           </div>
@@ -135,7 +167,7 @@
               <ion-title size="large">Audio Setup</ion-title>
             </ion-toolbar>
           </ion-header>
-           <div class="ion-margin">
+          <div class="ion-margin">
             <ion-text color="medium">
               <p>
                 Which configuration would you like to use for audio output on this device?
@@ -181,11 +213,12 @@
                     <!-- <p>isMatched: {{ hardwareStatus.isMatch}}</p> -->
                   </ng-container>
                   <ng-template #noHardware>
-                    <p>No hardware detected. NOTE: Some soundcards may not be detected automatically and need to be configured manually.</p>
+                    <p>No hardware detected. NOTE: Some soundcards may not be detected automatically and need to be
+                      configured manually.</p>
                   </ng-template>
-                  </ion-label>
+                </ion-label>
               </ion-item>
-              
+
             </ion-list>
           </ng-container>
           <ng-container *ngIf="segment === 'manual'">
@@ -222,12 +255,24 @@
 
       </div>
       <div *ngSwitchCase="1">
-        <ion-button *ngIf="isFirstDevice" (click)="setupAsSnapcastServer()" expand="block" color="primary">
-          Continue
-        </ion-button>
-        <ion-button fill="clear" (click)="setupAsSnapcastClient()" expand="block" color="medium">
-          Setup as Client
-        </ion-button>
+        <ng-container *ngIf="isFirstDevice">
+          <ion-button  (click)="setupAsSnapcastServer()" expand="block" color="primary">
+            Continue
+          </ion-button>
+          <ion-button fill="clear" (click)="setupAsSnapcastClient()" expand="block"
+            color="medium">
+            Setup as Client
+          </ion-button>
+        </ng-container>
+        <ng-container *ngIf="!isFirstDevice">
+          <ion-button (click)="setupAsSnapcastClient()" expand="block" color="primary">
+            Yes, Setup as Client
+          </ion-button>
+          <ion-button fill="clear" (click)="showSnapcastDoubleServerWarning()" expand="block"
+            color="medium">
+            No, Setup as Server
+          </ion-button>
+        </ng-container>
       </div>
       <div *ngSwitchCase="2">
         <ion-button *ngIf="state=='selected'" expand="block" color="primary" (click)="finishServerSetup()">

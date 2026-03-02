@@ -79,12 +79,12 @@ const routes: Routes = [
     loadChildren: () => import('./pages/camilla-dsp/camilla-dsp.module').then( m => m.CamillaDspPageModule)
   },
   {
-    path: 'ble-wifi-provisioning',
-    loadChildren: () => import('./pages/ble-wifi-provisioning/ble-wifi-provisioning.module').then( m => m.BleWifiProvisioningPageModule)
-  },
-  {
     path: 'ble-wifi-setup',
     loadChildren: () => import('./pages/setup/ble-wifi-setup/ble-wifi-setup.module').then( m => m.BleWifiSetupPageModule)
+  },
+  {
+    path: 'setup-soundcard/:id',
+    loadChildren: () => import('./pages/setup/setup-soundcard/setup-soundcard.module').then( m => m.SetupSoundcardPageModule)
   },
 
 
