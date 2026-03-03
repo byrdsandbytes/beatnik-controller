@@ -2,6 +2,7 @@ import { Component, Input, OnChanges, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { Group, Stream } from 'src/app/model/snapcast.model';
 import { Speaker } from 'src/app/model/speaker.model';
+import { toImageDataUrl } from 'src/app/utils/image.utils';
 
 @Component({
   selector: 'app-snapcast-group-preview',
@@ -64,13 +65,7 @@ export class SnapcastGroupPreviewComponent  implements OnInit, OnChanges {
     }
   }
 
-  convertCoverDataBase64(coverData: string, extension: string): string {
-    if (!coverData) {
-      return '';
-    }
-    // Convert base64 data to a data URL
-    return `data:image/${extension};base64,${coverData}`;
-  }
+  convertCoverDataBase64 = toImageDataUrl;
 
   getActiveSpeaker(): Speaker | undefined {
     if (!this.group || !this.speakerData) {

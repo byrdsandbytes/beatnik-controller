@@ -3,6 +3,7 @@ import { Observable } from 'rxjs';
 import { SnapcastWebsocketNotification } from 'src/app/model/snapcast-websocket-notification.model';
 import { SnapCastServerStatusResponse } from 'src/app/model/snapcast.model';
 import { SnapcastService } from 'src/app/services/snapcast.service';
+import { toImageDataUrl } from 'src/app/utils/image.utils';
 
 @Component({
   selector: 'app-streams',
@@ -21,8 +22,6 @@ export class StreamsPage implements OnInit {
     this.displayState = this.snapcastService.state$
   }
 
-  convertBase64ToImage(base64String: string, format: string): string {
-    return `data:image/${format};base64,${base64String}`;
-  }
+  convertBase64ToImage = toImageDataUrl;
 
 }
