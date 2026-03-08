@@ -162,7 +162,7 @@ export class SetupSoundcardPage implements OnInit {
 
   completeSetup() {
     console.log('SetupSoundcardPage: User completed soundcard setup, navigating back to client details');
-    this.router.navigateByUrl('tabs');
+    this.router.navigateByUrl('setup-device-group-name/' + this.ip);
   }
 
 }

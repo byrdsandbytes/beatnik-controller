@@ -1,0 +1,51 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Group Name</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <div class="container">
+    <ion-header collapse="condense">
+      <ion-toolbar>
+        <ion-title size="large">Device Name</ion-title>
+      </ion-toolbar>
+    </ion-header>
+
+    <!-- <ion-card-header>
+        <ion-card-title>Device Group Name</ion-card-title>
+      </ion-card-header> -->
+    <ion-item lines="none">
+      <ion-label>
+        <p class="ion-text-wrap">
+          Choose a descriptive name that reflects the location or purpose of this device (group), such as "Living Room
+          Amp"
+          or "Kitchen Audio".
+        </p>
+      </ion-label>
+    </ion-item>
+    <!-- </ion-card> -->
+    <ion-item class="ion-padding-vertical">
+      <ion-label position="stacked">Device Group Name</ion-label>
+      <ion-input type="text" [(ngModel)]="deviceGroupName" (ionInput)="changeGroupName(deviceGroupName)"
+        placeholder="e.g. Living Room"></ion-input>
+    </ion-item>
+    <ion-item lines="none">
+      <ion-label>
+        <p class="ion-text-wrap">
+          A device group can contain a single device or multiple devices, depending on your setup.
+        </p>
+      </ion-label>
+    </ion-item>
+  </div>
+</ion-content>
+<ion-footer>
+  <ion-toolbar color="light">
+    <ion-button expand="block" routerLink="/tabs">
+      Save & Complete Setup
+    </ion-button>
+  </ion-toolbar>
+</ion-footer>

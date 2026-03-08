@@ -86,6 +86,10 @@ const routes: Routes = [
     path: 'setup-soundcard/:id',
     loadChildren: () => import('./pages/setup/setup-soundcard/setup-soundcard.module').then( m => m.SetupSoundcardPageModule)
   },
+  {
+    path: 'setup-device-group-name/:ip',
+    loadChildren: () => import('./pages/setup/setup-device-group-name/setup-device-group-name.module').then( m => m.SetupDeviceGroupNamePageModule)
+  },
 
 
 ];

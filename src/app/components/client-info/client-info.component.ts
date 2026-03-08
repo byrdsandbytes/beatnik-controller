@@ -53,7 +53,7 @@ export class ClientInfoComponent implements OnInit {
     }
     var ipAddress = this.cleanIpAddress(this.client.host.ip);
     // if ip adress is 127.0.0.1 or localhost, it's the client running on the server so we get the server ip from user preferences
-    if (ipAddress === '127.0.0.1' || ipAddress === 'localhost') {
+    if (ipAddress === '127.0.0.1' || ipAddress === '172.18.0.1' || ipAddress === 'localhost') {
       await Preferences.get({ key: UserPreference.SERVER_URL }).then((result) => {
         ipAddress = result.value;
       });

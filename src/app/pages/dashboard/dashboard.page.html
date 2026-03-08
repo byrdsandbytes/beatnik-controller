@@ -1,15 +1,15 @@
 <ion-header class="ion-no-border">
-  <ion-toolbar color="light">
+  <ion-toolbar >
     <ion-title>Dashboard</ion-title>
     <!-- <ion-title *ngIf="(userProfile) as user">{{user.displayName}}s Home </ion-title> -->
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true" color="light">
+<ion-content [fullscreen]="true" >
   <div class="container">
     <ion-header collapse="condense">
       <span class="header-note">{{today | date:"EEEE, d.MMMM"}}</span>
-      <ion-toolbar color="light" class="ion-margin-top">
+      <ion-toolbar  class="ion-margin-top">
         <ion-title size="large"><span *ngIf="userPreeferenceUsername as name">{{name ? name+"s": 'Your'}}</span>
           Home</ion-title>
 

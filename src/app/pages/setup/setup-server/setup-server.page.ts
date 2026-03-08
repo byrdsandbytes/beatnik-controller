@@ -226,8 +226,27 @@ export class SetupServerPage implements OnInit {
 
   async setupAsSnapcastServer(): Promise<void> {
     console.log('Setting up this device as Snapcast server...');
-    this.slideTo(2);
-    this.connectToSnapcast(this.selectedService);
+    this.beatnikSnapcastService.enable(this.ip || '').subscribe({
+      next: (response) => {
+        this.setServerUrl();
+        console.log('Successfully enabled Snapserver on server at IP', this.ip, response);
+        this.connectToSnapcast(this.selectedService);
+        this.navToSetupSoundcard();
+
+      },
+      error: (err) => {
+        console.error('Failed to enable Snapserver on server at IP', this.ip, err);
+      }
+    });
+  }
+
+  setServerUrl() {
+    Preferences.set({
+      key: UserPreference.SERVER_URL,
+      value: this.ip || '',
+    }).then(() => {
+      console.log('Server URL set to:', this.ip);
+    });
   }
 
   async setupAsSecondaryServer(): Promise<void> {
@@ -317,7 +336,7 @@ export class SetupServerPage implements OnInit {
           text: 'Cancel',
           role: 'cancel',
           handler: () => {
-           
+
           }
         }
       ]
