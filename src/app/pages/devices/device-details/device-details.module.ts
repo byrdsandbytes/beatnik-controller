@@ -8,6 +8,7 @@ import { DeviceDetailsPageRoutingModule } from './device-details-routing.module'
 
 import { DeviceDetailsPage } from './device-details.page';
 import { SnapcastGroupPreviewModule } from 'src/app/components/snapcast-group-preview/snapcast-group-preview.module';
+import { ClientInfoModule } from 'src/app/components/client-info/client-info.module';
 
 @NgModule({
   imports: [
@@ -15,7 +16,8 @@ import { SnapcastGroupPreviewModule } from 'src/app/components/snapcast-group-pr
     FormsModule,
     IonicModule,
     DeviceDetailsPageRoutingModule,
-    SnapcastGroupPreviewModule
+    SnapcastGroupPreviewModule,
+    ClientInfoModule
   ],
   declarations: [DeviceDetailsPage]
 })

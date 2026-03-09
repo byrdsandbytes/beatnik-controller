@@ -113,11 +113,11 @@ export class SnapcastService implements OnDestroy {
           console.info('SnapcastService: WebSocket connection established.');
           this.fetchInitialServerStatus();
 
-          // Setup periodic refresh
-          const refreshSub = timer(this.SERVER_STATUS_REFRESH_INTERVAL_MS, this.SERVER_STATUS_REFRESH_INTERVAL_MS).subscribe(() => {
-            this.fetchInitialServerStatus();
-          });
-          this.serviceSubscriptions.add(refreshSub);
+          // // Setup periodic refresh
+          // const refreshSub = timer(this.SERVER_STATUS_REFRESH_INTERVAL_MS, this.SERVER_STATUS_REFRESH_INTERVAL_MS).subscribe(() => {
+          //   this.fetchInitialServerStatus();
+          // });
+          // this.serviceSubscriptions.add(refreshSub);
         },
       },
       closeObserver: {
@@ -146,7 +146,7 @@ export class SnapcastService implements OnDestroy {
   }
 
   private fetchInitialServerStatus(): void {
-    this.rpc<never, SnapCastServerStatusResponse>('Server.GetStatus').pipe(take(1)).subscribe({
+    this.rpc<never, SnapCastServerStatusResponse>('Server.GetStatus').subscribe({
       next: response => {
         if (response.result) {
           this.stateSubject$.next(response.result); // Update the state with the full server status

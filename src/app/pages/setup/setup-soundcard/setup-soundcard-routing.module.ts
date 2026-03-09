@@ -1,12 +1,12 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 
-import { BleWifiProvisioningPage } from './ble-wifi-provisioning.page';
+import { SetupSoundcardPage } from './setup-soundcard.page';
 
 const routes: Routes = [
   {
     path: '',
-    component: BleWifiProvisioningPage
+    component: SetupSoundcardPage
   }
 ];
 
@@ -14,4 +14,4 @@ const routes: Routes = [
   imports: [RouterModule.forChild(routes)],
   exports: [RouterModule],
 })
-export class BleWifiProvisioningPageRoutingModule {}
+export class SetupSoundcardPageRoutingModule {}

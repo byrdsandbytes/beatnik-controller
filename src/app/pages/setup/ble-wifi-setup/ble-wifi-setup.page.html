@@ -197,7 +197,7 @@
 </ion-content>
 
 <ion-footer>
-  <ion-toolbar class="ion-no-lines ion-padding-horizontal">
+  <ion-toolbar color="light" class="ion-no-lines ion-padding-horizontal">
     <div [ngSwitch]="slideIndex">
       <div *ngSwitchCase="0">
         <div>
@@ -230,7 +230,7 @@
       <div *ngSwitchCase="3">
         <div>
           <ion-button [disabled]="!isNetworkSetupComplete" (click)="completeSetup()" expand="block">
-            <ion-icon slot="start" name="checkmark-circle-outline"></ion-icon> Finish
+            <ion-icon slot="start" name="checkmark-circle-outline"></ion-icon> Continue
           </ion-button>
         </div>
       </div>

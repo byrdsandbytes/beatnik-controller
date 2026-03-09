@@ -92,15 +92,10 @@ export class BeatnikBlenoService {
         if (result.device) {
           console.log('Found device during scan:', result.device);
           this.handleFoundDevice(result);
+          BleClient.stopLEScan();
         }
       });
 
-      // Wait for a short period to gather scan results
-      await this.sleep(5000);
-
-      // Stop scanning
-      await BleClient.stopLEScan();
-      console.log('Stopped scanning.');
 
     } catch (error) {
       console.error('Error during scan/connect:', error);
@@ -152,7 +147,7 @@ export class BeatnikBlenoService {
       // Short delay to ensure characteristics are ready
       await this.sleep(2000);
 
-      // Try to read the device information first (this often works)
+      // Try to read the device information first 
       try {
         console.log('Reading device information...');
         const deviceInfo = await BleClient.read(
@@ -165,7 +160,6 @@ export class BeatnikBlenoService {
         console.warn('Could not read device information:', error);
       }
 
-      // Now try our service
       try {
         console.log('Verifying provisioning service access...');
         // First try to write to SSID characteristic (it should be writable)
@@ -280,33 +274,6 @@ export class BeatnikBlenoService {
     console.log('WiFi credentials sent.');
   }
 
-  // async subscribeToNetworkList(): Promise<void> {
-  //   if (!this.deviceId) {
-  //     throw new Error('Device not connected');
-  //   }
-
-  //   try {
-  //     console.log('Subscribing to network list notifications...');
-  //     await BleClient.startNotifications(
-  //       this.deviceId,
-  //       this.SERVICE,
-  //       this.NETWORK_LIST_CHAR,
-  //       (dataView) => {
-  //         const jsonString = dataViewToText(dataView);
-  //         try {
-  //           const networks: BleNetwork[] = JSON.parse(jsonString);
-  //           console.log('Received network list:', networks);
-  //           this.availableNetworks$.next(networks);
-  //         } catch (error) {
-  //           console.error('Error parsing network list JSON:', error);
-  //         }
-  //       }
-  //     );
-  //     console.log('Successfully subscribed to network list.');
-  //   } catch (error) {
-  //     console.error('Error subscribing to network list:', error);
-  //   }
-  // }
 
   // try to get network list in chunks
 
