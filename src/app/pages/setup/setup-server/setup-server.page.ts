@@ -134,12 +134,22 @@ export class SetupServerPage implements OnInit {
     try {
       const services = await firstValueFrom(this.services$);
       // check if there is only the service found with the current device's ip
-      if (services.length === 1) {
-        this.isFirstDevice = true;
-      } else if (services.length > 1) {
+      // if (services.length === 1) {
+      //   this.isFirstDevice = true;
+      // } else if (services.length > 1) {
+      //   this.isFirstDevice = false;
+      // } else {
+      //   this.isFirstDevice = true;
+      // }
+
+      //  check if there is more than one snapcasrt service found
+      const filteredServices = services.filter(service => service.type === this.SERVICE_SNAPCAST);
+      if (filteredServices.length > 1) {
+        console.log('Multiple Snapcast services found:', filteredServices);
         this.isFirstDevice = false;
       } else {
         this.isFirstDevice = true;
+        console.log('Single Snapcast service found, proceeding with setup');
       }
     } catch (error) {
       console.error('Error checking for existing Snapcast server:', error);
