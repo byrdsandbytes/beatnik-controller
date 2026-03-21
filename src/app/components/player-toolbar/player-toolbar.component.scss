@@ -1,31 +1,22 @@
+.round-button {
+  height: 40px;
+  aspect-ratio: 1/1;
+  --border-radius: 50% !important;
+}
 
-  
-  .round-button{
-    height: 40px;
-    aspect-ratio: 1/1;
-    --border-radius: 50% !important;
-    
-  }
-  
+.play-toolbar {
+  border-radius: 16px 16px 0 0;
+  border: 0px;
+}
 
-  
+.stream-range {
+  width: 100%;
+}
 
-  .play-toolbar{
-    border-radius: 16px 16px 0 0;
-    border: 0px;
-  }
+.volume-modal {
+  z-index: 1 !important;
+}
 
-
-  .stream-range{
-    width: 100%;
-  }
-  
-
-  .volume-modal{
-    z-index: 1 !important;
-  }
-
-  .spacer{
-    height: 60px;
-  }
-  
+.spacer {
+  height: 60px;
+}

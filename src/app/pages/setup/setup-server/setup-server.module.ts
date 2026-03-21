@@ -15,8 +15,8 @@ import { SwiperModule } from 'swiper/angular';
     FormsModule,
     IonicModule,
     SetupServerPageRoutingModule,
-    SwiperModule
+    SwiperModule,
   ],
-  declarations: [SetupServerPage]
+  declarations: [SetupServerPage],
 })
 export class SetupServerPageModule {}

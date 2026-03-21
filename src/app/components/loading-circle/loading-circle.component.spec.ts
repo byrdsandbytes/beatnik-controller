@@ -9,8 +9,8 @@ describe('LoadingCircleComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ LoadingCircleComponent ],
-      imports: [IonicModule.forRoot()]
+      declarations: [LoadingCircleComponent],
+      imports: [IonicModule.forRoot()],
     }).compileComponents();
 
     fixture = TestBed.createComponent(LoadingCircleComponent);

@@ -4,15 +4,9 @@ import { SnapcastStatusComponent } from './snapcast-status.component';
 import { IonicModule } from '@ionic/angular';
 import { FormsModule } from '@angular/forms';
 
-
-
 @NgModule({
   declarations: [SnapcastStatusComponent],
-  imports: [
-    CommonModule,
-    IonicModule,
-    FormsModule
-  ],
+  imports: [CommonModule, IonicModule, FormsModule],
   exports: [SnapcastStatusComponent],
 })
-export class SnapcastStatusModule { }
+export class SnapcastStatusModule {}

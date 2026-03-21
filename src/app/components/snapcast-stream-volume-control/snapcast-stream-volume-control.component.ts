@@ -6,26 +6,23 @@ import { SnapcastService } from 'src/app/services/snapcast.service';
   selector: 'app-snapcast-stream-volume-control',
   templateUrl: './snapcast-stream-volume-control.component.html',
   styleUrls: ['./snapcast-stream-volume-control.component.scss'],
-  standalone: false
+  standalone: false,
 })
 export class SnapcastStreamVolumeControlComponent implements OnInit {
-
   @Input() stream?: Stream;
   @Input() groups?: Group[] | null;
 
-  @Output() streamVolumeChange: EventEmitter<number> = new EventEmitter<number>();
+  @Output() streamVolumeChange: EventEmitter<number> =
+    new EventEmitter<number>();
 
   streamVolume: number = 0;
   clietsInStream: Client[] = [];
-
 
   knobMoveStartValue: number = 0;
   knobMoveRealtimeValue: number = 0;
   knobMoveDelta: number = 0;
 
-  constructor(
-    private snapcastService: SnapcastService
-  ) { }
+  constructor(private snapcastService: SnapcastService) {}
 
   ngOnInit() {
     if (!this.stream || !this.groups) {
@@ -36,14 +33,13 @@ export class SnapcastStreamVolumeControlComponent implements OnInit {
     this.calaculateStreamVolume(this.stream);
   }
 
-
-
-
   calaculateStreamVolume(stream: Stream): number {
     if (!stream || !this.groups) {
       return 0;
     }
-    const groupsWIthStream = this.groups.filter(group => group.stream_id === stream.id);
+    const groupsWIthStream = this.groups.filter(
+      (group) => group.stream_id === stream.id
+    );
     const clients: Client[] = [];
     for (const group of groupsWIthStream) {
       if (group.clients) {
@@ -56,8 +52,7 @@ export class SnapcastStreamVolumeControlComponent implements OnInit {
     // Calculate the average volume across all clients in the stream
     const totalVolume = clients.reduce((sum, client) => {
       return sum + (client.config?.volume?.percent || 0);
-    }
-      , 0);
+    }, 0);
     const averageVolume = totalVolume / clients.length;
     console.log(`Average volume for stream ${stream.id}: ${averageVolume}`);
     this.streamVolume = Math.round(averageVolume);
@@ -66,25 +61,38 @@ export class SnapcastStreamVolumeControlComponent implements OnInit {
   }
 
   changeStreamVolume(event: any): void {
-    console.log("Event: ", event);
-
+    console.log('Event: ', event);
   }
 
   changeStreambasedOnClientsVolume(stream: Stream): void {
     for (const client of this.clietsInStream) {
-      if (client.config && client.config.volume && typeof client.config.volume.percent === 'number') {
+      if (
+        client.config &&
+        client.config.volume &&
+        typeof client.config.volume.percent === 'number'
+      ) {
         const initialVolume = client.config.volume.percent;
         const targetVolume = initialVolume + this.knobMoveDelta;
         // Ensure the target volume is within the valid range
         const clampedVolume = Math.max(0, Math.min(100, targetVolume));
-        console.log(`Setting volume for client ${client.id} from ${initialVolume} to ${clampedVolume}`);
+        console.log(
+          `Setting volume for client ${client.id} from ${initialVolume} to ${clampedVolume}`
+        );
         // Here you would typically call a service to set the volume
-        this.snapcastService.setClientVolumePercent(client.id, clampedVolume).subscribe({
-          next: () => {
-            console.log(`Volume for client ${client.id} set to ${clampedVolume}`);
-          },
-          error: err => console.error(`Failed to set volume for client ${client.id}`, err)
-        });
+        this.snapcastService
+          .setClientVolumePercent(client.id, clampedVolume)
+          .subscribe({
+            next: () => {
+              console.log(
+                `Volume for client ${client.id} set to ${clampedVolume}`
+              );
+            },
+            error: (err) =>
+              console.error(
+                `Failed to set volume for client ${client.id}`,
+                err
+              ),
+          });
       }
     }
   }
@@ -101,5 +109,4 @@ export class SnapcastStreamVolumeControlComponent implements OnInit {
       // this.changeStreambasedOnClientsVolume(this.stream!);
     }
   }
-
 }

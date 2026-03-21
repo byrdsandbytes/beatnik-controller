@@ -7,10 +7,9 @@ import { Speaker } from 'src/app/model/speaker.model';
   selector: 'app-snapcast-group-preview',
   templateUrl: './snapcast-group-preview.component.html',
   styleUrls: ['./snapcast-group-preview.component.scss'],
-  standalone: false
+  standalone: false,
 })
-export class SnapcastGroupPreviewComponent  implements OnInit, OnChanges {
-
+export class SnapcastGroupPreviewComponent implements OnInit, OnChanges {
   @Input() group?: Group;
   @Input() streams?: Stream[] | null;
   @Input() speakerData?: Speaker[] | null;
@@ -18,9 +17,7 @@ export class SnapcastGroupPreviewComponent  implements OnInit, OnChanges {
   activeStream?: Stream;
   activeSpeaker?: Speaker;
 
-  constructor(
-    private router: Router
-  ) { }
+  constructor(private router: Router) {}
 
   ngOnInit() {
     this.getActiveStream();
@@ -32,9 +29,8 @@ export class SnapcastGroupPreviewComponent  implements OnInit, OnChanges {
   }
 
   getStreamById(streamId: string): Stream | undefined {
-    return this.streams?.find(stream => stream.id === streamId);
+    return this.streams?.find((stream) => stream.id === streamId);
   }
-
 
   getActiveStream(): Stream | undefined {
     if (!this.group || !this.streams) {
@@ -46,7 +42,9 @@ export class SnapcastGroupPreviewComponent  implements OnInit, OnChanges {
 
   navToGroupDetails(): void {
     if (!this.group) {
-      console.error('SnapcastGroupPreviewComponent: No group available to navigate to details');
+      console.error(
+        'SnapcastGroupPreviewComponent: No group available to navigate to details'
+      );
       return;
     }
     // Navigate to the group details page using the group's ID
@@ -77,7 +75,9 @@ export class SnapcastGroupPreviewComponent  implements OnInit, OnChanges {
       return undefined;
     }
     // Hacky implementation of speaker selection
-    this.activeSpeaker = this.speakerData.find(speaker => speaker.id === this.group.clients[0].config.name);
+    this.activeSpeaker = this.speakerData.find(
+      (speaker) => speaker.id === this.group.clients[0].config.name
+    );
     if (!this.activeSpeaker) {
       console.warn('No active speaker found for the group:', this.group.id);
       return undefined;
@@ -86,5 +86,4 @@ export class SnapcastGroupPreviewComponent  implements OnInit, OnChanges {
 
     return this.activeSpeaker;
   }
-
 }

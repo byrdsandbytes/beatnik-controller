@@ -9,12 +9,7 @@ import { DevicesPageRoutingModule } from './devices-routing.module';
 import { DevicesPage } from './devices.page';
 
 @NgModule({
-  imports: [
-    CommonModule,
-    FormsModule,
-    IonicModule,
-    DevicesPageRoutingModule
-  ],
-  declarations: [DevicesPage]
+  imports: [CommonModule, FormsModule, IonicModule, DevicesPageRoutingModule],
+  declarations: [DevicesPage],
 })
 export class DevicesPageModule {}

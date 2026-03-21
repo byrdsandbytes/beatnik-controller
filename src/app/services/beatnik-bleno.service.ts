@@ -1,5 +1,11 @@
 import { Injectable } from '@angular/core';
-import { BleClient, ScanResult, dataViewToText, textToDataView, numbersToDataView } from '@capacitor-community/bluetooth-le';
+import {
+  BleClient,
+  ScanResult,
+  dataViewToText,
+  textToDataView,
+  numbersToDataView,
+} from '@capacitor-community/bluetooth-le';
 import { BehaviorSubject } from 'rxjs';
 
 export interface BleNetwork {
@@ -17,9 +23,8 @@ export interface WifiStatus {
   message: string;
 }
 
-
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class BeatnikBlenoService {
   // Use lowercase UUIDs for compatibility
@@ -32,19 +37,22 @@ export class BeatnikBlenoService {
   private readonly NETWORK_LIST_CHAR = '6e400007-b5a3-f393-e0a9-e50e24dcca9e';
 
   // Observables for state management
-  public readonly wifiStatus$ = new BehaviorSubject<WifiStatus>({ connected: false, message: 'Not Connected' });
-  public readonly deviceConnectionStatus$ = new BehaviorSubject<'Disconnected' | 'Scanning' | 'Connecting' | 'Connected'>('Disconnected');
+  public readonly wifiStatus$ = new BehaviorSubject<WifiStatus>({
+    connected: false,
+    message: 'Not Connected',
+  });
+  public readonly deviceConnectionStatus$ = new BehaviorSubject<
+    'Disconnected' | 'Scanning' | 'Connecting' | 'Connected'
+  >('Disconnected');
   public readonly deviceId$ = new BehaviorSubject<string | null>(null);
   public readonly availableNetworks$ = new BehaviorSubject<BleNetwork[]>([]);
 
-
   private deviceId: string | null = null;
 
-  constructor() { }
-
+  constructor() {}
 
   private sleep(ms: number): Promise<void> {
-    return new Promise(resolve => setTimeout(resolve, ms));
+    return new Promise((resolve) => setTimeout(resolve, ms));
   }
 
   /**
@@ -56,14 +64,13 @@ export class BeatnikBlenoService {
       await BleClient.initialize();
       this.deviceConnectionStatus$.next('Scanning');
 
-
       console.log('Requesting BLE device...');
       const device = await BleClient.requestDevice({
         // name: 'beatnik',
         services: [
-          this.SERVICE,  // Only request the main service UUID
-          '0000180a-0000-1000-8000-00805f9b34fb' // Device Information Service
-        ]
+          this.SERVICE, // Only request the main service UUID
+          '0000180a-0000-1000-8000-00805f9b34fb', // Device Information Service
+        ],
       });
 
       if (device) {
@@ -84,19 +91,20 @@ export class BeatnikBlenoService {
       this.deviceConnectionStatus$.next('Scanning');
       console.log('Scanning for BLE devices...');
       // use requestLeScan instead of requestDevice to avoid dialog
-      const scanResult = await BleClient.requestLEScan({
-        services: [this.SERVICE, '0000180a-0000-1000-8000-00805f9b34fb'],
-        allowDuplicates: false
-      }, (result) => {
-        console.log('Scan result:', result);
-        if (result.device) {
-          console.log('Found device during scan:', result.device);
-          this.handleFoundDevice(result);
-          BleClient.stopLEScan();
+      const scanResult = await BleClient.requestLEScan(
+        {
+          services: [this.SERVICE, '0000180a-0000-1000-8000-00805f9b34fb'],
+          allowDuplicates: false,
+        },
+        (result) => {
+          console.log('Scan result:', result);
+          if (result.device) {
+            console.log('Found device during scan:', result.device);
+            this.handleFoundDevice(result);
+            BleClient.stopLEScan();
+          }
         }
-      });
-
-
+      );
     } catch (error) {
       console.error('Error during scan/connect:', error);
       this.deviceConnectionStatus$.next('Disconnected');
@@ -123,12 +131,15 @@ export class BeatnikBlenoService {
       console.log('Available services:', JSON.stringify(services, null, 2));
 
       // Find our service
-      const provisioningService = services.find(s =>
-        s.uuid.toLowerCase() === this.SERVICE.toLowerCase()
+      const provisioningService = services.find(
+        (s) => s.uuid.toLowerCase() === this.SERVICE.toLowerCase()
       );
 
       if (!provisioningService) {
-        console.error('Available services:', services.map(s => s.uuid));
+        console.error(
+          'Available services:',
+          services.map((s) => s.uuid)
+        );
         throw new Error(`Provisioning service ${this.SERVICE} not found`);
       }
 
@@ -136,10 +147,11 @@ export class BeatnikBlenoService {
 
       // Log all characteristics for debugging
       if (provisioningService.characteristics) {
-        console.log('Service characteristics:',
-          provisioningService.characteristics.map(c => ({
+        console.log(
+          'Service characteristics:',
+          provisioningService.characteristics.map((c) => ({
             uuid: c.uuid,
-            properties: c.properties
+            properties: c.properties,
           }))
         );
       }
@@ -147,7 +159,7 @@ export class BeatnikBlenoService {
       // Short delay to ensure characteristics are ready
       await this.sleep(2000);
 
-      // Try to read the device information first 
+      // Try to read the device information first
       try {
         console.log('Reading device information...');
         const deviceInfo = await BleClient.read(
@@ -155,7 +167,10 @@ export class BeatnikBlenoService {
           '0000180a-0000-1000-8000-00805f9b34fb',
           '00002a50-0000-1000-8000-00805f9b34fb'
         );
-        console.log('Device information:', new TextDecoder().decode(deviceInfo));
+        console.log(
+          'Device information:',
+          new TextDecoder().decode(deviceInfo)
+        );
       } catch (error) {
         console.warn('Could not read device information:', error);
       }
@@ -183,7 +198,6 @@ export class BeatnikBlenoService {
       await this.subscribeToStatusNotifications();
       await this.subscribeToNetworkList();
       await this.scanForWifiNetworks();
-
     } catch (error) {
       console.error('Error handling device:', error);
       this.disconnect();
@@ -210,7 +224,7 @@ export class BeatnikBlenoService {
         (dataView) => {
           console.log('Status notification received:', {
             type: dataView.constructor.name,
-            buffer: Array.from(new Uint8Array(dataView.buffer))
+            buffer: Array.from(new Uint8Array(dataView.buffer)),
           });
 
           try {
@@ -224,7 +238,7 @@ export class BeatnikBlenoService {
               // Fallback for plain text
               this.wifiStatus$.next({
                 connected: false,
-                message: statusString
+                message: statusString,
               });
             }
           } catch (error) {
@@ -253,17 +267,32 @@ export class BeatnikBlenoService {
     try {
       console.log('Writing SSID:', ssid);
       // Use the textToDataView helper for encoding
-      await BleClient.write(this.deviceId, this.SERVICE, this.SSID_CHAR, textToDataView(ssid));
+      await BleClient.write(
+        this.deviceId,
+        this.SERVICE,
+        this.SSID_CHAR,
+        textToDataView(ssid)
+      );
       await this.sleep(500); // Wait for server to process
 
       console.log('Writing password');
-      await BleClient.write(this.deviceId, this.SERVICE, this.PASS_CHAR, textToDataView(password));
+      await BleClient.write(
+        this.deviceId,
+        this.SERVICE,
+        this.PASS_CHAR,
+        textToDataView(password)
+      );
       await this.sleep(500); // Wait for server to process
 
       console.log('Triggering connection');
       // Use numbersToDataView for the trigger command
       // The characteristic seems to prefer WriteWithoutResponse based on logs
-      await BleClient.writeWithoutResponse(this.deviceId, this.SERVICE, this.CONNECT_CHAR, numbersToDataView([1]));
+      await BleClient.writeWithoutResponse(
+        this.deviceId,
+        this.SERVICE,
+        this.CONNECT_CHAR,
+        numbersToDataView([1])
+      );
 
       console.log('WiFi credentials sent successfully');
     } catch (error) {
@@ -273,7 +302,6 @@ export class BeatnikBlenoService {
 
     console.log('WiFi credentials sent.');
   }
-
 
   // try to get network list in chunks
 
@@ -297,7 +325,10 @@ export class BeatnikBlenoService {
           // Try to parse the accumulated data
           try {
             // Check if it looks like a complete JSON array (starts with [ and ends with ])
-            if (accumulatedData.trim().startsWith('[') && accumulatedData.trim().endsWith(']')) {
+            if (
+              accumulatedData.trim().startsWith('[') &&
+              accumulatedData.trim().endsWith(']')
+            ) {
               const networks: BleNetwork[] = JSON.parse(accumulatedData);
               console.log('Received network list:', networks);
               this.availableNetworks$.next(networks);
@@ -316,8 +347,8 @@ export class BeatnikBlenoService {
   }
 
   /**
-  * Triggers a WiFi scan on the remote device.
-  */
+   * Triggers a WiFi scan on the remote device.
+   */
   async scanForWifiNetworks(): Promise<void> {
     if (!this.deviceId) {
       throw new Error('Device not connected');

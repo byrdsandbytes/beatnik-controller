@@ -9,26 +9,34 @@
 
 <ion-content [fullscreen]="true">
   <div class="container">
-
     <ion-header collapse="condense">
       <ion-toolbar>
         <ion-title size="large">Setup Soundcard</ion-title>
       </ion-toolbar>
     </ion-header>
 
-    <ion-card class="ion-text-center" *ngIf="hardwareStatus$|async as hardwareStatus else loading">
+    <ion-card
+      class="ion-text-center"
+      *ngIf="hardwareStatus$|async as hardwareStatus else loading"
+    >
       <ion-label>
-
         <ng-container *ngIf="hardwareStatus.currentConfig; else noConfig">
           <h2>Current Soundcard Information</h2>
 
-          <img [src]="'assets/soundcards/' + hardwareStatus.currentConfig.id + '.webp'" #myImage
-            (error)="myImage.src = 'assets/placeholder/audio_board_placeholder.webp'" />
+          <img
+            [src]="'assets/soundcards/' + hardwareStatus.currentConfig.id + '.webp'"
+            #myImage
+            (error)="myImage.src = 'assets/placeholder/audio_board_placeholder.webp'"
+          />
           <p>Name: {{ hardwareStatus.currentConfig.name}}</p>
           <p>Id: {{ hardwareStatus.currentConfig.id}}</p>
           <p>isMatched: {{ hardwareStatus.isMatch}}</p>
         </ng-container>
-        <ion-button expand="full" color="secondary" (click)="openSoundcardPicker()">
+        <ion-button
+          expand="full"
+          color="secondary"
+          (click)="openSoundcardPicker()"
+        >
           <ion-icon name="create" slot="start"></ion-icon>
           Choose Different Soundcard
         </ion-button>
@@ -39,8 +47,10 @@
     </ion-card>
     <ng-template #loading>
       <div [ngSwitch]="state" class="ion-text-center">
-
-        <app-loading-circle [isPulsing]="true" icon="radio"></app-loading-circle>
+        <app-loading-circle
+          [isPulsing]="true"
+          icon="radio"
+        ></app-loading-circle>
 
         <div *ngSwitchCase="'loading'">
           <p>Loading hardware status...</p>
@@ -48,15 +58,20 @@
         <div *ngSwitchCase="'rebooting'">
           <ion-label>
             <h3>Rebooting client... Please wait.</h3>
-            <p>The client is rebooting to apply the new soundcard configuration. This may take a minute or two.
-              Please wait while the client comes back online.</p>
+            <p>
+              The client is rebooting to apply the new soundcard configuration.
+              This may take a minute or two. Please wait while the client comes
+              back online.
+            </p>
           </ion-label>
         </div>
         <div *ngSwitchDefault>
-          <p>Unable to load hardware status. Please ensure the client is online and try again.</p>
+          <p>
+            Unable to load hardware status. Please ensure the client is online
+            and try again.
+          </p>
         </div>
       </div>
-
     </ng-template>
   </div>
 </ion-content>
@@ -64,7 +79,7 @@
   <ion-toolbar color="light">
     <ion-button expand="full" color="primary" (click)="completeSetup()">
       <ion-icon name="checkmark-circle" slot="start"></ion-icon>
-      Continue  
+      Continue
     </ion-button>
   </ion-toolbar>
 </ion-footer>

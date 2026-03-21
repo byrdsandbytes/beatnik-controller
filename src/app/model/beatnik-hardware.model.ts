@@ -1,2 +1,1 @@
-export class BeatnikHardware {
-}
+export class BeatnikHardware {}

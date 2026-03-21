@@ -9,13 +9,11 @@
 
 <ion-content [fullscreen]="true">
   <div class="container" *ngIf="stream else noStream">
-
     <ion-header collapse="condense">
       <ion-toolbar>
         <ion-title size="large">{{stream.id}}</ion-title>
       </ion-toolbar>
     </ion-header>
-
 
     <ion-accordion-group>
       <ion-accordion value="{{ stream.id }}">
@@ -30,7 +28,6 @@
         </ion-item>
       </ion-accordion>
     </ion-accordion-group>
-
   </div>
 
   <ng-template #noStream>
@@ -43,6 +40,4 @@
       <p>Please select a stream to view its details.</p>
     </div>
   </ng-template>
-
-
 </ion-content>

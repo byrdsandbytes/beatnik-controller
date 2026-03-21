@@ -5,7 +5,7 @@ export interface HatProfile {
   testedbyBeatnik: boolean;
   testedByCommunity: boolean;
   // String oder Regex, um den Namen im /proc/device-tree/hat/product zu matchen
-  eepromMatch?: string; 
+  eepromMatch?: string;
   camilla: {
     device: string; // Das ALSA Playback Device, z.B. "hw:1,0" oder "hw:Headphones"
     format: string; // Das unterstützte Format, z.B. "S32LE" oder "S16LE"
@@ -26,8 +26,8 @@ export const SUPPORTED_HATS: Record<string, HatProfile> = {
     testedByCommunity: false,
     camilla: {
       device: 'plughw:CARD=sndrpihifiberry,DEV=0',
-      format: 'S32LE'
-    }
+      format: 'S32LE',
+    },
   },
   'hifiberry-dac8x': {
     id: 'hifiberry-dac8x',
@@ -38,21 +38,21 @@ export const SUPPORTED_HATS: Record<string, HatProfile> = {
     testedByCommunity: false,
     camilla: {
       device: 'plughw:CARD=sndrpihifiberry,DEV=0',
-      format: 'S32LE'
-    }
+      format: 'S32LE',
+    },
   },
   'hifiberry-dacplus-std': {
     id: 'hifiberry-dacplus-std',
     name: 'HiFiBerry DAC+ Standard',
     // Kernel >= 6.1.77
     overlay: 'dtoverlay=hifiberry-dacplus-std',
-    eepromMatch: 'HiFiBerry DAC+', 
+    eepromMatch: 'HiFiBerry DAC+',
     testedbyBeatnik: false,
     testedByCommunity: false,
     camilla: {
       device: 'plughw:CARD=sndrpihifiberry,DEV=0',
-      format: 'S32LE'
-    }
+      format: 'S32LE',
+    },
   },
   'hifiberry-dacplus-pro': {
     id: 'hifiberry-dacplus-pro',
@@ -64,8 +64,8 @@ export const SUPPORTED_HATS: Record<string, HatProfile> = {
     testedByCommunity: false,
     camilla: {
       device: 'plughw:CARD=sndrpihifiberry,DEV=0',
-      format: 'S32LE'
-    }
+      format: 'S32LE',
+    },
   },
 
   'hifiberry-dacplushd': {
@@ -77,8 +77,8 @@ export const SUPPORTED_HATS: Record<string, HatProfile> = {
     testedByCommunity: false,
     camilla: {
       device: 'plughw:CARD=sndrpihifiberry,DEV=0',
-      format: 'S32LE'
-    }
+      format: 'S32LE',
+    },
   },
   'hifiberry-dacplusadc': {
     id: 'hifiberry-dacplusadc',
@@ -89,8 +89,8 @@ export const SUPPORTED_HATS: Record<string, HatProfile> = {
     testedByCommunity: false,
     camilla: {
       device: 'plughw:CARD=sndrpihifiberry,DEV=0',
-      format: 'S32LE'
-    }
+      format: 'S32LE',
+    },
   },
   'hifiberry-dacplusadcpro': {
     id: 'hifiberry-dacplusadcpro',
@@ -101,8 +101,8 @@ export const SUPPORTED_HATS: Record<string, HatProfile> = {
     testedByCommunity: false,
     camilla: {
       device: 'plughw:CARD=sndrpihifiberry,DEV=0',
-      format: 'S32LE'
-    }
+      format: 'S32LE',
+    },
   },
 
   // --- HiFiBerry Amps ---
@@ -111,7 +111,7 @@ export const SUPPORTED_HATS: Record<string, HatProfile> = {
   //   id: 'hifiberry-amp',
   //   name: 'HiFiBerry Amp+',
   //   overlay: 'dtoverlay=hifiberry-amp',
-  //   eepromMatch: 'HiFiBerry Amp', 
+  //   eepromMatch: 'HiFiBerry Amp',
   //   testedbyBeatnik: false,
   //   camilla: {
   //     device: 'plughw:CARD=sndrpihifiberry,DEV=0',
@@ -123,13 +123,13 @@ export const SUPPORTED_HATS: Record<string, HatProfile> = {
     name: 'HiFiBerry Amp2 / Amp4',
     // Uses DAC+ Standard overlay on newer kernels
     overlay: 'dtoverlay=hifiberry-dacplus-std',
-    eepromMatch: 'HiFiBerry Amp2', 
+    eepromMatch: 'HiFiBerry Amp2',
     testedbyBeatnik: false,
     testedByCommunity: false,
     camilla: {
       device: 'plughw:CARD=sndrpihifiberry,DEV=0',
-      format: 'S32LE'
-    }
+      format: 'S32LE',
+    },
   },
   // 'hifiberry-amp3': {
   //   id: 'hifiberry-amp3',
@@ -151,8 +151,8 @@ export const SUPPORTED_HATS: Record<string, HatProfile> = {
     testedByCommunity: true,
     camilla: {
       device: 'plughw:CARD=sndrpihifiberry,DEV=0',
-      format: 'S32LE'
-    }
+      format: 'S32LE',
+    },
   },
 
   // --- HiFiBerry Digi ---
@@ -166,8 +166,8 @@ export const SUPPORTED_HATS: Record<string, HatProfile> = {
     testedByCommunity: true,
     camilla: {
       device: 'plughw:CARD=sndrpihifiberry,DEV=0',
-      format: 'S24LE3'
-    }
+      format: 'S24LE3',
+    },
   },
   'hifiberry-digi-pro': {
     id: 'hifiberry-digi-pro',
@@ -178,8 +178,8 @@ export const SUPPORTED_HATS: Record<string, HatProfile> = {
     testedByCommunity: true,
     camilla: {
       device: 'plughw:CARD=sndrpihifiberry,DEV=0',
-      format: 'S24LE3'
-    }
+      format: 'S24LE3',
+    },
   },
 
   // --- Others ---
@@ -193,8 +193,8 @@ export const SUPPORTED_HATS: Record<string, HatProfile> = {
     testedByCommunity: false,
     camilla: {
       device: 'hw:1,0',
-      format: 'S32LE'
-    }
+      format: 'S32LE',
+    },
   },
   'rpi-digiamp-plus': {
     id: 'rpi-digiamp-plus',
@@ -205,8 +205,8 @@ export const SUPPORTED_HATS: Record<string, HatProfile> = {
     testedByCommunity: false,
     camilla: {
       device: 'hw:1,0',
-      format: 'S32LE'
-    }
+      format: 'S32LE',
+    },
   },
   'rpi-hdmi0': {
     id: 'rpi-hdmi0',
@@ -216,8 +216,8 @@ export const SUPPORTED_HATS: Record<string, HatProfile> = {
     testedByCommunity: false,
     camilla: {
       device: 'hw:CARD=vc4hdmi0,DEV=0',
-      format: 'S16LE'
-    }
+      format: 'S16LE',
+    },
   },
   'usb-dac': {
     id: 'usb-dac',
@@ -228,10 +228,10 @@ export const SUPPORTED_HATS: Record<string, HatProfile> = {
     testedByCommunity: false,
     camilla: {
       device: 'hw:1,0',
-      format: 'S16LE'
-    }
+      format: 'S16LE',
+    },
   },
-  'none': {
+  none: {
     id: 'none',
     name: 'No HAT (Headphone Jack)',
     overlay: '# No HAT configured',
@@ -239,7 +239,7 @@ export const SUPPORTED_HATS: Record<string, HatProfile> = {
     testedByCommunity: false,
     camilla: {
       device: 'hw:0,0',
-      format: 'S16LE'
-    }
-  }
+      format: 'S16LE',
+    },
+  },
 };

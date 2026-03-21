@@ -17,8 +17,8 @@ import { ClientInfoModule } from 'src/app/components/client-info/client-info.mod
     IonicModule,
     DeviceDetailsPageRoutingModule,
     SnapcastGroupPreviewModule,
-    ClientInfoModule
+    ClientInfoModule,
   ],
-  declarations: [DeviceDetailsPage]
+  declarations: [DeviceDetailsPage],
 })
 export class DeviceDetailsPageModule {}

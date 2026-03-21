@@ -19,8 +19,8 @@ import { ClientInfoModule } from 'src/app/components/client-info/client-info.mod
     ClientDetailsPageRoutingModule,
     // CamillaDspModule,
     // SoundcardPickerModule,
-    ClientInfoModule
+    ClientInfoModule,
   ],
-  declarations: [ClientDetailsPage]
+  declarations: [ClientDetailsPage],
 })
 export class ClientDetailsPageModule {}

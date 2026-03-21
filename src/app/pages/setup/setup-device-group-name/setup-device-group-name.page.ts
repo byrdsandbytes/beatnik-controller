@@ -8,10 +8,9 @@ import { SnapcastService } from 'src/app/services/snapcast.service';
   selector: 'app-setup-device-group-name',
   templateUrl: './setup-device-group-name.page.html',
   styleUrls: ['./setup-device-group-name.page.scss'],
-  standalone: false
+  standalone: false,
 })
 export class SetupDeviceGroupNamePage implements OnInit {
-
   ip: string = '';
   serverState: Observable<SnapCastServerStatusResponse>;
   groupId: string = '';
@@ -20,7 +19,7 @@ export class SetupDeviceGroupNamePage implements OnInit {
   constructor(
     private activatedRoute: ActivatedRoute,
     private snapcastService: SnapcastService
-  ) { }
+  ) {}
 
   async ngOnInit() {
     // Get the IP from the route parameters
@@ -29,14 +28,17 @@ export class SetupDeviceGroupNamePage implements OnInit {
     this.serverState = this.snapcastService.state$;
 
     // Get the group ID for the IP
-    this.groupId = await this.getGroupIdFromIp(this.ip) || '';
+    this.groupId = (await this.getGroupIdFromIp(this.ip)) || '';
     console.log('SetupDeviceGroupNamePage: Group ID for IP:', this.groupId);
   }
 
   async getGroupIdFromIp(ip: string): Promise<string | null> {
     const state = await firstValueFrom(this.snapcastService.state$);
     if (!state || !state.server || !state.server.groups) {
-      console.warn('SetupDeviceGroupNamePage: Invalid server state received', state);
+      console.warn(
+        'SetupDeviceGroupNamePage: Invalid server state received',
+        state
+      );
       return null;
     }
     for (const group of state.server.groups) {
@@ -44,9 +46,13 @@ export class SetupDeviceGroupNamePage implements OnInit {
         for (const client of group.clients) {
           const hostIP = client.host?.ip;
           // remove ::ffff prefix if present
-          const normalizedIP = hostIP?.startsWith('::ffff:') ? hostIP.substring(7) : hostIP;
+          const normalizedIP = hostIP?.startsWith('::ffff:')
+            ? hostIP.substring(7)
+            : hostIP;
           if (normalizedIP === ip) {
-            console.log(`SetupDeviceGroupNamePage: Found group ID ${group.id} for IP ${ip}`);
+            console.log(
+              `SetupDeviceGroupNamePage: Found group ID ${group.id} for IP ${ip}`
+            );
             if (group.name) {
               this.deviceGroupName = group.name;
             }
@@ -60,18 +66,25 @@ export class SetupDeviceGroupNamePage implements OnInit {
     return null;
   }
 
-   changeGroupName(newName: string): void {
+  changeGroupName(newName: string): void {
     if (!this.groupId) {
-      console.error('SetupDeviceGroupNamePage: No group ID available to change group name');
+      console.error(
+        'SetupDeviceGroupNamePage: No group ID available to change group name'
+      );
       return;
     }
     this.snapcastService.setGroupName(this.groupId, newName).subscribe({
       next: () => {
-        console.log(`SetupDeviceGroupNamePage: Group name changed to ${newName} for ID ${this.groupId}`);
+        console.log(
+          `SetupDeviceGroupNamePage: Group name changed to ${newName} for ID ${this.groupId}`
+        );
       },
       error: (error) => {
-        console.error(`SetupDeviceGroupNamePage: Error changing group name for ID ${this.groupId}`, error);
-      }
+        console.error(
+          `SetupDeviceGroupNamePage: Error changing group name for ID ${this.groupId}`,
+          error
+        );
+      },
     });
   }
 }

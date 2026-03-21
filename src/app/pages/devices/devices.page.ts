@@ -10,18 +10,11 @@ import { SnapcastService } from 'src/app/services/snapcast.service';
   standalone: false,
 })
 export class DevicesPage implements OnInit {
-
   serverState?: Observable<SnapCastServerStatusResponse>;
 
-  constructor(
-    private snapcastService: SnapcastService 
-  ) { }
+  constructor(private snapcastService: SnapcastService) {}
 
   ngOnInit() {
     this.serverState = this.snapcastService.state$;
-
-    
-
   }
-
 }

@@ -9,12 +9,7 @@ import { ZeroconfPageRoutingModule } from './zeroconf-routing.module';
 import { ZeroconfPage } from './zeroconf.page';
 
 @NgModule({
-  imports: [
-    CommonModule,
-    FormsModule,
-    IonicModule,
-    ZeroconfPageRoutingModule
-  ],
-  declarations: [ZeroconfPage]
+  imports: [CommonModule, FormsModule, IonicModule, ZeroconfPageRoutingModule],
+  declarations: [ZeroconfPage],
 })
 export class ZeroconfPageModule {}

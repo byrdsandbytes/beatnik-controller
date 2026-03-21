@@ -1,19 +1,27 @@
 import { Component, OnInit } from '@angular/core';
 import { ZeroconfService } from 'src/app/services/zero-conf.service';
-import { ZeroConf, ZeroConfService as ZeroConfServiceModel } from 'capacitor-zeroconf';
+import {
+  ZeroConf,
+  ZeroConfService as ZeroConfServiceModel,
+} from 'capacitor-zeroconf';
 import { firstValueFrom, Observable } from 'rxjs';
 import { SnapcastService } from 'src/app/services/snapcast.service';
-import { ServerDetail, SnapCastServerStatusResponse } from 'src/app/model/snapcast.model';
+import {
+  ServerDetail,
+  SnapCastServerStatusResponse,
+} from 'src/app/model/snapcast.model';
 import { ActivatedRoute, Router } from '@angular/router';
 import Swiper, { SwiperOptions } from 'swiper';
 import { AlertController, NavController } from '@ionic/angular';
-import { BeatnikHardwareService, HardwareStatus } from 'src/app/services/beatnik-hardware.service';
+import {
+  BeatnikHardwareService,
+  HardwareStatus,
+} from 'src/app/services/beatnik-hardware.service';
 import { BeatnikHardware } from 'src/app/model/beatnik-hardware.model';
 import { SUPPORTED_HATS } from 'src/app/constant/hat.constant';
 import { BeatnikSnapcastService } from 'src/app/services/beatnik-snapcast.service';
 import { Preferences } from '@capacitor/preferences';
 import { UserPreference } from 'src/app/enum/user-preference.enum';
-
 
 @Component({
   selector: 'app-setup-server',
@@ -22,13 +30,13 @@ import { UserPreference } from 'src/app/enum/user-preference.enum';
   standalone: false,
 })
 export class SetupServerPage implements OnInit {
-
   services$: Observable<ZeroConfServiceModel[]>;
   selectedService: ZeroConfServiceModel | null = null;
   readonly SERVICE_SNAPCAST = '_snapcast._tcp.';
   readonly SERVICE_BEATNIK = '_beatnik._tcp.';
   isScanning = false;
-  state: 'initial' | 'scanning' | 'manual' | 'selected' | 'deviceFound' = 'initial';
+  state: 'initial' | 'scanning' | 'manual' | 'selected' | 'deviceFound' =
+    'initial';
   statusIcon: string = 'radio';
   snapcastServerStatus: Observable<SnapCastServerStatusResponse> | null = null;
   segment: string = 'server';
@@ -41,7 +49,7 @@ export class SetupServerPage implements OnInit {
   swiperConfig: SwiperOptions = {
     slidesPerView: 1,
     spaceBetween: 0,
-    allowTouchMove: false
+    allowTouchMove: false,
   };
 
   statusText: string = 'Searching for Snapcast Servers...';
@@ -68,7 +76,7 @@ export class SetupServerPage implements OnInit {
   async ngOnInit() {
     await this.getRouteIp();
     await this.getUserPreferencesServerName();
-    this.services$.subscribe(services => {
+    this.services$.subscribe((services) => {
       if (services.length > 0) {
         this.selectedService = services[0];
         // add timeout of 2 seconds before sliding to next slide
@@ -79,7 +87,6 @@ export class SetupServerPage implements OnInit {
         }, 2000);
         // this.connectToSnapcast(services[0]);
         this.checkIfThereIsExistingSnapcastServer();
-
       }
     });
     this.scanForServices();
@@ -125,7 +132,7 @@ export class SetupServerPage implements OnInit {
     }
   }
 
-  // get route param 
+  // get route param
   async getRouteIp() {
     this.ip = this.activatedRoute.snapshot.paramMap.get('ip');
   }
@@ -143,7 +150,9 @@ export class SetupServerPage implements OnInit {
       // }
 
       //  check if there is more than one snapcasrt service found
-      const filteredServices = services.filter(service => service.type === this.SERVICE_SNAPCAST);
+      const filteredServices = services.filter(
+        (service) => service.type === this.SERVICE_SNAPCAST
+      );
       if (filteredServices.length > 1) {
         console.log('Multiple Snapcast services found:', filteredServices);
         this.isFirstDevice = false;
@@ -160,13 +169,15 @@ export class SetupServerPage implements OnInit {
     this.isScanning = true;
     this.state = 'scanning';
     try {
-
       await this.zeroconf.watch(this.SERVICE_SNAPCAST);
-      console.log(`Started scanning for services of type: ${this.SERVICE_SNAPCAST}`);
+      console.log(
+        `Started scanning for services of type: ${this.SERVICE_SNAPCAST}`
+      );
       await this.zeroconf.watch(this.SERVICE_BEATNIK);
-      console.log(`Started scanning for services of type: ${this.SERVICE_BEATNIK}`);
-    }
-    catch (error) {
+      console.log(
+        `Started scanning for services of type: ${this.SERVICE_BEATNIK}`
+      );
+    } catch (error) {
       console.error('Error starting service scan:', error);
     }
   }
@@ -211,7 +222,11 @@ export class SetupServerPage implements OnInit {
     }
 
     try {
-      await this.snapcastService.connect(service.ipv4Addresses[0], undefined, true);
+      await this.snapcastService.connect(
+        service.ipv4Addresses[0],
+        undefined,
+        true
+      );
 
       console.log('Connected to service:', service);
     } catch (error) {
@@ -219,11 +234,11 @@ export class SetupServerPage implements OnInit {
     }
 
     try {
-      this.snapcastServerStatus = this.snapcastService.state$
+      this.snapcastServerStatus = this.snapcastService.state$;
       console.log('Fetching server status...');
       const status = await firstValueFrom(this.snapcastServerStatus);
       // set timeout of 2 seconds before changing state
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      await new Promise((resolve) => setTimeout(resolve, 2000));
       console.log('Server status:', status);
       this.state = 'selected';
       this.statusText = 'Connected to Snapcast Server.';
@@ -239,14 +254,21 @@ export class SetupServerPage implements OnInit {
     this.beatnikSnapcastService.enable(this.ip || '').subscribe({
       next: (response) => {
         this.setServerUrl();
-        console.log('Successfully enabled Snapserver on server at IP', this.ip, response);
+        console.log(
+          'Successfully enabled Snapserver on server at IP',
+          this.ip,
+          response
+        );
         this.connectToSnapcast(this.selectedService);
         this.navToSetupSoundcard();
-
       },
       error: (err) => {
-        console.error('Failed to enable Snapserver on server at IP', this.ip, err);
-      }
+        console.error(
+          'Failed to enable Snapserver on server at IP',
+          this.ip,
+          err
+        );
+      },
     });
   }
 
@@ -263,12 +285,20 @@ export class SetupServerPage implements OnInit {
     console.log('Setting up this device as secondary Snapcast server...');
     this.beatnikSnapcastService.enable(this.ip || '').subscribe({
       next: (response) => {
-        console.log('Successfully enabled Snapserver on server at IP', this.ip, response);
+        console.log(
+          'Successfully enabled Snapserver on server at IP',
+          this.ip,
+          response
+        );
         this.slideTo(2);
       },
       error: (err) => {
-        console.error('Failed to enable Snapserver on server at IP', this.ip, err);
-      }
+        console.error(
+          'Failed to enable Snapserver on server at IP',
+          this.ip,
+          err
+        );
+      },
     });
   }
 
@@ -280,12 +310,20 @@ export class SetupServerPage implements OnInit {
     console.log('Setting up this device as Snapcast client...');
     const result = this.beatnikSnapcastService.disable(this.ip).subscribe({
       next: (response) => {
-        console.log('Successfully disabled Snapserver on server at IP', this.ip, response);
+        console.log(
+          'Successfully disabled Snapserver on server at IP',
+          this.ip,
+          response
+        );
         this.navToSetupSoundcard();
       },
       error: (err) => {
-        console.error('Failed to disable Snapserver on server at IP', this.ip, err);
-      }
+        console.error(
+          'Failed to disable Snapserver on server at IP',
+          this.ip,
+          err
+        );
+      },
     });
   }
 
@@ -309,47 +347,61 @@ export class SetupServerPage implements OnInit {
       console.error('No manual HAT ID provided');
       return;
     }
-    console.log(`Applying manual hardware configuration ${this.manualHatId} to server at IP ${this.ip}`);
-    this.beatnikHardwareService.applyConfiguration(this.manualHatId, this.ip || '').subscribe({
-      next: (response) => {
-        console.log(`Successfully applied manual hardware configuration ${this.manualHatId} to server at IP ${this.ip}`, response);
-        if (response.rebootRequired) {
-          console.log('Reboot required. Triggering reboot...');
-          this.beatnikHardwareService.reboot(this.ip || '').subscribe({
-            next: () => {
-              console.log(`Successfully triggered reboot for server at IP ${this.ip}`);
-            },
-            error: (err) => {
-              console.error(`Failed to trigger reboot for server at IP ${this.ip}`, err);
-            }
-          });
-        }
-      },
-      error: (err) => {
-        console.error(`Failed to apply manual hardware configuration ${this.manualHatId} to server at IP ${this.ip}`, err);
-      }
-    });
+    console.log(
+      `Applying manual hardware configuration ${this.manualHatId} to server at IP ${this.ip}`
+    );
+    this.beatnikHardwareService
+      .applyConfiguration(this.manualHatId, this.ip || '')
+      .subscribe({
+        next: (response) => {
+          console.log(
+            `Successfully applied manual hardware configuration ${this.manualHatId} to server at IP ${this.ip}`,
+            response
+          );
+          if (response.rebootRequired) {
+            console.log('Reboot required. Triggering reboot...');
+            this.beatnikHardwareService.reboot(this.ip || '').subscribe({
+              next: () => {
+                console.log(
+                  `Successfully triggered reboot for server at IP ${this.ip}`
+                );
+              },
+              error: (err) => {
+                console.error(
+                  `Failed to trigger reboot for server at IP ${this.ip}`,
+                  err
+                );
+              },
+            });
+          }
+        },
+        error: (err) => {
+          console.error(
+            `Failed to apply manual hardware configuration ${this.manualHatId} to server at IP ${this.ip}`,
+            err
+          );
+        },
+      });
   }
 
   async showSnapcastDoubleServerWarning() {
     const alert = await this.alertController.create({
       header: 'Existing Snapcast Server Detected',
-      message: 'Another Snapcast server was detected on the network. Setting up multiple servers may cause conflicts. Are you sure you want to set up this device as a secondary server?',
+      message:
+        'Another Snapcast server was detected on the network. Setting up multiple servers may cause conflicts. Are you sure you want to set up this device as a secondary server?',
       buttons: [
         {
           text: 'Yes, Setup as Server',
           handler: () => {
             this.setupAsSecondaryServer();
-          }
+          },
         },
         {
           text: 'Cancel',
           role: 'cancel',
-          handler: () => {
-
-          }
-        }
-      ]
+          handler: () => {},
+        },
+      ],
     });
 
     await alert.present();
@@ -358,6 +410,4 @@ export class SetupServerPage implements OnInit {
   navToSetupSoundcard() {
     this.router.navigateByUrl(`/setup-soundcard/${this.ip}`);
   }
-
-
 }

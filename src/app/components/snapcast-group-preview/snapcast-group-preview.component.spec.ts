@@ -9,8 +9,8 @@ describe('SnapcastGroupPreviewComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ SnapcastGroupPreviewComponent ],
-      imports: [IonicModule.forRoot()]
+      declarations: [SnapcastGroupPreviewComponent],
+      imports: [IonicModule.forRoot()],
     }).compileComponents();
 
     fixture = TestBed.createComponent(SnapcastGroupPreviewComponent);

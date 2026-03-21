@@ -1,71 +1,65 @@
-
-
-.fab-row{
-    min-height: 80px;
+.fab-row {
+  min-height: 80px;
 }
 
-.custom-fab-button{
-    margin: 16px;
+.custom-fab-button {
+  margin: 16px;
 }
 
 .header-note {
-    color: var(--ion-color-medium);
-    text-transform: uppercase;
-    font-weight: 400;
-    font-size: 12px;
-    // position: ;
-    // top: -10px;
-    // left:0;
-    z-index: 1000;
-    margin: 0;
-    margin-left: 18px;
-    margin-bottom: -12px;
-    line-height: 0;
-  }
+  color: var(--ion-color-medium);
+  text-transform: uppercase;
+  font-weight: 400;
+  font-size: 12px;
+  // position: ;
+  // top: -10px;
+  // left:0;
+  z-index: 1000;
+  margin: 0;
+  margin-left: 18px;
+  margin-bottom: -12px;
+  line-height: 0;
+}
 
+.page-padding-bottom {
+  margin-bottom: 300px;
+}
 
+.disconnected {
+  opacity: 50%;
+}
 
-  .page-padding-bottom{
-    margin-bottom: 300px;
-  }
+.no-state-container {
+  margin-top: 32px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 40vh;
+}
 
-  .disconnected{
-    opacity: 50%;
-  }
+.fab-label {
+  font-size: 8px;
+  width: 80%;
+  text-align: center;
+}
 
-  .no-state-container {
-    margin-top: 32px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    height: 40vh;
-  }
+.fab-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
 
-  .fab-label{
-    font-size: 8px;
-    width: 80%;
-    text-align: center;
-  }
-
-  .fab-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .disconnected-overlay {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    color: var(--ion-color-medium);
-    z-index: 2000;
-    
-  }
-
+.disconnected-overlay {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: var(--ion-color-medium);
+  z-index: 2000;
+}

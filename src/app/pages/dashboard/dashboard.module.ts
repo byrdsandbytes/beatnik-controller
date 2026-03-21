@@ -13,7 +13,6 @@ import { SnapcastGroupPreviewModule } from 'src/app/components/snapcast-group-pr
 import { RouterModule } from '@angular/router';
 import { SnapcastStreamPreviewModule } from 'src/app/components/snapcast-stream-preview/snapcast-stream-preview.module';
 
-
 @NgModule({
   imports: [
     CommonModule,
@@ -24,8 +23,8 @@ import { SnapcastStreamPreviewModule } from 'src/app/components/snapcast-stream-
     SnapcastStatusModule,
     SnapcastGroupPreviewModule,
     RouterModule,
-    SnapcastStreamPreviewModule
+    SnapcastStreamPreviewModule,
   ],
-  declarations: [DashboardPage]
+  declarations: [DashboardPage],
 })
 export class DashboardPageModule {}

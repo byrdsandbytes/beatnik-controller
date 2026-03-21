@@ -14,8 +14,8 @@ import { PlayerToolbarModule } from '../components/player-toolbar/player-toolbar
     CommonModule,
     FormsModule,
     TabsPageRoutingModule,
-    PlayerToolbarModule
+    PlayerToolbarModule,
   ],
-  declarations: [TabsPage]
+  declarations: [TabsPage],
 })
 export class TabsPageModule {}

@@ -6,21 +6,15 @@ import { FormsModule } from '@angular/forms';
 import { CamillaDspModule } from '../camilla-dsp/camilla-dsp.module';
 import { SoundcardPickerModule } from '../soundcard-picker/soundcard-picker.module';
 
-
-
 @NgModule({
-  declarations: [
-    ClientInfoComponent
-  ],
+  declarations: [ClientInfoComponent],
   imports: [
     CommonModule,
     IonicModule,
     FormsModule,
     CamillaDspModule,
-    SoundcardPickerModule
+    SoundcardPickerModule,
   ],
-  exports: [
-    ClientInfoComponent
-  ]
+  exports: [ClientInfoComponent],
 })
-export class ClientInfoModule { }
+export class ClientInfoModule {}

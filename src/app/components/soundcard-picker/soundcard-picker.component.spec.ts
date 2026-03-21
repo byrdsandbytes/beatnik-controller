@@ -9,8 +9,8 @@ describe('SoundcardPickerComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ SoundcardPickerComponent ],
-      imports: [IonicModule.forRoot()]
+      declarations: [SoundcardPickerComponent],
+      imports: [IonicModule.forRoot()],
     }).compileComponents();
 
     fixture = TestBed.createComponent(SoundcardPickerComponent);

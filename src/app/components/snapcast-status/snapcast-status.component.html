@@ -1,6 +1,5 @@
 <div class="snapcast-container">
-
-  <ng-container *ngIf="(displayState | async) as state; else loadingOrError">
+  <ng-container *ngIf="displayState | async as state; else loadingOrError">
     <ion-list>
       <ion-item>
         <ion-label>
@@ -17,7 +16,10 @@
       <ion-item>
         <ion-label>
           <h3>OS / Arch</h3>
-          <p>{{ state.server.server.host.os }} / {{ state.server.server.host.arch }}</p>
+          <p>
+            {{ state.server.server.host.os }} /
+            {{ state.server.server.host.arch }}
+          </p>
         </ion-label>
       </ion-item>
       <ion-item>
@@ -36,11 +38,13 @@
         <ion-label>
           <h3>Clients</h3>
           <p *ngIf="getClientStats(state) as stats">
-            {{ stats.total }} Total ({{ stats.online }} Online, {{ stats.offline }} Offline)
+            {{ stats.total }} Total ({{ stats.online }} Online,
+            {{ stats.offline }} Offline)
           </p>
         </ion-label>
-        <ion-button slot="end" fill="outline" (click)="cleanOfflineClients()">Clean Offline Clients</ion-button>
-
+        <ion-button slot="end" fill="outline" (click)="cleanOfflineClients()"
+          >Clean Offline Clients</ion-button
+        >
       </ion-item>
       <ion-item>
         <ion-label>
@@ -55,7 +59,7 @@
         <ion-item slot="header" color="light">
           <ion-label>JSON Server Response</ion-label>
         </ion-item>
-        <div class="ion-padding" slot="content" style="overflow-x: auto;">
+        <div class="ion-padding" slot="content" style="overflow-x: auto">
           <pre>{{ state | json }}</pre>
         </div>
       </ion-accordion>
@@ -64,6 +68,8 @@
 
   <ng-template #loadingOrError>
     <p>Loading Snapcast status or WebSocket not connected...</p>
-    <ion-button (click)="snapcastService.connect()">Attempt to Connect</ion-button>
+    <ion-button (click)="snapcastService.connect()"
+      >Attempt to Connect</ion-button
+    >
   </ng-template>
 </div>

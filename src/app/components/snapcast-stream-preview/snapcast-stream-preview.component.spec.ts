@@ -9,8 +9,8 @@ describe('SnapcastStreamPreviewComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ SnapcastStreamPreviewComponent ],
-      imports: [IonicModule.forRoot()]
+      declarations: [SnapcastStreamPreviewComponent],
+      imports: [IonicModule.forRoot()],
     }).compileComponents();
 
     fixture = TestBed.createComponent(SnapcastStreamPreviewComponent);

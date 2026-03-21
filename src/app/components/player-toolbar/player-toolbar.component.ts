@@ -1,10 +1,21 @@
 // player-toolbar.component.ts
-import { Component, OnInit, OnDestroy, OnChanges, SimpleChanges } from '@angular/core'; // OnChanges und SimpleChanges hinzugefügt
+import {
+  Component,
+  OnInit,
+  OnDestroy,
+  OnChanges,
+  SimpleChanges,
+} from '@angular/core'; // OnChanges und SimpleChanges hinzugefügt
 import { Observable, Subscription, tap, firstValueFrom } from 'rxjs'; // firstValueFrom hinzugefügt
-import { Group, Stream, ServerDetail, Client, SnapCastServerStatusResponse } from 'src/app/model/snapcast.model'; // Client importiert für Typisierung
+import {
+  Group,
+  Stream,
+  ServerDetail,
+  Client,
+  SnapCastServerStatusResponse,
+} from 'src/app/model/snapcast.model'; // Client importiert für Typisierung
 import { SnapcastService } from 'src/app/services/snapcast.service';
 import { Haptics, ImpactStyle, NotificationType } from '@capacitor/haptics';
-
 
 @Component({
   selector: 'app-player-toolbar',
@@ -13,7 +24,6 @@ import { Haptics, ImpactStyle, NotificationType } from '@capacitor/haptics';
   standalone: false,
 })
 export class PlayerToolbarComponent implements OnInit, OnChanges, OnDestroy {
-
   // This is the primary state observable for the component.
   public displayState$: Observable<SnapCastServerStatusResponse | null>;
 
@@ -23,17 +33,10 @@ export class PlayerToolbarComponent implements OnInit, OnChanges, OnDestroy {
   private knobMoveStart = false;
   private knobMoveEnd = false;
 
- 
-
-  constructor(
-    public snapcastService: SnapcastService
-  ) {
-
-
-  }
+  constructor(public snapcastService: SnapcastService) {}
 
   ngOnInit(): void {
-    this.displayState$ = this.snapcastService.state$
+    this.displayState$ = this.snapcastService.state$;
     this.snapcastService.connect();
   }
 
@@ -48,7 +51,10 @@ export class PlayerToolbarComponent implements OnInit, OnChanges, OnDestroy {
    */
   changeVolumeForClient(client: Client, event: any): void {
     if (!this.knobMoveStart) {
-      console.warn('PlayerToolbarComponent: changeVolumeForClient called without knobMoveStart. Ignoring event:', event);
+      console.warn(
+        'PlayerToolbarComponent: changeVolumeForClient called without knobMoveStart. Ignoring event:',
+        event
+      );
       return;
     }
     // Step 1: Robustly extract the numerical value from the event.
@@ -56,24 +62,39 @@ export class PlayerToolbarComponent implements OnInit, OnChanges, OnDestroy {
     let newVolume: number;
     if (event && typeof event.detail?.value === 'number') {
       newVolume = event.detail.value;
-    } else if (event && event.target && typeof event.target.value !== 'undefined') {
+    } else if (
+      event &&
+      event.target &&
+      typeof event.target.value !== 'undefined'
+    ) {
       newVolume = parseFloat(event.target.value);
     } else {
-      console.error('PlayerToolbarComponent: Could not extract volume value from event:', event);
+      console.error(
+        'PlayerToolbarComponent: Could not extract volume value from event:',
+        event
+      );
       return;
     }
 
     if (isNaN(newVolume)) {
-      console.error('PlayerToolbarComponent: Volume value is not a number:', event);
+      console.error(
+        'PlayerToolbarComponent: Volume value is not a number:',
+        event
+      );
       return;
     }
 
-    console.log(`PlayerToolbarComponent: Setting desired volume for client ${client.id} to ${newVolume}`);
+    console.log(
+      `PlayerToolbarComponent: Setting desired volume for client ${client.id} to ${newVolume}`
+    );
 
     // Step 2: Call the service method.
     // The service will optimistically update the `desiredState`, which makes the UI feel instant.
     // It then sends the RPC command to the server.
-    const volumeUpdate$ = this.snapcastService.setClientVolumePercent(client.id, newVolume);
+    const volumeUpdate$ = this.snapcastService.setClientVolumePercent(
+      client.id,
+      newVolume
+    );
     this.hapticsImpactLight();
 
     // Step 3: Subscribe to handle the result of the RPC call (especially errors).
@@ -82,14 +103,19 @@ export class PlayerToolbarComponent implements OnInit, OnChanges, OnDestroy {
       volumeUpdate$.subscribe({
         next: () => {
           // The UI has already updated optimistically. This confirms the RPC was sent.
-          console.log(`PlayerToolbarComponent: RPC for client ${client.id} volume sent successfully.`);
+          console.log(
+            `PlayerToolbarComponent: RPC for client ${client.id} volume sent successfully.`
+          );
         },
-        error: err => {
+        error: (err) => {
           // If the RPC fails, the service should ideally handle rolling back the desiredState.
           // The component can show a user-facing error here.
-          console.error(`PlayerToolbarComponent: Failed to set volume for client ${client.id}`, err);
+          console.error(
+            `PlayerToolbarComponent: Failed to set volume for client ${client.id}`,
+            err
+          );
           // Example: this.toastController.create({ message: 'Failed to change volume', ... }).present();
-        }
+        },
       })
     );
   }
@@ -129,7 +155,6 @@ export class PlayerToolbarComponent implements OnInit, OnChanges, OnDestroy {
     await Haptics.vibrate();
   }
 
-
   convertCoverDataBase64(coverData: string, extension: string): string {
     if (!coverData) {
       return '';
@@ -150,8 +175,4 @@ export class PlayerToolbarComponent implements OnInit, OnChanges, OnDestroy {
     this.knobMoveStart = false;
     // Optionally, you can add haptic feedback here
   }
-
-  
-
-
 }

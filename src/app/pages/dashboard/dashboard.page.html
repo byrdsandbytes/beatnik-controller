@@ -6,10 +6,19 @@
 </ion-header>
 
 <ion-content [fullscreen]="true">
-  <ion-refresher [pullFactor]="0.5" [pullMin]="100" [pullMax]="300" slot="fixed" (ionRefresh)="handleRefresh($event)">
-
-    <ion-refresher-content class="refresher" pullingIcon="chevron-down-outline" pullingText="Pull to refresh"
-      [refreshingText]="refreshingText">
+  <ion-refresher
+    [pullFactor]="0.5"
+    [pullMin]="100"
+    [pullMax]="300"
+    slot="fixed"
+    (ionRefresh)="handleRefresh($event)"
+  >
+    <ion-refresher-content
+      class="refresher"
+      pullingIcon="chevron-down-outline"
+      pullingText="Pull to refresh"
+      [refreshingText]="refreshingText"
+    >
     </ion-refresher-content>
   </ion-refresher>
 
@@ -17,101 +26,137 @@
     <ion-header collapse="condense">
       <div class="header-note">
         <span>{{today | date:"EEEE, d.MMMM"}}</span>
-
       </div>
       <ion-toolbar class="ion-margin-top">
-        <ion-title size="large"><span *ngIf="userPreeferenceUsername as name">{{name ? name+"s": 'Your'}}</span>
-          Home</ion-title>
-
+        <ion-title size="large"
+          ><span *ngIf="userPreeferenceUsername as name"
+            >{{name ? name+"s": 'Your'}}</span
+          >
+          Home</ion-title
+        >
       </ion-toolbar>
     </ion-header>
     <div class="fab-row row jsutify-content-center align-items-center">
       <div class="col col-4 col-lg-2 fab-container">
-        <ion-fab-button class="custom-fab-button" color="light" (click)="openModal()">
-          <ion-icon [name]="numberOfPlayingClients>0?'volume-high':'volume-high-outline'"></ion-icon>
+        <ion-fab-button
+          class="custom-fab-button"
+          color="light"
+          (click)="openModal()"
+        >
+          <ion-icon
+            [name]="numberOfPlayingClients>0?'volume-high':'volume-high-outline'"
+          ></ion-icon>
         </ion-fab-button>
-        <div class="fab-label">{{numberOfPlayingClients +"/"+ totalClients}} Client(s) playing</div>
+        <div class="fab-label">
+          {{numberOfPlayingClients +"/"+ totalClients}} Client(s) playing
+        </div>
       </div>
       <div class="col col-4 col-lg-2 fab-container">
-        <ion-fab-button class="custom-fab-button" color="light" [routerLink]="'/server-status'">
-          <ion-icon [name]="lastServerResponseDeltaInSeconds < 2400?'wifi':'wifi-outline'"></ion-icon>
+        <ion-fab-button
+          class="custom-fab-button"
+          color="light"
+          [routerLink]="'/server-status'"
+        >
+          <ion-icon
+            [name]="lastServerResponseDeltaInSeconds < 2400?'wifi':'wifi-outline'"
+          ></ion-icon>
         </ion-fab-button>
-        <div class="fab-label">{{lastServerResponseDeltaInSeconds < 240?'Online':'Offline'}}: {{lastServerResponseTime |
-            date: 'dd.MM.yy HH:mm:ss' }}</div>
+        <div class="fab-label">
+          {{lastServerResponseDeltaInSeconds < 240?'Online':'Offline'}}:
+          {{lastServerResponseTime | date: 'dd.MM.yy HH:mm:ss' }}
         </div>
-        <div class="col col-4 col-lg-2 fab-container">
-          <ion-fab-button class="custom-fab-button" color="light" (click)="getPlayerStatus()">
-            <ion-icon [name]="numberOfPlayingStreams>0?'musical-note':'musical-note-outline'"></ion-icon>
-          </ion-fab-button>
-          <div class="fab-label">{{numberOfPlayingStreams +"/"+ totalStreams}} Stream(s) playing</div>
-
-        </div>
-
       </div>
-
-
-
+      <div class="col col-4 col-lg-2 fab-container">
+        <ion-fab-button
+          class="custom-fab-button"
+          color="light"
+          (click)="getPlayerStatus()"
+        >
+          <ion-icon
+            [name]="numberOfPlayingStreams>0?'musical-note':'musical-note-outline'"
+          ></ion-icon>
+        </ion-fab-button>
+        <div class="fab-label">
+          {{numberOfPlayingStreams +"/"+ totalStreams}} Stream(s) playing
+        </div>
+      </div>
     </div>
+  </div>
 
+  <div class="container">
+    <ion-list-header>
+      <ion-label
+        ><span *ngIf="userPreeferenceUsername as name"
+          >{{name ? name+"s": 'Your'}}</span
+        >
+        Devices</ion-label
+      >
+      <ion-button size="small" fill="clear" [routerLink]="'/ble-wifi-setup'">
+        <ion-icon slot="icon-only" name="add-circle-outline"></ion-icon>
+      </ion-button>
+    </ion-list-header>
+  </div>
+  <ng-container *ngIf="(displayState|async) as state else noState">
+    <div class="container">
+      <swiper
+        (swiper)="onSwiper($event)"
+        (slideChange)="onSlideChange($event)"
+        [config]="swiperConfig"
+      >
+        <ng-container *ngFor="let group of state.server.groups; let i = index">
+          <ng-template swiperSlide *ngIf="group.clients[0].connected">
+            <app-snapcast-group-preview
+              [streams]="state.server.streams"
+              [group]="group"
+              [speakerData]="speakerData"
+            ></app-snapcast-group-preview>
+          </ng-template>
+        </ng-container>
+        <ng-container *ngFor="let group of state.server.groups; let i = index">
+          <ng-template swiperSlide *ngIf="group.clients[0].connected === false">
+            <div class="disconnected-overlay">
+              <ion-icon name="cloud-offline" size="large"></ion-icon>
+              <!-- <p>Group Offline</p> -->
+            </div>
+            <div class="disconnected">
+              <app-snapcast-group-preview
+                [streams]="state.server.streams"
+                [group]="group"
+              ></app-snapcast-group-preview>
+            </div>
+          </ng-template>
+        </ng-container>
+      </swiper>
+    </div>
     <div class="container">
       <ion-list-header>
-        <ion-label><span *ngIf="userPreeferenceUsername as name">{{name ? name+"s": 'Your'}}</span>
-          Devices</ion-label>
-        <ion-button size="small" fill="clear" [routerLink]="'/ble-wifi-setup'">
-          <ion-icon slot="icon-only" name="add-circle-outline"></ion-icon>
-        </ion-button>
+        <ion-label
+          ><span *ngIf="userPreeferenceUsername as name"
+            >{{name ? name+"s": 'Your'}}</span
+          >
+          Streams</ion-label
+        >
       </ion-list-header>
+      <swiper
+        (swiper)="onSwiper($event)"
+        (slideChange)="onSlideChange($event)"
+        [config]="swiperConfig"
+      >
+        <ng-template
+          swiperSlide
+          *ngFor="let stream of state.server.streams; let i = index"
+        >
+          <app-snapcast-stream-preview
+            [stream]="stream"
+          ></app-snapcast-stream-preview>
+        </ng-template>
+      </swiper>
     </div>
-    <ng-container *ngIf="(displayState|async) as state else noState">
+  </ng-container>
 
-
-
-      <div class="container">
-        <swiper (swiper)="onSwiper($event)" (slideChange)="onSlideChange($event)" [config]="swiperConfig">
-          <ng-container *ngFor="let group of state.server.groups; let i = index">
-            <ng-template swiperSlide *ngIf="group.clients[0].connected">
-
-              <app-snapcast-group-preview [streams]="state.server.streams" [group]="group"
-                [speakerData]="speakerData"></app-snapcast-group-preview>
-            </ng-template>
-
-          </ng-container>
-          <ng-container *ngFor="let group of state.server.groups; let i = index">
-            <ng-template swiperSlide *ngIf="group.clients[0].connected === false">
-              <div class="disconnected-overlay">
-                <ion-icon name="cloud-offline" size="large"></ion-icon>
-                <!-- <p>Group Offline</p> -->
-              </div>
-              <div class="disconnected">
-
-                <app-snapcast-group-preview [streams]="state.server.streams"
-                  [group]="group"></app-snapcast-group-preview>
-              </div>
-            </ng-template>
-
-
-          </ng-container>
-        </swiper>
-      </div>
-      <div class="container">
-
-
-        <ion-list-header>
-          <ion-label><span *ngIf="userPreeferenceUsername as name">{{name ? name+"s": 'Your'}}</span>
-            Streams</ion-label>
-        </ion-list-header>
-        <swiper (swiper)="onSwiper($event)" (slideChange)="onSlideChange($event)" [config]="swiperConfig">
-          <ng-template swiperSlide *ngFor="let stream of state.server.streams; let i = index">
-            <app-snapcast-stream-preview [stream]="stream"></app-snapcast-stream-preview>
-          </ng-template>
-        </swiper>
-      </div>
-    </ng-container>
-
-    <!-- <app-snapcast-status></app-snapcast-status> -->
-    <!-- <div class="page-padding-bottom">
+  <!-- <app-snapcast-status></app-snapcast-status> -->
+  <!-- <div class="page-padding-bottom">
     </div> -->
-
 </ion-content>
 
 <ng-template #noState>
@@ -122,8 +167,11 @@
         <ion-card-title>Loading...</ion-card-title>
       </ion-card-header>
       <ion-card-content>
-        Please wait while the server status is being loaded. Checking url: <b>{{userPreferenceServerUrl?
-          userPreferenceServerUrl:environment.snapcastServerUrl}}</b>
+        Please wait while the server status is being loaded. Checking url:
+        <b
+          >{{userPreferenceServerUrl?
+          userPreferenceServerUrl:environment.snapcastServerUrl}}</b
+        >
       </ion-card-content>
     </div>
     <ng-template #noServer>
@@ -132,15 +180,17 @@
           <ion-card-title>No Server Available</ion-card-title>
         </ion-card-header>
         <ion-card-content>
-          Please check your Beatnik Pi server connection. No Server found at <b>{{userPreferenceServerUrl?
-            userPreferenceServerUrl:environment.snapcastServerUrl}}</b>
-          <br>
-          Wanna use a different server? Go to the <a routerLink="/tabs/menu/settings">Settings</a> page and change the
+          Please check your Beatnik Pi server connection. No Server found at
+          <b
+            >{{userPreferenceServerUrl?
+            userPreferenceServerUrl:environment.snapcastServerUrl}}</b
+          >
+          <br />
+          Wanna use a different server? Go to the
+          <a routerLink="/tabs/menu/settings">Settings</a> page and change the
           Snapcast server URL.
-          <br>
+          <br />
           Just wana test test? Enable the Demo mode:
-
-
         </ion-card-content>
         <ion-button fill="clear" color="primary" (click)="enableDemoMode()">
           <ion-icon name="play"></ion-icon> Enable Demo Mode

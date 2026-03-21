@@ -1,10 +1,8 @@
-import { Client, Properties, Server, Stream, Volume } from "./snapcast.model";
-
-
+import { Client, Properties, Server, Stream, Volume } from './snapcast.model';
 
 export interface SnapcastWebsocketNotification {
-    jsonrpc: string
-    method:
+  jsonrpc: string;
+  method:
     | 'Stream.OnProperties'
     | 'Stream.OnUpdate'
     | 'Client.OnConnect'
@@ -16,7 +14,7 @@ export interface SnapcastWebsocketNotification {
     | 'Group.OnStreamChanged'
     | 'Group.OnNameChanged'
     | 'Server.OnUpdate';
-    params:
+  params:
     | StreamOnProperties
     | StreamOnUpdate
     | ClientOnConnect
@@ -32,62 +30,58 @@ export interface SnapcastWebsocketNotification {
 
 // Stream Notifications
 export interface StreamOnProperties {
-    id: string;
-    properties: Properties;
+  id: string;
+  properties: Properties;
 }
 
 export interface StreamOnUpdate {
-    id: string;
-    stream: Stream;
+  id: string;
+  stream: Stream;
 }
-
-
 
 // Client Notifications
 export interface ClientOnConnect {
-    client: Client;
-    id: string;
+  client: Client;
+  id: string;
 }
 
 export interface ClientOnDisconnect {
-    client: Client;
-    id: string;
+  client: Client;
+  id: string;
 }
 
 export interface ClientVolumeChange {
-    id: string;
-    volume: Volume;
+  id: string;
+  volume: Volume;
 }
 
 export interface ClientLatencyChange {
-    id: string;
-    latency: number;
+  id: string;
+  latency: number;
 }
 
 export interface ClientNameChange {
-    id: string;
-    name: string;
+  id: string;
+  name: string;
 }
 
 // Group Notifications
 export interface GroupMuteChange {
-    id: string;
-    mute: boolean;
+  id: string;
+  mute: boolean;
 }
 
 export interface GroupStreamChange {
-    id: string;
-    stream_id: string;
+  id: string;
+  stream_id: string;
 }
 
 export interface GroupNameChange {
-    id: string;
-    name: string;
+  id: string;
+  name: string;
 }
 
 // Server Notifications
 export interface ServerOnUpdate {
-    server: Server;
+  server: Server;
 }
-
-

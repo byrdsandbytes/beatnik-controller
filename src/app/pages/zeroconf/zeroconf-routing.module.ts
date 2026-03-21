@@ -6,8 +6,8 @@ import { ZeroconfPage } from './zeroconf.page';
 const routes: Routes = [
   {
     path: '',
-    component: ZeroconfPage
-  }
+    component: ZeroconfPage,
+  },
 ];
 
 @NgModule({

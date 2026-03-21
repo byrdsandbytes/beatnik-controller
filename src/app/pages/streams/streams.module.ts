@@ -15,8 +15,8 @@ import { SnapcastStreamPreviewModule } from 'src/app/components/snapcast-stream-
     FormsModule,
     IonicModule,
     StreamsPageRoutingModule,
-    SnapcastStreamPreviewModule
+    SnapcastStreamPreviewModule,
   ],
-  declarations: [StreamsPage]
+  declarations: [StreamsPage],
 })
 export class StreamsPageModule {}

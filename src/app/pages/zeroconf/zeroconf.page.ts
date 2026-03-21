@@ -1,8 +1,10 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Observable } from 'rxjs';
-import { ZeroConf, ZeroConfService as ZeroConfServiceModel } from 'capacitor-zeroconf';
+import {
+  ZeroConf,
+  ZeroConfService as ZeroConfServiceModel,
+} from 'capacitor-zeroconf';
 import { ZeroconfService } from '../../services/zero-conf.service';
-
 
 @Component({
   selector: 'app-zeroconf',
@@ -20,20 +22,20 @@ export class ZeroconfPage implements OnDestroy {
     this.services$ = this.zeroconf.services$;
   }
 
-  async ngOnInit() {
-
-  }
+  async ngOnInit() {}
 
   async scanForServices(): Promise<void> {
     this.isScanning = true;
     try {
-     
       await this.zeroconf.watch(this.SERVICE_SNAPCAST);
-      console.log(`Started scanning for services of type: ${this.SERVICE_SNAPCAST}`);
+      console.log(
+        `Started scanning for services of type: ${this.SERVICE_SNAPCAST}`
+      );
       await this.zeroconf.watch(this.SERVICE_BEATNIK);
-      console.log(`Started scanning for services of type: ${this.SERVICE_BEATNIK}`);
-    }
-    catch (error) {
+      console.log(
+        `Started scanning for services of type: ${this.SERVICE_BEATNIK}`
+      );
+    } catch (error) {
       console.error('Error starting service scan:', error);
     }
   }
@@ -63,7 +65,6 @@ export class ZeroconfPage implements OnDestroy {
   //   name: 'My Angular App',
   //   port: 8080
   // });
-
 
   // Clean up when the component is destroyed
   ngOnDestroy() {

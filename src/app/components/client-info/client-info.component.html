@@ -1,147 +1,154 @@
-  <!-- <ion-toolbar class="ion-no-padding ion-no-margin" color="light"> -->
-  <ion-segment color="primary" [(ngModel)]="segment" [scrollable]="true">
-    <ion-segment-button value="camilla-dsp">
-      <ion-label>Camilla DSP</ion-label>
-    </ion-segment-button>
+<!-- <ion-toolbar class="ion-no-padding ion-no-margin" color="light"> -->
+<ion-segment color="primary" [(ngModel)]="segment" [scrollable]="true">
+  <ion-segment-button value="camilla-dsp">
+    <ion-label>Camilla DSP</ion-label>
+  </ion-segment-button>
 
-    <ion-segment-button value="soundcard">
+  <ion-segment-button value="soundcard">
+    <ion-label> Soundcard</ion-label>
+  </ion-segment-button>
+
+  <ion-segment-button value="details">
+    <ion-label>Info</ion-label>
+  </ion-segment-button>
+
+  <ion-segment-button value="settings">
+    <ion-label>Settings</ion-label>
+  </ion-segment-button>
+</ion-segment>
+<!-- </ion-toolbar> -->
+
+<ng-container *ngIf="segment === 'details'">
+  <ion-list *ngIf="serverState | async as state">
+    <ion-item>
       <ion-label>
-        Soundcard</ion-label>
-    </ion-segment-button>
-
-
-    <ion-segment-button value="details">
-      <ion-label>Info</ion-label>
-    </ion-segment-button>
-
-    <ion-segment-button value="settings">
-      <ion-label>Settings</ion-label>
-    </ion-segment-button>
-  </ion-segment>
-  <!-- </ion-toolbar> -->
-
-  <ng-container *ngIf="segment === 'details'">
-    <ion-list *ngIf="serverState | async as state">
-      
-      <ion-item>
-        <ion-label>
-          <h2>Snap Client Information</h2>
-          <p>Id: {{client.id}}</p>
-          <p *ngIf="client.lastSeen">{{client.lastSeen.sec * 1000 | date: 'long'}}</p>
-          <hr />
-          <h3>Host</h3>
-          <p>Name: {{client.host.name}}</p>
-          <p>OS: {{client.host.os}}</p>
-          <p>Architecture: {{client.host.arch}}</p>
-          <p>IP Address: {{cleanIpAddress(client.host.ip)}}</p>
-          <p>MAC Address: {{client.host.mac}}</p>
-          <hr />
-          <h3>Configuration</h3>
-          <p>Name: {{ client.config.name}}</p>
-          <p>Client ID: {{ client.id }}</p>
-          <p>Volume: {{ client.config.volume.percent || 'N/A' }}%</p>
-          <p>Muted: {{ client.config.volume.muted}}</p>
-          <p>Latency: {{ client.config.latency }} ms</p>
-          <p>Connected: {{ client.connected }}</p>
-          <p>Last Seen: {{ client.lastSeen.sec * 1000 | date : 'long' }}</p>
-          <p></p>
-        </ion-label>
-      </ion-item>
-      <ion-accordion-group *ngIf="client">
-        <ion-accordion value="{{ client.id }}">
-          <ion-item slot="header">
-            <ion-label>
-              <h2>{{ client.id }}</h2>
-              <p>Raw json</p>
-            </ion-label>
-          </ion-item>
-          <ion-item slot="content" lines="none" color="dark">
-            <pre>{{ client| json }}</pre>
-          </ion-item>
-        </ion-accordion>
-      </ion-accordion-group>
-      <!-- <ion-item>
+        <h2>Snap Client Information</h2>
+        <p>Id: {{ client.id }}</p>
+        <p *ngIf="client.lastSeen">
+          {{ client.lastSeen.sec * 1000 | date : "long" }}
+        </p>
+        <hr />
+        <h3>Host</h3>
+        <p>Name: {{ client.host.name }}</p>
+        <p>OS: {{ client.host.os }}</p>
+        <p>Architecture: {{ client.host.arch }}</p>
+        <p>IP Address: {{ cleanIpAddress(client.host.ip) }}</p>
+        <p>MAC Address: {{ client.host.mac }}</p>
+        <hr />
+        <h3>Configuration</h3>
+        <p>Name: {{ client.config.name }}</p>
+        <p>Client ID: {{ client.id }}</p>
+        <p>Volume: {{ client.config.volume.percent || "N/A" }}%</p>
+        <p>Muted: {{ client.config.volume.muted }}</p>
+        <p>Latency: {{ client.config.latency }} ms</p>
+        <p>Connected: {{ client.connected }}</p>
+        <p>Last Seen: {{ client.lastSeen.sec * 1000 | date : "long" }}</p>
+        <p></p>
+      </ion-label>
+    </ion-item>
+    <ion-accordion-group *ngIf="client">
+      <ion-accordion value="{{ client.id }}">
+        <ion-item slot="header">
+          <ion-label>
+            <h2>{{ client.id }}</h2>
+            <p>Raw json</p>
+          </ion-label>
+        </ion-item>
+        <ion-item slot="content" lines="none" color="dark">
+          <pre>{{ client | json }}</pre>
+        </ion-item>
+      </ion-accordion>
+    </ion-accordion-group>
+    <!-- <ion-item>
         <ion-label>
           <h2>Camilla DSP Information</h2> -->
+  </ion-list>
+</ng-container>
 
+<ng-container *ngIf="segment === 'soundcard'">
+  <ion-list *ngIf="hardwareStatus$ | async as hardwareStatus">
+    <ion-card>
+      <ion-label>
+        <h2>Soundcard Information</h2>
+        <hr />
 
-
-    </ion-list>
-  </ng-container>
-
-  <ng-container *ngIf="segment === 'soundcard'">
-    
-    <ion-list *ngIf="hardwareStatus$ | async as hardwareStatus">
-      <ion-card>
-        <ion-label>
-          <h2>Soundcard Information</h2>
+        <ng-container *ngIf="hardwareStatus.currentConfig; else noConfig">
           <hr />
+          <h3>Config Status</h3>
+          <img
+            [src]="
+              'assets/soundcards/' + hardwareStatus.currentConfig.id + '.webp'
+            "
+            #myImage
+            (error)="
+              myImage.src = 'assets/placeholder/audio_board_placeholder.webp'
+            "
+          />
+          <p>Name: {{ hardwareStatus.currentConfig.name }}</p>
+          <p>Id: {{ hardwareStatus.currentConfig.id }}</p>
+          <p>isMatched: {{ hardwareStatus.isMatch }}</p>
+        </ng-container>
+        <ion-button
+          expand="full"
+          color="primary"
+          (click)="openSoundcardPicker()"
+        >
+          <ion-icon name="create" slot="start"></ion-icon>
+          Choose Soundcard
+        </ion-button>
+        <ng-template #noConfig>
+          <p>No current configuration available.</p>
+        </ng-template>
+      </ion-label>
+    </ion-card>
+  </ion-list>
+  <ion-button
+    fill="clear"
+    expand="full"
+    color="primary"
+    (click)="getHardwareInfo()"
+  >
+    <u>Refresh Soundcard Info</u>
+  </ion-button>
+</ng-container>
 
-          <ng-container *ngIf="hardwareStatus.currentConfig; else noConfig">
-            <hr />
-            <h3>Config Status </h3>
-            <img [src]="'assets/soundcards/' + hardwareStatus.currentConfig.id + '.webp'" #myImage
-              (error)="myImage.src = 'assets/placeholder/audio_board_placeholder.webp'" />
-            <p>Name: {{ hardwareStatus.currentConfig.name}}</p>
-            <p>Id: {{ hardwareStatus.currentConfig.id}}</p>
-            <p>isMatched: {{ hardwareStatus.isMatch}}</p>
-          </ng-container>
-          <ion-button expand="full" color="primary" (click)="openSoundcardPicker()">
-            <ion-icon name="create" slot="start"></ion-icon>
-            Choose Soundcard
-          </ion-button>
-          <ng-template #noConfig>
-            <p>No current configuration available.</p>
-          </ng-template>
-         
-        </ion-label>
-      </ion-card>
-   
-    </ion-list>
-    <ion-button fill="clear" expand="full" color="primary" (click)="getHardwareInfo()">
-     <u>Refresh Soundcard Info</u>
-    </ion-button>
-  </ng-container>
-
-  <ng-container *ngIf="segment === 'settings'">
-    <div>
-      <h2>Settings</h2>
-      <!-- get snapcast server status -->
-      <div *ngIf="snapcastServerStatus">
-        <h3>Snapcast Server Status</h3>
-        <p>{{ snapcastServerStatus.message}}</p>
-        <pre>{{ snapcastServerStatus | json }}</pre>
-      </div>
-      <ion-button expand="full" color="primary" (click)="refreshSnapcastStatus()">
-        Refresh Snapcast Server Status
-      </ion-button>
-
-      <ion-button expand="full" color="danger" (click)="disableSnapcastServer()">
-        Disable Snapcast Server
-      </ion-button>
-
-      <ion-button expand="full" color="secondary" (click)="enableSnapcastServer()">
-        Enable Snapcast Server
-      </ion-button>
-
-    <!-- <ion-button expand="full" color="primary" (click)="chooseSpeakers()">
-      Choose Speakers
-    </ion-button> -->
-
-
+<ng-container *ngIf="segment === 'settings'">
+  <div>
+    <h2>Settings</h2>
+    <!-- get snapcast server status -->
+    <div *ngIf="snapcastServerStatus">
+      <h3>Snapcast Server Status</h3>
+      <p>{{ snapcastServerStatus.message }}</p>
+      <pre>{{ snapcastServerStatus | json }}</pre>
     </div>
-  </ng-container>
-  <ng-container *ngIf="segment === 'camilla-dsp'">
-    <app-camilla-dsp *ngIf="camillaDspUrl" [url]="camillaDspUrl"></app-camilla-dsp>
-  </ng-container>
+    <ion-button expand="full" color="primary" (click)="refreshSnapcastStatus()">
+      Refresh Snapcast Server Status
+    </ion-button>
 
+    <ion-button expand="full" color="danger" (click)="disableSnapcastServer()">
+      Disable Snapcast Server
+    </ion-button>
 
-  
+    <ion-button
+      expand="full"
+      color="secondary"
+      (click)="enableSnapcastServer()"
+    >
+      Enable Snapcast Server
+    </ion-button>
 
     <!-- <ion-button expand="full" color="primary" (click)="chooseSpeakers()">
       Choose Speakers
     </ion-button> -->
+  </div>
+</ng-container>
+<ng-container *ngIf="segment === 'camilla-dsp'">
+  <app-camilla-dsp
+    *ngIf="camillaDspUrl"
+    [url]="camillaDspUrl"
+  ></app-camilla-dsp>
+</ng-container>
 
- 
-
-
+<!-- <ion-button expand="full" color="primary" (click)="chooseSpeakers()">
+      Choose Speakers
+    </ion-button> -->

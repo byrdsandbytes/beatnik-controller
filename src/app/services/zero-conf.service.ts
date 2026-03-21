@@ -2,18 +2,23 @@
 
 import { Injectable, OnDestroy, NgZone } from '@angular/core';
 // @ts-ignore
-import { ZeroConf, ZeroConfService, ZeroConfWatchResult } from 'capacitor-zeroconf';
+import {
+  ZeroConf,
+  ZeroConfService,
+  ZeroConfWatchResult,
+} from 'capacitor-zeroconf';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { distinctUntilChanged, scan } from 'rxjs/operators';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class ZeroconfService implements OnDestroy {
   private readonly servicesSubject = new BehaviorSubject<ZeroConfService[]>([]);
-  
+
   // Expose the list of services as an observable
-  public readonly services$: Observable<ZeroConfService[]> = this.servicesSubject.asObservable();
+  public readonly services$: Observable<ZeroConfService[]> =
+    this.servicesSubject.asObservable();
 
   constructor(private ngZone: NgZone) {
     // Listen for discovery events and update the services list
@@ -28,7 +33,7 @@ export class ZeroconfService implements OnDestroy {
   private handleDiscoveryEvent(result: ZeroConfWatchResult) {
     const currentServices = this.servicesSubject.getValue();
     const service = result.service;
-    
+
     switch (result.action) {
       case 'added':
         // The service has been discovered but not yet resolved.
@@ -38,7 +43,9 @@ export class ZeroconfService implements OnDestroy {
       case 'resolved':
         // The service is now resolved with an IP address and port.
         // Now we can add or update it in our list.
-        const existingIndex = currentServices.findIndex(s => s.name === service.name && s.type === service.type);
+        const existingIndex = currentServices.findIndex(
+          (s) => s.name === service.name && s.type === service.type
+        );
         if (existingIndex > -1) {
           currentServices[existingIndex] = service;
           this.servicesSubject.next([...currentServices]);
@@ -48,7 +55,9 @@ export class ZeroconfService implements OnDestroy {
         break;
       case 'removed':
         // Remove the service from the list
-        const filteredServices = currentServices.filter(s => s.name !== service.name || s.type !== service.type);
+        const filteredServices = currentServices.filter(
+          (s) => s.name !== service.name || s.type !== service.type
+        );
         this.servicesSubject.next(filteredServices);
         break;
     }

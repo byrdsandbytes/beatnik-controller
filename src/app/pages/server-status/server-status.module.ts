@@ -15,8 +15,8 @@ import { SnapcastStatusModule } from 'src/app/components/snapcast-status/snapcas
     FormsModule,
     IonicModule,
     ServerStatusPageRoutingModule,
-    SnapcastStatusModule
+    SnapcastStatusModule,
   ],
-  declarations: [ServerStatusPage]
+  declarations: [ServerStatusPage],
 })
 export class ServerStatusPageModule {}

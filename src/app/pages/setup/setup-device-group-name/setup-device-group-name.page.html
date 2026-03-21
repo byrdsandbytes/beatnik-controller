@@ -21,22 +21,26 @@
     <ion-item lines="none">
       <ion-label>
         <p class="ion-text-wrap">
-          Choose a descriptive name that reflects the location or purpose of this device (group), such as "Living Room
-          Amp"
-          or "Kitchen Audio".
+          Choose a descriptive name that reflects the location or purpose of
+          this device (group), such as "Living Room Amp" or "Kitchen Audio".
         </p>
       </ion-label>
     </ion-item>
     <!-- </ion-card> -->
     <ion-item class="ion-padding-vertical">
       <ion-label position="stacked">Device Group Name</ion-label>
-      <ion-input type="text" [(ngModel)]="deviceGroupName" (ionInput)="changeGroupName(deviceGroupName)"
-        placeholder="e.g. Living Room"></ion-input>
+      <ion-input
+        type="text"
+        [(ngModel)]="deviceGroupName"
+        (ionInput)="changeGroupName(deviceGroupName)"
+        placeholder="e.g. Living Room"
+      ></ion-input>
     </ion-item>
     <ion-item lines="none">
       <ion-label>
         <p class="ion-text-wrap">
-          A device group can contain a single device or multiple devices, depending on your setup.
+          A device group can contain a single device or multiple devices,
+          depending on your setup.
         </p>
       </ion-label>
     </ion-item>

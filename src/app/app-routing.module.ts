@@ -4,99 +4,135 @@ import { PreloadAllModules, RouterModule, Routes } from '@angular/router';
 const routes: Routes = [
   {
     path: '',
-    loadChildren: () => import('./tabs/tabs.module').then(m => m.TabsPageModule)
+    loadChildren: () =>
+      import('./tabs/tabs.module').then((m) => m.TabsPageModule),
   },
   {
     path: 'server-status',
-    loadChildren: () => import('./pages/server-status/server-status.module').then(m => m.ServerStatusPageModule)
+    loadChildren: () =>
+      import('./pages/server-status/server-status.module').then(
+        (m) => m.ServerStatusPageModule
+      ),
   },
   {
     path: 'devices',
     children: [
       {
         path: '',
-        loadChildren: () => import('./pages/devices/devices.module').then(m => m.DevicesPageModule)
+        loadChildren: () =>
+          import('./pages/devices/devices.module').then(
+            (m) => m.DevicesPageModule
+          ),
       },
       {
         path: ':id',
-        loadChildren: () => import('./pages/devices/device-details/device-details.module').then(m => m.DeviceDetailsPageModule)
-      }
-    ]
+        loadChildren: () =>
+          import('./pages/devices/device-details/device-details.module').then(
+            (m) => m.DeviceDetailsPageModule
+          ),
+      },
+    ],
   },
   {
     path: 'clients',
     children: [
       {
         path: ':id',
-        loadChildren: () => import('./pages/clients/client-details/client-details.module').then(m => m.ClientDetailsPageModule)
-      }
-    ]
+        loadChildren: () =>
+          import('./pages/clients/client-details/client-details.module').then(
+            (m) => m.ClientDetailsPageModule
+          ),
+      },
+    ],
   },
   {
     path: 'streams',
     children: [
       {
         path: '',
-        loadChildren: () => import('./pages/streams/streams.module').then(m => m.StreamsPageModule)
+        loadChildren: () =>
+          import('./pages/streams/streams.module').then(
+            (m) => m.StreamsPageModule
+          ),
       },
       {
         path: ':id',
-        loadChildren: () => import('./pages/streams/stream-details/stream-details.module').then(m => m.StreamDetailsPageModule)
-      }
-    ]
+        loadChildren: () =>
+          import('./pages/streams/stream-details/stream-details.module').then(
+            (m) => m.StreamDetailsPageModule
+          ),
+      },
+    ],
   },
   {
     path: 'menu',
     children: [
       {
         path: '',
-        loadChildren: () => import('./pages/menu/menu.module').then(m => m.MenuPageModule)
+        loadChildren: () =>
+          import('./pages/menu/menu.module').then((m) => m.MenuPageModule),
       },
-
-
 
       // {
       //   path: 'about',
       //   loadChildren: () => import('./pages/about/about.module').then(m => m.AboutPageModule)
       // }
-
-    ]
+    ],
   },
   {
     path: 'settings',
-    loadChildren: () => import('./pages/settings/settings.module').then(m => m.SettingsPageModule)
+    loadChildren: () =>
+      import('./pages/settings/settings.module').then(
+        (m) => m.SettingsPageModule
+      ),
   },
   {
     path: 'zeroconf',
-    loadChildren: () => import('./pages/zeroconf/zeroconf.module').then( m => m.ZeroconfPageModule)
+    loadChildren: () =>
+      import('./pages/zeroconf/zeroconf.module').then(
+        (m) => m.ZeroconfPageModule
+      ),
   },
   {
     path: 'setup-server/:ip',
-    loadChildren: () => import('./pages/setup/setup-server/setup-server.module').then( m => m.SetupServerPageModule)
+    loadChildren: () =>
+      import('./pages/setup/setup-server/setup-server.module').then(
+        (m) => m.SetupServerPageModule
+      ),
   },
   {
     path: 'camilla-dsp',
-    loadChildren: () => import('./pages/camilla-dsp/camilla-dsp.module').then( m => m.CamillaDspPageModule)
+    loadChildren: () =>
+      import('./pages/camilla-dsp/camilla-dsp.module').then(
+        (m) => m.CamillaDspPageModule
+      ),
   },
   {
     path: 'ble-wifi-setup',
-    loadChildren: () => import('./pages/setup/ble-wifi-setup/ble-wifi-setup.module').then( m => m.BleWifiSetupPageModule)
+    loadChildren: () =>
+      import('./pages/setup/ble-wifi-setup/ble-wifi-setup.module').then(
+        (m) => m.BleWifiSetupPageModule
+      ),
   },
   {
     path: 'setup-soundcard/:id',
-    loadChildren: () => import('./pages/setup/setup-soundcard/setup-soundcard.module').then( m => m.SetupSoundcardPageModule)
+    loadChildren: () =>
+      import('./pages/setup/setup-soundcard/setup-soundcard.module').then(
+        (m) => m.SetupSoundcardPageModule
+      ),
   },
   {
     path: 'setup-device-group-name/:ip',
-    loadChildren: () => import('./pages/setup/setup-device-group-name/setup-device-group-name.module').then( m => m.SetupDeviceGroupNamePageModule)
+    loadChildren: () =>
+      import(
+        './pages/setup/setup-device-group-name/setup-device-group-name.module'
+      ).then((m) => m.SetupDeviceGroupNamePageModule),
   },
-
-
 ];
 @NgModule({
   imports: [
-    RouterModule.forRoot(routes, { preloadingStrategy: PreloadAllModules })
+    RouterModule.forRoot(routes, { preloadingStrategy: PreloadAllModules }),
   ],
-  exports: [RouterModule]
+  exports: [RouterModule],
 })
-export class AppRoutingModule { }
+export class AppRoutingModule {}

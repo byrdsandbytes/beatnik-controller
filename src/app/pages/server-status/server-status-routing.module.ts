@@ -6,8 +6,8 @@ import { ServerStatusPage } from './server-status.page';
 const routes: Routes = [
   {
     path: '',
-    component: ServerStatusPage
-  }
+    component: ServerStatusPage,
+  },
 ];
 
 @NgModule({

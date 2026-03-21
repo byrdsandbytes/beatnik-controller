@@ -28,10 +28,9 @@ export interface ApplyResponse {
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class BeatnikHardwareService {
-
   constructor(private http: HttpClient) {}
 
   private getApiUrl(host: string): string {
@@ -57,7 +56,9 @@ export class BeatnikHardwareService {
    * This will update config.txt and camilladsp.yml
    */
   applyConfiguration(hatId: string, host: string): Observable<ApplyResponse> {
-    return this.http.post<ApplyResponse>(`${this.getApiUrl(host)}/apply`, { hatId });
+    return this.http.post<ApplyResponse>(`${this.getApiUrl(host)}/apply`, {
+      hatId,
+    });
   }
 
   /**

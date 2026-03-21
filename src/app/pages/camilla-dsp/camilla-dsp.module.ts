@@ -15,8 +15,8 @@ import { CamillaDspModule } from 'src/app/components/camilla-dsp/camilla-dsp.mod
     FormsModule,
     IonicModule,
     CamillaDspPageRoutingModule,
-    CamillaDspModule
+    CamillaDspModule,
   ],
-  declarations: [CamillaDspPage]
+  declarations: [CamillaDspPage],
 })
 export class CamillaDspPageModule {}

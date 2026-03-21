@@ -13,16 +13,13 @@ import { SnapcastService } from 'src/app/services/snapcast.service';
 export class StreamsPage implements OnInit {
   displayState?: Observable<SnapCastServerStatusResponse | null>;
 
-  constructor(
-    private readonly snapcastService: SnapcastService,
-  ) { }
+  constructor(private readonly snapcastService: SnapcastService) {}
 
   ngOnInit() {
-    this.displayState = this.snapcastService.state$
+    this.displayState = this.snapcastService.state$;
   }
 
   convertBase64ToImage(base64String: string, format: string): string {
     return `data:image/${format};base64,${base64String}`;
   }
-
 }

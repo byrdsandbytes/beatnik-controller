@@ -13,8 +13,8 @@ import { StreamDetailsPage } from './stream-details.page';
     CommonModule,
     FormsModule,
     IonicModule,
-    StreamDetailsPageRoutingModule
+    StreamDetailsPageRoutingModule,
   ],
-  declarations: [StreamDetailsPage]
+  declarations: [StreamDetailsPage],
 })
 export class StreamDetailsPageModule {}

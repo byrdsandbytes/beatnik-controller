@@ -7,9 +7,18 @@ import { ChooseSpeakersComponent } from 'src/app/components/choose-speakers/choo
 import { SoundcardPickerComponent } from 'src/app/components/soundcard-picker/soundcard-picker.component';
 import { SUPPORTED_HATS } from 'src/app/constant/hat.constant';
 import { UserPreference } from 'src/app/enum/user-preference.enum';
-import { Client, SnapCastServerStatusResponse } from 'src/app/model/snapcast.model';
-import { BeatnikHardwareService, HardwareStatus } from 'src/app/services/beatnik-hardware.service';
-import { BeatnikSnapcastService, SnapcastActionResponse } from 'src/app/services/beatnik-snapcast.service';
+import {
+  Client,
+  SnapCastServerStatusResponse,
+} from 'src/app/model/snapcast.model';
+import {
+  BeatnikHardwareService,
+  HardwareStatus,
+} from 'src/app/services/beatnik-hardware.service';
+import {
+  BeatnikSnapcastService,
+  SnapcastActionResponse,
+} from 'src/app/services/beatnik-snapcast.service';
 import { CamillaDspService } from 'src/app/services/camilla-dsp.service';
 import { SnapcastService } from 'src/app/services/snapcast.service';
 
@@ -17,11 +26,9 @@ import { SnapcastService } from 'src/app/services/snapcast.service';
   selector: 'app-client-details',
   templateUrl: './client-details.page.html',
   styleUrls: ['./client-details.page.scss'],
-  standalone: false
+  standalone: false,
 })
 export class ClientDetailsPage implements OnInit {
-
-
   id?: string;
 
   serverState?: Observable<SnapCastServerStatusResponse>;
@@ -38,13 +45,10 @@ export class ClientDetailsPage implements OnInit {
 
   snapcastServerStatus?: SnapcastActionResponse;
 
-
-
   constructor(
     private avtivateRoute: ActivatedRoute,
-    private snapcastService: SnapcastService,
-   
-  ) { }
+    private snapcastService: SnapcastService
+  ) {}
 
   async ngOnInit() {
     this.serverState = this.snapcastService.state$;
@@ -59,7 +63,9 @@ export class ClientDetailsPage implements OnInit {
 
   subscribeToClient() {
     if (!this.id) {
-      console.error('ClientDetailsPage: No ID available to subscribe to client');
+      console.error(
+        'ClientDetailsPage: No ID available to subscribe to client'
+      );
       return;
     }
     this.serverState.subscribe(async (state) => {
@@ -67,13 +73,16 @@ export class ClientDetailsPage implements OnInit {
         console.warn('ClientDetailsPage: Invalid server state received', state);
         return;
       }
-      this.client = state.server.groups.flatMap(group => group.clients).find(client => client.id === this.id);
+      this.client = state.server.groups
+        .flatMap((group) => group.clients)
+        .find((client) => client.id === this.id);
       if (!this.client) {
-        console.error(`ClientDetailsPage: Client with ID ${this.id} not found in server state`);
+        console.error(
+          `ClientDetailsPage: Client with ID ${this.id} not found in server state`
+        );
       } else {
         console.log('ClientDetailsPage: Found client:', this.client);
       }
     });
   }
-
 }

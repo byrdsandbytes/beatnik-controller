@@ -10,13 +10,15 @@ import { HttpClientModule } from '@angular/common/http';
 
 @NgModule({
   declarations: [AppComponent],
-  imports: [BrowserModule, HttpClientModule,  IonicModule.forRoot(
-    {
+  imports: [
+    BrowserModule,
+    HttpClientModule,
+    IonicModule.forRoot({
       mode: 'ios', // Set the mode to 'ios' for iOS style
       swipeBackEnabled: false, // Disable swipe back gesture
-      
-    }
-  ), AppRoutingModule],
+    }),
+    AppRoutingModule,
+  ],
   providers: [{ provide: RouteReuseStrategy, useClass: IonicRouteStrategy }],
   bootstrap: [AppComponent],
 })

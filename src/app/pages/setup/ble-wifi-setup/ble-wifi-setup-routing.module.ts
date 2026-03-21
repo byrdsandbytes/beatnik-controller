@@ -6,8 +6,8 @@ import { BleWifiSetupPage } from './ble-wifi-setup.page';
 const routes: Routes = [
   {
     path: '',
-    component: BleWifiSetupPage
-  }
+    component: BleWifiSetupPage,
+  },
 ];
 
 @NgModule({

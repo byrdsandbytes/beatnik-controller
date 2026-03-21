@@ -6,8 +6,8 @@ import { StreamsPage } from './streams.page';
 const routes: Routes = [
   {
     path: '',
-    component: StreamsPage
-  }
+    component: StreamsPage,
+  },
 ];
 
 @NgModule({

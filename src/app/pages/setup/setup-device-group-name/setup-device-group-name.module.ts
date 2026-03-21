@@ -13,8 +13,8 @@ import { SetupDeviceGroupNamePage } from './setup-device-group-name.page';
     CommonModule,
     FormsModule,
     IonicModule,
-    SetupDeviceGroupNamePageRoutingModule
+    SetupDeviceGroupNamePageRoutingModule,
   ],
-  declarations: [SetupDeviceGroupNamePage]
+  declarations: [SetupDeviceGroupNamePage],
 })
 export class SetupDeviceGroupNamePageModule {}

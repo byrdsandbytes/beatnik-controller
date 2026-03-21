@@ -4,15 +4,9 @@ import { SnapcastGroupPreviewComponent } from './snapcast-group-preview.componen
 import { IonicModule } from '@ionic/angular';
 import { RouterModule } from '@angular/router';
 
-
-
 @NgModule({
   declarations: [SnapcastGroupPreviewComponent],
-  imports: [
-    CommonModule,
-    IonicModule,
-    RouterModule
-  ],
+  imports: [CommonModule, IonicModule, RouterModule],
   exports: [SnapcastGroupPreviewComponent],
 })
-export class SnapcastGroupPreviewModule { }
+export class SnapcastGroupPreviewModule {}

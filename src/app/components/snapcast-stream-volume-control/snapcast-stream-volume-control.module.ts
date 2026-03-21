@@ -4,15 +4,9 @@ import { SnapcastStreamVolumeControlComponent } from './snapcast-stream-volume-c
 import { IonicModule } from '@ionic/angular';
 import { FormsModule } from '@angular/forms';
 
-
-
 @NgModule({
   declarations: [SnapcastStreamVolumeControlComponent],
-  imports: [
-    CommonModule,
-    IonicModule,
-    FormsModule
-  ],
+  imports: [CommonModule, IonicModule, FormsModule],
   exports: [SnapcastStreamVolumeControlComponent],
 })
-export class SnapcastStreamVolumeControlModule { }
+export class SnapcastStreamVolumeControlModule {}

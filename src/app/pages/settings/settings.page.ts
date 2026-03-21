@@ -7,18 +7,13 @@ import { SnapcastService } from 'src/app/services/snapcast.service';
   selector: 'app-settings',
   templateUrl: './settings.page.html',
   styleUrls: ['./settings.page.scss'],
-  standalone: false
+  standalone: false,
 })
 export class SettingsPage implements OnInit {
+  userName?: string;
+  serverUrl?: string;
 
-  userName?: string
-  serverUrl?: string
-
-  
-
-  constructor(
-    private snapcastService: SnapcastService
-  ) { }
+  constructor(private snapcastService: SnapcastService) {}
 
   ngOnInit() {
     this.getUserPreferences();

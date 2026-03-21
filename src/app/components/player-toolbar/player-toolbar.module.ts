@@ -5,20 +5,14 @@ import { IonicModule } from '@ionic/angular';
 import { FormsModule } from '@angular/forms';
 import { SnapcastStreamVolumeControlModule } from '../snapcast-stream-volume-control/snapcast-stream-volume-control.module';
 
-
-
 @NgModule({
-  declarations: [
-    PlayerToolbarComponent
-  ],
+  declarations: [PlayerToolbarComponent],
   imports: [
     CommonModule,
     IonicModule,
     FormsModule,
-    SnapcastStreamVolumeControlModule
+    SnapcastStreamVolumeControlModule,
   ],
-  exports: [
-    PlayerToolbarComponent
-  ]
+  exports: [PlayerToolbarComponent],
 })
-export class PlayerToolbarModule { }
+export class PlayerToolbarModule {}

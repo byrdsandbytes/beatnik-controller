@@ -92,4 +92,3 @@ export interface MixerSource {
   mute: boolean;
   scale: string | null;
 }
-

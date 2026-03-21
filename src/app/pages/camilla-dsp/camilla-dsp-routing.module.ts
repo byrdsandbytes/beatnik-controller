@@ -6,8 +6,8 @@ import { CamillaDspPage } from './camilla-dsp.page';
 const routes: Routes = [
   {
     path: '',
-    component: CamillaDspPage
-  }
+    component: CamillaDspPage,
+  },
 ];
 
 @NgModule({

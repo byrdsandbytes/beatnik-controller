@@ -6,8 +6,8 @@ import { SetupServerPage } from './setup-server.page';
 const routes: Routes = [
   {
     path: '',
-    component: SetupServerPage
-  }
+    component: SetupServerPage,
+  },
 ];
 
 @NgModule({

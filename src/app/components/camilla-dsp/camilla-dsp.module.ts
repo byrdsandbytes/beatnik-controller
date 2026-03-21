@@ -5,12 +5,8 @@ import { IonicModule } from '@ionic/angular';
 import { CamillaDspComponent } from './camilla-dsp.component';
 
 @NgModule({
-  imports: [
-    CommonModule,
-    FormsModule,
-    IonicModule
-  ],
+  imports: [CommonModule, FormsModule, IonicModule],
   declarations: [CamillaDspComponent],
-  exports: [CamillaDspComponent]
+  exports: [CamillaDspComponent],
 })
 export class CamillaDspModule {}

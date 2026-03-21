@@ -9,8 +9,8 @@ describe('ChooseSpeakersComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ ChooseSpeakersComponent ],
-      imports: [IonicModule.forRoot()]
+      declarations: [ChooseSpeakersComponent],
+      imports: [IonicModule.forRoot()],
     }).compileComponents();
 
     fixture = TestBed.createComponent(ChooseSpeakersComponent);

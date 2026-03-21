@@ -1,2 +1,1 @@
-export class ZeroConf {
-}
+export class ZeroConf {}

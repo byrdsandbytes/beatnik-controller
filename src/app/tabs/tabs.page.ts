@@ -1,4 +1,10 @@
-import { AfterViewInit, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import {
+  AfterViewInit,
+  Component,
+  ElementRef,
+  OnInit,
+  ViewChild,
+} from '@angular/core';
 import { GestureController, ModalController } from '@ionic/angular';
 import { SnapcastService } from '../services/snapcast.service';
 import { PlayerToolbarComponent } from '../components/player-toolbar/player-toolbar.component';
@@ -10,22 +16,15 @@ import { PlayerToolbarComponent } from '../components/player-toolbar/player-tool
   standalone: false,
 })
 export class TabsPage implements OnInit, AfterViewInit {
+  isModalOpen: boolean = false;
 
-  isModalOpen:boolean = false;
+  constructor(private modalController: ModalController) {}
 
-
-
-  constructor(
-    private modalController: ModalController) { }
-
-  ngOnInit(): void {
-
-  }
+  ngOnInit(): void {}
 
   ionViewWillEnter() {
     this.createPlayerModal();
   }
-
 
   ionViewWillLeave() {
     console.log('ionViewWillLeave');
@@ -34,8 +33,7 @@ export class TabsPage implements OnInit, AfterViewInit {
     console.log('Modal closed');
   }
 
-  ngAfterViewInit() {
-  }
+  ngAfterViewInit() {}
 
   async createPlayerModal() {
     const modal = await this.modalController.create({
@@ -46,14 +44,10 @@ export class TabsPage implements OnInit, AfterViewInit {
       showBackdrop: false,
       backdropDismiss: false,
       initialBreakpoint: 0.25,
-      breakpoints: [0.05, 0.25, 0.5, 0.75,1
-      ],
+      breakpoints: [0.05, 0.25, 0.5, 0.75, 1],
       backdropBreakpoint: 0.75,
-
     });
     await modal.present();
     this.isModalOpen = true;
   }
-
-
 }

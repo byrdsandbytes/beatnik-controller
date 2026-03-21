@@ -9,12 +9,7 @@ import { MenuPageRoutingModule } from './menu-routing.module';
 import { MenuPage } from './menu.page';
 
 @NgModule({
-  imports: [
-    CommonModule,
-    FormsModule,
-    IonicModule,
-    MenuPageRoutingModule
-  ],
-  declarations: [MenuPage]
+  imports: [CommonModule, FormsModule, IonicModule, MenuPageRoutingModule],
+  declarations: [MenuPage],
 })
 export class MenuPageModule {}

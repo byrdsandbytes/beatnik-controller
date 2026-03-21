@@ -3,9 +3,7 @@
     <ion-title>Soundcard Picker</ion-title>
     <ion-buttons slot="start">
       <!-- cllose modal -->
-      <ion-button (click)="dismiss()">
-        Cancel
-      </ion-button>
+      <ion-button (click)="dismiss()"> Cancel </ion-button>
     </ion-buttons>
     <ion-buttons slot="end">
       <ion-button (click)="dismiss()" [disabled]="!selectedHatId">
@@ -15,33 +13,47 @@
   </ion-toolbar>
   <ion-toolbar color="light">
     <ion-searchbar (ionInput)="filterHats($event.target.value)"></ion-searchbar>
-
   </ion-toolbar>
 </ion-header>
 <ion-content>
   <div class="container">
     <div class="row">
-      <div class="col-6" [class.selected]="selectedHatId == hat.id" *ngFor="let hat of filteredHats"
-        (click)="selectedHatId = hat.id">
+      <div
+        class="col-6"
+        [class.selected]="selectedHatId == hat.id"
+        *ngFor="let hat of filteredHats"
+        (click)="selectedHatId = hat.id"
+      >
         <!-- checkmark -->
         <div class="checkmark">
-          <ion-icon *ngIf="selectedHatId == hat.id" name="checkmark-circle" color="primary"></ion-icon>
+          <ion-icon
+            *ngIf="selectedHatId == hat.id"
+            name="checkmark-circle"
+            color="primary"
+          ></ion-icon>
         </div>
-        <img [src]="'assets/soundcards/' + hat.id + '.webp'" #myImage
-          (error)="myImage.src = 'assets/placeholder/audio_board_placeholder.webp'" />
+        <img
+          [src]="'assets/soundcards/' + hat.id + '.webp'"
+          #myImage
+          (error)="
+            myImage.src = 'assets/placeholder/audio_board_placeholder.webp'
+          "
+        />
         <ion-card-header>
           <ion-card-subtitle>{{ hat.name }}</ion-card-subtitle>
         </ion-card-header>
         <ion-card-content>
-          <ion-badge color="primary" *ngIf="hat.testedbyBeatnik">Tested by Beatnik</ion-badge>
-          <ion-badge color="secondary" *ngIf="hat.testedByCommunity">Tested by Community</ion-badge>
+          <ion-badge color="primary" *ngIf="hat.testedbyBeatnik"
+            >Tested by Beatnik</ion-badge
+          >
+          <ion-badge color="secondary" *ngIf="hat.testedByCommunity"
+            >Tested by Community</ion-badge
+          >
           <p>ID: {{ hat.id }}</p>
-          <p>dt Overlay: {{ hat.overlay}}</p>
-          <p>Format: {{hat.camilla.format}}</p>
+          <p>dt Overlay: {{ hat.overlay }}</p>
+          <p>Format: {{ hat.camilla.format }}</p>
         </ion-card-content>
-
       </div>
-
     </div>
   </div>
 </ion-content>

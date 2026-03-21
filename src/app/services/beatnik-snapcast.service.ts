@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 export interface SnapcastStatus {
-  active: boolean;  // Is the service currently running (systemctl is-active)
+  active: boolean; // Is the service currently running (systemctl is-active)
   enabled: boolean; // Is the service set to start on boot (systemctl is-enabled)
 }
 
@@ -13,10 +13,9 @@ export interface SnapcastActionResponse extends SnapcastStatus {
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class BeatnikSnapcastService {
-
   constructor(private http: HttpClient) {}
 
   private getApiUrl(host: string): string {
@@ -34,13 +33,19 @@ export class BeatnikSnapcastService {
    * Enable Snapserver (starts immediately and enables on boot)
    */
   enable(host: string): Observable<SnapcastActionResponse> {
-    return this.http.post<SnapcastActionResponse>(`${this.getApiUrl(host)}/enable`, {});
+    return this.http.post<SnapcastActionResponse>(
+      `${this.getApiUrl(host)}/enable`,
+      {}
+    );
   }
 
   /**
    * Disable Snapserver (stops immediately and disables on boot)
    */
   disable(host: string): Observable<SnapcastActionResponse> {
-    return this.http.post<SnapcastActionResponse>(`${this.getApiUrl(host)}/disable`, {});
+    return this.http.post<SnapcastActionResponse>(
+      `${this.getApiUrl(host)}/disable`,
+      {}
+    );
   }
 }

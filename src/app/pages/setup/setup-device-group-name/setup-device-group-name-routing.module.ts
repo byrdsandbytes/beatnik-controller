@@ -6,8 +6,8 @@ import { SetupDeviceGroupNamePage } from './setup-device-group-name.page';
 const routes: Routes = [
   {
     path: '',
-    component: SetupDeviceGroupNamePage
-  }
+    component: SetupDeviceGroupNamePage,
+  },
 ];
 
 @NgModule({

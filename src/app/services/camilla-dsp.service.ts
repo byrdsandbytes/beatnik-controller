@@ -1,10 +1,21 @@
 import { Injectable } from '@angular/core';
 import { webSocket, WebSocketSubject } from 'rxjs/webSocket';
 import { Subject, Observable, BehaviorSubject, timer, of } from 'rxjs';
-import { retryWhen, switchMap, tap, delayWhen, filter, map } from 'rxjs/operators';
+import {
+  retryWhen,
+  switchMap,
+  tap,
+  delayWhen,
+  filter,
+  map,
+} from 'rxjs/operators';
 
 // Defines the possible connection states
-export type ConnectionStatus = 'Connected' | 'Connecting' | 'Disconnected' | 'Error';
+export type ConnectionStatus =
+  | 'Connected'
+  | 'Connecting'
+  | 'Disconnected'
+  | 'Error';
 
 // A simple type for the JSON commands CamillaDSP expects
 // Example: { "command": "GetState", "params": null }
@@ -18,19 +29,28 @@ interface CamillaDspCommand {
 export class CamillaDspService {
   private socket$!: WebSocketSubject<any>;
   private messagesSubject = new Subject<any>();
-  private connectionStatusSubject = new BehaviorSubject<ConnectionStatus>('Disconnected');
+  private connectionStatusSubject = new BehaviorSubject<ConnectionStatus>(
+    'Disconnected'
+  );
   private readonly RECONNECT_INTERVAL_MS = 5000;
 
   // Public observables for components to subscribe to
   public messages$: Observable<any> = this.messagesSubject.asObservable();
-  public connectionStatus$: Observable<ConnectionStatus> = this.connectionStatusSubject.asObservable();
+  public connectionStatus$: Observable<ConnectionStatus> =
+    this.connectionStatusSubject.asObservable();
   public signalLevels$: Observable<any>;
   private levelUpdateIntervalId: any;
 
   constructor() {
     this.signalLevels$ = this.messages$.pipe(
-      filter(msg => (msg && msg.SignalLevels) || (msg && (msg.GetSignalLevels && msg.GetSignalLevels.value))),
-      map(msg => msg.SignalLevels ? msg.SignalLevels : msg.GetSignalLevels.value)
+      filter(
+        (msg) =>
+          (msg && msg.SignalLevels) ||
+          (msg && msg.GetSignalLevels && msg.GetSignalLevels.value)
+      ),
+      map((msg) =>
+        msg.SignalLevels ? msg.SignalLevels : msg.GetSignalLevels.value
+      )
     );
   }
 
@@ -66,10 +86,14 @@ export class CamillaDspService {
     this.socket$
       .pipe(
         // The retryWhen operator handles reconnection logic
-        retryWhen(errors =>
+        retryWhen((errors) =>
           errors.pipe(
-            tap(err => {
-              console.error(`Connection error: ${err}. Retrying in ${this.RECONNECT_INTERVAL_MS / 1000}s...`);
+            tap((err) => {
+              console.error(
+                `Connection error: ${err}. Retrying in ${
+                  this.RECONNECT_INTERVAL_MS / 1000
+                }s...`
+              );
               this.connectionStatusSubject.next('Error');
             }),
             // Wait for the specified interval before trying to reconnect
@@ -78,8 +102,8 @@ export class CamillaDspService {
         )
       )
       .subscribe({
-        next: msg => this.messagesSubject.next(msg), // Forward messages to our subject
-        error: err => {
+        next: (msg) => this.messagesSubject.next(msg), // Forward messages to our subject
+        error: (err) => {
           // This block is less likely to be hit due to retryWhen, but good for unrecoverable errors
           console.error('WebSocket unrecoverable error:', err);
           this.connectionStatusSubject.next('Error');
@@ -100,7 +124,7 @@ export class CamillaDspService {
 
     // CamillaDSP expects a JSON object where the key is the command name
     const commandToSend: CamillaDspCommand = { [command]: params };
-    
+
     console.log('Sending command:', commandToSend);
     this.socket$.next(commandToSend);
   }
@@ -112,14 +136,14 @@ export class CamillaDspService {
    */
   public startLevelUpdates(intervalMs: number): void {
     this.stopLevelUpdates(); // Clear any existing interval
-    
+
     // Also set the calculation interval on the server just in case
     if (intervalMs > 0) {
       this.sendCommand('SetUpdateInterval', intervalMs);
-      
+
       // Setup client-side polling
       this.levelUpdateIntervalId = setInterval(() => {
-          this.sendCommand('GetSignalLevels');
+        this.sendCommand('GetSignalLevels');
       }, intervalMs);
     }
   }
@@ -129,8 +153,8 @@ export class CamillaDspService {
    */
   public stopLevelUpdates(): void {
     if (this.levelUpdateIntervalId) {
-        clearInterval(this.levelUpdateIntervalId);
-        this.levelUpdateIntervalId = null;
+      clearInterval(this.levelUpdateIntervalId);
+      this.levelUpdateIntervalId = null;
     }
     this.sendCommand('SetUpdateInterval', 0);
   }

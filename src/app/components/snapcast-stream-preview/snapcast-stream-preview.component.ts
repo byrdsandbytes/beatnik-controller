@@ -7,14 +7,13 @@ import { Stream } from 'src/app/model/snapcast.model';
   styleUrls: ['./snapcast-stream-preview.component.scss'],
   standalone: false,
 })
-export class SnapcastStreamPreviewComponent  implements OnInit {
+export class SnapcastStreamPreviewComponent implements OnInit {
   @Input() stream?: Stream;
 
-  constructor() { }
+  constructor() {}
 
   ngOnInit() {}
 
-  
   convertCoverDataBase64(coverData: string, extension: string): string {
     if (!coverData) {
       return '';
@@ -22,5 +21,4 @@ export class SnapcastStreamPreviewComponent  implements OnInit {
     // Convert base64 data to a data URL
     return `data:image/${extension};base64,${coverData}`;
   }
-
 }

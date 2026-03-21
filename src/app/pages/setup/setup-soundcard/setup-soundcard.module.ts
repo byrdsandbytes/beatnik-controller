@@ -15,8 +15,8 @@ import { LoadingCircleModule } from 'src/app/components/loading-circle/loading-c
     FormsModule,
     IonicModule,
     SetupSoundcardPageRoutingModule,
-    LoadingCircleModule
+    LoadingCircleModule,
   ],
-  declarations: [SetupSoundcardPage]
+  declarations: [SetupSoundcardPage],
 })
 export class SetupSoundcardPageModule {}

@@ -12,8 +12,6 @@
   </ion-header>
 </ion-content> -->
 
-
-
 <ion-header>
   <ion-toolbar>
     <ion-buttons slot="start">
@@ -31,9 +29,7 @@
   </ion-toolbar>
 </ion-header>
 
-
 <ion-content>
-  
   <!-- <ion-list>
     <ion-list-header>
       <ion-label>Discovered Devices</ion-label>
@@ -64,23 +60,28 @@
       <ion-item *ngIf="services.length === 0 && isScanning">
         <ion-label>Searching for services...</ion-label>
       </ion-item>
-      
+
       <ion-item *ngFor="let service of services">
         <ion-label>
           <h2>{{ service.hostname }}</h2>
           <p>{{ service.name }}</p>
           <p>{{ service.type }}</p>
           <p>{{ service.ipv4Addresses[0] }}:{{ service.port }}</p>
-           <ng-container *ngIf="service.type === SERVICE_BEATNIK">
+          <ng-container *ngIf="service.type === SERVICE_BEATNIK">
             <p>Beatnik Device - MAC: {{ service.txtRecord['mac'] }}</p>
-             <p>Beatnik Pi: {{ service.txtRecord['model'] }}</p>
-             <p>Beatnik Version: {{ service.txtRecord['version'] }}</p>
-             <p>RAM: {{ service.txtRecord['ram'] }}</p>
-           </ng-container>
+            <p>Beatnik Pi: {{ service.txtRecord['model'] }}</p>
+            <p>Beatnik Version: {{ service.txtRecord['version'] }}</p>
+            <p>RAM: {{ service.txtRecord['ram'] }}</p>
+          </ng-container>
         </ion-label>
         <ng-container *ngIf="service.type === SERVICE_BEATNIK">
           <!-- <p>{{service.hostname}}</p> -->
-          <ion-button fill="outline" slot="end" [routerLink]="['/clients', service.txtRecord['mac']]">View Device</ion-button>
+          <ion-button
+            fill="outline"
+            slot="end"
+            [routerLink]="['/clients', service.txtRecord['mac']]"
+            >View Device</ion-button
+          >
         </ng-container>
       </ion-item>
     </ion-list>
@@ -97,6 +98,7 @@
       </ion-label>
     </ion-item>
   </div>
-  <ion-button expand="full" (click)="scanForServices()">Scan for Services</ion-button>
-  
+  <ion-button expand="full" (click)="scanForServices()"
+    >Scan for Services</ion-button
+  >
 </ion-content>

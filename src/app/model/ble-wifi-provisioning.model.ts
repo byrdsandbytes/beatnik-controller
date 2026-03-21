@@ -1,2 +1,1 @@
-export class BleWifiProvisioning {
-}
+export class BleWifiProvisioning {}

@@ -1,6 +1,4 @@
-
-
 export enum UserPreference {
-    USERNAME = 'username',
-    SERVER_URL = 'serverUrl',
+  USERNAME = 'username',
+  SERVER_URL = 'serverUrl',
 }

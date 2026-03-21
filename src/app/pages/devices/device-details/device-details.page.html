@@ -1,8 +1,10 @@
 <ion-header [translucent]="true">
-
   <ion-toolbar>
     <ion-buttons slot="start">
-      <ion-back-button defaultHref="/tabs/devices" text="Back"></ion-back-button>
+      <ion-back-button
+        defaultHref="/tabs/devices"
+        text="Back"
+      ></ion-back-button>
     </ion-buttons>
     <ion-title>Device Details></ion-title>
   </ion-toolbar>
@@ -20,50 +22,83 @@
       <ng-container *ngIf="serverState | async as state">
         <div class="row justify-content-center">
           <div class="col-12 col-md-4 col-lg-3">
-            <app-snapcast-group-preview [group]="group" [streams]="state.server.streams"></app-snapcast-group-preview>
-
+            <app-snapcast-group-preview
+              [group]="group"
+              [streams]="state.server.streams"
+            ></app-snapcast-group-preview>
           </div>
         </div>
         <ion-card color="primary">
-          <ng-container *ngFor="let stream of state.server.streams" class="ion-padding-top" lines="none" color="dark">
-            <ion-item *ngIf="stream.id === group.stream_id && stream.properties.metadata" color="primary">
+          <ng-container
+            *ngFor="let stream of state.server.streams"
+            class="ion-padding-top"
+            lines="none"
+            color="dark"
+          >
+            <ion-item
+              *ngIf="stream.id === group.stream_id && stream.properties.metadata"
+              color="primary"
+            >
               <ion-thumbnail slot="start">
-                <img *ngIf="stream.properties.metadata.artData as artData"
-                  [src]="convertCoverDataBase64(artData.data, artData.extension)" alt="cover image">
+                <img
+                  *ngIf="stream.properties.metadata.artData as artData"
+                  [src]="convertCoverDataBase64(artData.data, artData.extension)"
+                  alt="cover image"
+                />
               </ion-thumbnail>
               <ion-label *ngIf="stream.properties.metadata">
                 <p>{{stream.id}}</p>
-                <h2> {{ stream.properties.metadata.title }}</h2>
+                <h2>{{ stream.properties.metadata.title }}</h2>
                 <p>{{ stream.properties.metadata.artist }}</p>
-
               </ion-label>
             </ion-item>
           </ng-container>
           <ion-item color="primary">
             <ion-label>Stream</ion-label>
-            <ion-select (ionChange)="changeStream(group.stream_id)" slot="end" interface="action-sheet"
-              [(ngModel)]="group.stream_id" placeholder="Select Stream">
-              <ion-select-option *ngFor="let stream of state.server.streams" [value]="stream.id">
+            <ion-select
+              (ionChange)="changeStream(group.stream_id)"
+              slot="end"
+              interface="action-sheet"
+              [(ngModel)]="group.stream_id"
+              placeholder="Select Stream"
+            >
+              <ion-select-option
+                *ngFor="let stream of state.server.streams"
+                [value]="stream.id"
+              >
                 {{ stream.id }}
               </ion-select-option>
             </ion-select>
           </ion-item>
         </ion-card>
 
-          <ion-item color="">
-            <ion-label>Group Name</ion-label>
-            <ion-input (ionInput)="changeGroupName(group.name)" class="ion-text-end" slot="end" [(ngModel)]="group.name"
-              placeholder="Enter Group Name"></ion-input>
-          </ion-item>
-          <ion-item color="">
-            <ion-label>Clients</ion-label>
-            <ion-select slot="end" interface="action-sheet" [(ngModel)]="group.clients" multiple="true"
-              placeholder="Select Clients">
-              <ion-select-option *ngFor="let client of group.clients" [value]="client">
-                {{ client.config.name || client.id }}
-              </ion-select-option>
-            </ion-select>
-          </ion-item>
+        <ion-item color="">
+          <ion-label>Group Name</ion-label>
+          <ion-input
+            (ionInput)="changeGroupName(group.name)"
+            class="ion-text-end"
+            slot="end"
+            [(ngModel)]="group.name"
+            placeholder="Enter Group Name"
+          ></ion-input>
+        </ion-item>
+        <ion-item color="">
+          <ion-label>Clients</ion-label>
+          <ion-select
+            slot="end"
+            interface="action-sheet"
+            [(ngModel)]="group.clients"
+            multiple="true"
+            placeholder="Select Clients"
+          >
+            <ion-select-option
+              *ngFor="let client of group.clients"
+              [value]="client"
+            >
+              {{ client.config.name || client.id }}
+            </ion-select-option>
+          </ion-select>
+        </ion-item>
       </ng-container>
     </ng-container>
   </ng-container>

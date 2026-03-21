@@ -8,7 +8,7 @@ describe('BeatnikSnapcastService', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule]
+      imports: [HttpClientTestingModule],
     });
     service = TestBed.inject(BeatnikSnapcastService);
   });

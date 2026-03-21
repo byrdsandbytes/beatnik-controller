@@ -9,8 +9,8 @@ describe('SnapcastStreamVolumeControlComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ SnapcastStreamVolumeControlComponent ],
-      imports: [IonicModule.forRoot()]
+      declarations: [SnapcastStreamVolumeControlComponent],
+      imports: [IonicModule.forRoot()],
     }).compileComponents();
 
     fixture = TestBed.createComponent(SnapcastStreamVolumeControlComponent);

@@ -108,9 +108,7 @@
               "extension": "jpg"
             },
             "artUrl": "http://beatnik-server:1780/__image_cache?name=6ecadcd8aa64a26023b719a72eb2632c.jpg",
-            "artist": [
-              "Richard & Linda Thompson"
-            ],
+            "artist": ["Richard & Linda Thompson"],
             "title": "A Man In Need"
           }
         },
@@ -147,9 +145,7 @@
               "extension": "jpg"
             },
             "artUrl": "http://beatnik-server:1780/__image_cache?name=",
-            "artist": [
-              "Bob Dylan"
-            ],
+            "artist": ["Bob Dylan"],
             "title": "Blowin' In the Wind"
           }
         },

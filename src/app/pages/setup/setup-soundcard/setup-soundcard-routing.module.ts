@@ -6,8 +6,8 @@ import { SetupSoundcardPage } from './setup-soundcard.page';
 const routes: Routes = [
   {
     path: '',
-    component: SetupSoundcardPage
-  }
+    component: SetupSoundcardPage,
+  },
 ];
 
 @NgModule({

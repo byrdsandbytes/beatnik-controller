@@ -15,8 +15,8 @@ import { SwiperModule } from 'swiper/angular';
     FormsModule,
     IonicModule,
     BleWifiSetupPageRoutingModule,
-    SwiperModule
+    SwiperModule,
   ],
-  declarations: [BleWifiSetupPage]
+  declarations: [BleWifiSetupPage],
 })
 export class BleWifiSetupPageModule {}

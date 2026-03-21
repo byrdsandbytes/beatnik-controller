@@ -1,2 +1,1 @@
-export class BeatnikBleno {
-}
+export class BeatnikBleno {}

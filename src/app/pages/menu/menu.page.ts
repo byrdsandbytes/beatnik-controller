@@ -5,22 +5,18 @@ import packageJson from '../../../../package.json';
   selector: 'app-menu',
   templateUrl: './menu.page.html',
   styleUrls: ['./menu.page.scss'],
-  standalone: false
+  standalone: false,
 })
 export class MenuPage implements OnInit {
-
   version: string = '0.0.0';
 
-  constructor() { }
+  constructor() {}
 
   ngOnInit() {
-       this.version = packageJson.version;
-
+    this.version = packageJson.version;
   }
 
   async getVersion() {
     // get version from package.json
   }
-  
-
 }

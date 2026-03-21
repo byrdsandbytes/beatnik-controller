@@ -9,8 +9,8 @@ describe('SnapcastStatusComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ SnapcastStatusComponent ],
-      imports: [IonicModule.forRoot()]
+      declarations: [SnapcastStatusComponent],
+      imports: [IonicModule.forRoot()],
     }).compileComponents();
 
     fixture = TestBed.createComponent(SnapcastStatusComponent);

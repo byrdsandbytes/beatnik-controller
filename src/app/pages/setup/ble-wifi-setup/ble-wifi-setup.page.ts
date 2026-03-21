@@ -2,30 +2,37 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { NavController } from '@ionic/angular';
 import { firstValueFrom, Observable } from 'rxjs';
-import { BeatnikBlenoService, BleNetwork, WifiStatus } from 'src/app/services/beatnik-bleno.service';
+import {
+  BeatnikBlenoService,
+  BleNetwork,
+  WifiStatus,
+} from 'src/app/services/beatnik-bleno.service';
 import Swiper, { SwiperOptions } from 'swiper';
 
 @Component({
   selector: 'app-ble-wifi-setup',
   templateUrl: './ble-wifi-setup.page.html',
   styleUrls: ['./ble-wifi-setup.page.scss'],
-  standalone: false
+  standalone: false,
 })
 export class BleWifiSetupPage implements OnInit {
-
   isScanning: boolean = false;
   isWifiVerifying: boolean = false;
   isNetworkSetupComplete: boolean = false;
-  deviceConnectionStatus$: Observable<'Disconnected' | 'Scanning' | 'Connecting' | 'Connected'> = this.beatikBlenoService.deviceConnectionStatus$;
-  wifiConnectionStatus: Observable<WifiStatus> = this.beatikBlenoService.wifiStatus$;
-  availableNetworks$: Observable<BleNetwork[]> = this.beatikBlenoService.availableNetworks$;
+  deviceConnectionStatus$: Observable<
+    'Disconnected' | 'Scanning' | 'Connecting' | 'Connected'
+  > = this.beatikBlenoService.deviceConnectionStatus$;
+  wifiConnectionStatus: Observable<WifiStatus> =
+    this.beatikBlenoService.wifiStatus$;
+  availableNetworks$: Observable<BleNetwork[]> =
+    this.beatikBlenoService.availableNetworks$;
 
   public statusText: string = 'Waiting for user to start scan.';
 
   swiperConfig: SwiperOptions = {
     slidesPerView: 1,
     spaceBetween: 0,
-    allowTouchMove: false
+    allowTouchMove: false,
   };
 
   selectedNetwork: BleNetwork | null = null;
@@ -39,10 +46,9 @@ export class BleWifiSetupPage implements OnInit {
     private beatikBlenoService: BeatnikBlenoService,
     private router: Router,
     private navCtrl: NavController
-  ) { }
+  ) {}
 
-  ngOnInit() {
-  }
+  ngOnInit() {}
 
   async scanForServices() {
     this.isScanning = true;
@@ -57,7 +63,7 @@ export class BleWifiSetupPage implements OnInit {
   }
 
   subsribeToDeviceConnectionStatus() {
-    this.deviceConnectionStatus$.subscribe(status => {
+    this.deviceConnectionStatus$.subscribe((status) => {
       console.log('Device connection status:', status);
       // delay to allow UI to update
       if (status === 'Scanning') {
@@ -80,8 +86,7 @@ export class BleWifiSetupPage implements OnInit {
     this.statusText = 'Searching for available Wi-Fi networks...';
     // delay to allow UI to update
     setTimeout(() => {
-
-      this.availableNetworks$.subscribe(networks => {
+      this.availableNetworks$.subscribe((networks) => {
         console.log('Available networks:', networks);
         if (networks.length > 0) {
           this.statusText = `Found ${networks.length} Wi-Fi networks. Please select one to connect.`;
@@ -90,7 +95,6 @@ export class BleWifiSetupPage implements OnInit {
         }
         this.isScanning = false;
         this.slideTo(1);
-
       });
     }, 2000);
   }
@@ -137,7 +141,7 @@ export class BleWifiSetupPage implements OnInit {
   }
 
   async subscribeToWifiStatus() {
-    this.wifiConnectionStatus.subscribe(status => {
+    this.wifiConnectionStatus.subscribe((status) => {
       console.log('Wi-Fi connection status:', status);
       if (status.connected) {
         this.statusText = `Connected to Wi-Fi network. IP Address: ${status.ip}`;
@@ -155,10 +159,11 @@ export class BleWifiSetupPage implements OnInit {
     // Navigate to home and reset navigation stack
     // await this.router.navigate(['/tabs'], { replaceUrl: true });
     // navigate to server setup page and add IP address to url params
-    const wifiConnectionStatus = await firstValueFrom(this.wifiConnectionStatus)
+    const wifiConnectionStatus = await firstValueFrom(
+      this.wifiConnectionStatus
+    );
     const ip = wifiConnectionStatus.ip || '';
     await this.router.navigate([`/setup-server/${ip}`], { replaceUrl: true });
-
   }
 
   handleBack() {
@@ -168,6 +173,4 @@ export class BleWifiSetupPage implements OnInit {
       this.navCtrl.navigateBack('/tabs');
     }
   }
-
-
 }
