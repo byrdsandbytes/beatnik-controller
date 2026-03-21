@@ -1,5 +1,5 @@
 import { Component, HostListener, OnInit } from '@angular/core';
-import { ModalController } from '@ionic/angular';
+import { ModalController, RefresherCustomEvent } from '@ionic/angular';
 import { first, firstValueFrom, interval, Observable } from 'rxjs';
 import { Client, Group, ServerDetail, SnapCastServerStatusResponse, Stream } from 'src/app/model/snapcast.model';
 import { SnapcastService } from 'src/app/services/snapcast.service';
@@ -70,6 +70,8 @@ export class DashboardPage implements OnInit {
   lastServerResponseDeltaInSeconds?: number;
 
   speakerData: Speaker[] = [];
+
+  refreshingText: string = 'Refreshing... ';
 
 
 
@@ -238,6 +240,36 @@ export class DashboardPage implements OnInit {
       },
       error: (error) => {
         console.error('Error loading speaker data:', error);
+      }
+    });
+  }
+
+  handleRefresh(event: RefresherCustomEvent) {
+    this.refreshSeverState(event);
+
+  }
+
+  refreshSeverState(event: RefresherCustomEvent): void {
+    console.log('Refreshing server state...');
+    this.snapcastService.refreshState().subscribe({
+      next: () => {
+        console.log('Server state refreshed successfully');
+        const now = new Date();
+        setTimeout(() => {          this.refreshingText = 'Server state refreshed successfully at ' + now.toLocaleTimeString();
+        }, 500);
+        // this.refreshingText = 'Server state refreshed successfully at ' + now.toLocaleTimeString();
+        // event.target.complete();
+        setTimeout(() => {
+          event.target.complete();
+          this.refreshingText = 'Refreshing... ';
+        }, 1500);
+      },
+      error: (error) => {
+        console.error('Error refreshing server state:', error);
+        this.refreshingText = 'Error refreshing server state';
+        setTimeout(() => {
+          event.target.complete();
+        }, 1500);
       }
     });
   }

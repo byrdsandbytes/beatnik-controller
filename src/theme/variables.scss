@@ -108,6 +108,9 @@
 	border-radius: 8px 8px 0 0;
 	--border-radius: 8px 8px 0 0;
   }
+    .refresher-refreshing-text, .refresher-pulling-text {
+    font-size: 12px;
+  }
 }
 
 @media (prefers-color-scheme: dark) {
