@@ -2,7 +2,7 @@ services:
   beatnik:
     image: ghcr.io/byrdsandbytes/beatnik-controller:latest
     container_name: beatnik-controller
-    restart: until-stopped
+    restart: unless-stopped
     ports:
       - "80:80"
       - "8443:443"
