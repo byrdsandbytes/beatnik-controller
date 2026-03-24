@@ -1,15 +1,25 @@
 <ion-header class="ion-no-border">
-  <ion-toolbar >
+  <ion-toolbar>
     <ion-title>Dashboard</ion-title>
     <!-- <ion-title *ngIf="(userProfile) as user">{{user.displayName}}s Home </ion-title> -->
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true" >
+<ion-content [fullscreen]="true">
+  <ion-refresher [pullFactor]="0.5" [pullMin]="100" [pullMax]="300" slot="fixed" (ionRefresh)="handleRefresh($event)">
+
+    <ion-refresher-content class="refresher" pullingIcon="chevron-down-outline" pullingText="Pull to refresh"
+      [refreshingText]="refreshingText">
+    </ion-refresher-content>
+  </ion-refresher>
+
   <div class="container">
     <ion-header collapse="condense">
-      <span class="header-note">{{today | date:"EEEE, d.MMMM"}}</span>
-      <ion-toolbar  class="ion-margin-top">
+      <div class="header-note">
+        <span>{{today | date:"EEEE, d.MMMM"}}</span>
+
+      </div>
+      <ion-toolbar class="ion-margin-top">
         <ion-title size="large"><span *ngIf="userPreeferenceUsername as name">{{name ? name+"s": 'Your'}}</span>
           Home</ion-title>
 

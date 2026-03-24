@@ -13,12 +13,14 @@
     text-transform: uppercase;
     font-weight: 400;
     font-size: 12px;
-    position: absolute;
-    top: -10px;
+    // position: ;
+    // top: -10px;
+    // left:0;
     z-index: 1000;
     margin: 0;
     margin-left: 18px;
-    margin-bottom: 16px;
+    margin-bottom: -12px;
+    line-height: 0;
   }
 
 
@@ -66,3 +68,4 @@
     z-index: 2000;
     
   }
+
