@@ -2,6 +2,9 @@ import { Component, OnInit } from '@angular/core';
 import { Preferences } from '@capacitor/preferences';
 import { UserPreference } from '../../enum/user-preference.enum';
 import { SnapcastService } from 'src/app/services/snapcast.service';
+import { AlertController, LoadingController, ToastController } from '@ionic/angular';
+import { result } from 'lodash-es';
+import { firstValueFrom, timeout } from 'rxjs';
 
 @Component({
   selector: 'app-settings',
@@ -14,10 +17,13 @@ export class SettingsPage implements OnInit {
   userName?: string
   serverUrl?: string
 
-  
+
 
   constructor(
-    private snapcastService: SnapcastService
+    private snapcastService: SnapcastService,
+    private loadingController: LoadingController,
+    private toastController: ToastController,
+    private alertController: AlertController
   ) { }
 
   ngOnInit() {
@@ -52,9 +58,40 @@ export class SettingsPage implements OnInit {
     });
   }
 
-  connectToServer() {
+  async connectToServer() {
+    // disocnnect first if already connected and timeout 2 seconds
+    timeout(2000);
     // Logic to connect to the server using the serverUrl
     console.log('Connecting to server at:', this.serverUrl);
-    this.snapcastService.connect(this.serverUrl || '');
+
+    // show loading indicator
+    const loading = await this.loadingController.create({
+      message: 'Connecting to server...',
+    });
+    await loading.present();
+    const result = await this.snapcastService.connect(this.serverUrl!);
+    // get serverstaus to verify connection
+    try {     
+      const status =  await firstValueFrom(this.snapcastService.getServerStatus());
+      console.log('Successfully connected to server');
+      const toast = await this.toastController.create({
+        message: 'Successfully connected to server',
+        duration: 2000,
+        color: 'success'
+      });
+      await toast.present();
+    } catch (error) {
+      console.error('Failed to connect to server:', error);
+      const alert = await this.alertController.create({
+        header: 'Connection Failed',
+        message: 'Failed to connect to server. Please check the URL and try again.',
+        buttons: ['OK']
+      });
+      await alert.present();
+    } finally {
+      loading.dismiss();
+    }
   }
 }
+
+

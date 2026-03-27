@@ -233,7 +233,7 @@ export class ClientInfoComponent implements OnInit {
     }
   }
 
-   async refreshSnapcastStatus() {
+  async refreshSnapcastStatus() {
     if (!this.client) {
       console.error('Client Info Component: No client available to refresh Snapcast status');
       return;
@@ -248,6 +248,19 @@ export class ClientInfoComponent implements OnInit {
     }
   }
 
-
-
+  rebootDevice() {
+    if (!this.client) {
+      console.error('Client Info Component: No client available to reboot');
+      return;
+    }
+    const localHostName = this.client.host.name + '.local';
+    this.beatnikHardwareService.reboot(localHostName).subscribe({
+      next: () => {
+        console.log(`Client Info Component: Successfully triggered reboot for client ${this.client?.id}`);
+      },
+      error: (err) => {
+        console.error(`Client Info Component: Failed to trigger reboot for client ${this.client?.id}`, err);
+      }
+    });
+  }
 }
