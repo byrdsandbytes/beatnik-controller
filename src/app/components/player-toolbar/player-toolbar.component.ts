@@ -4,6 +4,7 @@ import { Observable, Subscription, tap, firstValueFrom } from 'rxjs'; // firstVa
 import { Group, Stream, ServerDetail, Client, SnapCastServerStatusResponse } from 'src/app/model/snapcast.model'; // Client importiert für Typisierung
 import { SnapcastService } from 'src/app/services/snapcast.service';
 import { Haptics, ImpactStyle, NotificationType } from '@capacitor/haptics';
+import { CoverDataService } from 'src/app/services/cover-data.service';
 
 
 @Component({
@@ -23,10 +24,11 @@ export class PlayerToolbarComponent implements OnInit, OnChanges, OnDestroy {
   private knobMoveStart = false;
   private knobMoveEnd = false;
 
- 
+
 
   constructor(
-    public snapcastService: SnapcastService
+    public snapcastService: SnapcastService,
+    private coverDateService: CoverDataService
   ) {
 
 
@@ -131,11 +133,7 @@ export class PlayerToolbarComponent implements OnInit, OnChanges, OnDestroy {
 
 
   convertCoverDataBase64(coverData: string, extension: string): string {
-    if (!coverData) {
-      return '';
-    }
-    // Convert base64 data to a data URL
-    return `data:image/${extension};base64,${coverData}`;
+    return this.coverDateService.convertCoverDataBase64(coverData, extension);
   }
 
   knobMoveStartEvent(event: any): void {
@@ -151,7 +149,12 @@ export class PlayerToolbarComponent implements OnInit, OnChanges, OnDestroy {
     // Optionally, you can add haptic feedback here
   }
 
-  
+  onCoverImageError(event: Event): void {
+    this.coverDateService.onCoverImageError(event);
+  }
+
+
+
 
 
 }
