@@ -1,6 +1,8 @@
 <div class="row g-0">
     <div class="col col-12 col-lg-12">
 
+
+
         <div *ngIf="levels" class="meters-section">
             <ion-list-header color="primary">
                 <ion-label>
@@ -163,7 +165,7 @@
                 *ngFor="let filter of parsedConfig.filters | keyvalue">
                 <ion-card-header lines="none">
                     <ion-card-subtitle>
-                    {{ filter.key }}
+                        {{ filter.key }}
                     </ion-card-subtitle>
                 </ion-card-header>
                 <ion-item color="primary"> Type: {{ filter.value.type }} </ion-item>
@@ -231,27 +233,83 @@
 </div>
 
 
-<div class="p-4">
-    <h1 class="text-2xl font-bold mb-4">CamillaDSP Control</h1>
-    <ion-input placeholder="WebSocket URL" [(ngModel)]="url"></ion-input>
-    <p class="mb-2">
-        Connection Status: <strong>{{ connectionStatus }}</strong>
-    </p>
-    <!-- <ion-button (click)="connect()">Connect</ion-button>
-    <ion-button (click)="disconnect()">Disconnect</ion-button>
-    <ion-button (click)="getState()">Get State</ion-button>
-    <ion-button (click)="getConfigJson()">Get Config JSON</ion-button>
-    <ion-button (click)="getConfigYaml()">Get Config YAML</ion-button>
-    <ion-button (click)="getUpdateInterval()">Get Update Interval</ion-button>
-    <ion-button (click)="getCaptureSignalLevels()">Get Capture Signal Levels</ion-button>
-    <ion-button (click)="setUpdateInterval(100)">Set update Interval</ion-button>
-    <ion-button (click)="getVolume()">Get Volume</ion-button> -->
+<ion-accordion-group class="ion-margin-top">
+    <ion-accordion value="camilla-dsp-control">
+        <ion-item slot="header">
+            <ion-label>CamillaDSP Connection</ion-label>
+        </ion-item>
 
+        <div class="ion-padding" slot="content">
+            <ion-card-title class="ion-padding-top">WebSocket Connection</ion-card-title>
 
+            <ion-input placeholder="WebSocket URL" [(ngModel)]="url"></ion-input>
+            <p class="mb-2">
+                Connection Status: <strong>{{ connectionStatus }}</strong>
+            </p>
+            <!-- <ion-button (click)="connect()">Connect</ion-button>
+        <ion-button (click)="disconnect()">Disconnect</ion-button>
+        <ion-button (click)="getState()">Get State</ion-button>
+        <ion-button (click)="getConfigJson()">Get Config JSON</ion-button>
+        <ion-button (click)="getConfigYaml()">Get Config YAML</ion-button>
+        <ion-button (click)="getUpdateInterval()">Get Update Interval</ion-button>
+        <ion-button (click)="getCaptureSignalLevels()">Get Capture Signal Levels</ion-button>
+        <ion-button (click)="setUpdateInterval(100)">Set update Interval</ion-button>
+        <ion-button (click)="getVolume()">Get Volume</ion-button> -->
+            <!-- <pre class="bg-gray-100 p-4 rounded mt-4 overflow-auto">
+                {{ lastMessage | json }}
+                </pre>
+            <pre class="bg-gray-100 p-4 rounded mt-4 overflow-auto">
+                {{ parsedConfig | json }}
+                </pre> -->
+        </div>
+    </ion-accordion>
+</ion-accordion-group>
 
-</div>
+<ion-accordion-group class="ion-margin-bottom">
+    <ion-accordion value="camilla-dsp-config">
+        <ion-item slot="header">
+            <ion-label>Advanced CamillaDSP Config</ion-label>
+        </ion-item>
 
-<!-- <pre class="bg-gray-100 p-4 rounded mt-4 overflow-auto">
-{{ lastMessage | json }}</pre>
-<pre class="bg-gray-100 p-4 rounded mt-4 overflow-auto">
-{{ parsedConfig | json }}</pre> -->
+        <div class="ion-padding" slot="content">
+            <ion-card-title>Default Config</ion-card-title>
+            <p>Manage the default config file used on this device. Only use this if you know what you are doing.</p>
+            <ion-item>
+                <ion-label position="stacked">Current Default Config</ion-label>
+                <ion-note color="medium">{{ currentCamillaConfigFile || 'No default config selected' }}</ion-note>
+            </ion-item>
+
+            <ion-item>
+                <ion-label position="stacked">Available Config Files</ion-label>
+                <ion-select [(ngModel)]="selectedCamillaConfig" placeholder="Select CamillaDSP config"
+                    [disabled]="isLoadingCamillaConfigs || isSavingCamillaConfig || availableCamillaConfigs.length === 0">
+                    <ion-select-option *ngFor="let config of availableCamillaConfigs" [value]="config">
+                        {{ config }}
+                    </ion-select-option>
+                </ion-select>
+            </ion-item>
+
+            <ion-text color="medium" *ngIf="isLoadingCamillaConfigs">
+                <p>Loading CamillaDSP configs...</p>
+            </ion-text>
+
+            <ion-text color="danger" *ngIf="camillaConfigError">
+                <p>{{ camillaConfigError }}</p>
+            </ion-text>
+
+            <ion-text color="success" *ngIf="camillaConfigMessage">
+                <p>{{ camillaConfigMessage }}</p>
+            </ion-text>
+
+            <ion-button expand="block" color="medium" fill="outline" (click)="loadCamillaConfigState()"
+                [disabled]="isLoadingCamillaConfigs || isSavingCamillaConfig">
+                Refresh Config List
+            </ion-button>
+
+            <ion-button expand="block" color="primary" (click)="saveDefaultCamillaConfig()"
+                [disabled]="!selectedCamillaConfig || isLoadingCamillaConfigs || isSavingCamillaConfig">
+                Set Default Config
+            </ion-button>
+        </div>
+    </ion-accordion>
+</ion-accordion-group>
