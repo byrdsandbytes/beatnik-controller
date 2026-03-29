@@ -60,7 +60,6 @@ export class SettingsPage implements OnInit {
 
   async connectToServer() {
     // disocnnect first if already connected and timeout 2 seconds
-    timeout(2000);
     // Logic to connect to the server using the serverUrl
     console.log('Connecting to server at:', this.serverUrl);
 
@@ -70,10 +69,12 @@ export class SettingsPage implements OnInit {
     });
     await loading.present();
     const result = await this.snapcastService.connect(this.serverUrl!);
+    timeout(2000);
+    console.log('Connection result:', result);
     // get serverstaus to verify connection
-    try {     
-      const status =  await firstValueFrom(this.snapcastService.getServerStatus());
-      console.log('Successfully connected to server');
+    try {
+      const status = await firstValueFrom(this.snapcastService.getServerStatus());
+      console.log('Successfully connected to server', status);
       const toast = await this.toastController.create({
         message: 'Successfully connected to server',
         duration: 2000,
