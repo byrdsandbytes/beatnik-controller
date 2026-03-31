@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Observable } from 'rxjs';
 import { Client, Group, SnapCastServerStatusResponse, Stream } from 'src/app/model/snapcast.model';
+import { CoverDataService } from 'src/app/services/cover-data.service';
 import { SnapcastService } from 'src/app/services/snapcast.service';
 
 @Component({
@@ -13,7 +14,7 @@ import { SnapcastService } from 'src/app/services/snapcast.service';
 export class DeviceDetailsPage implements OnInit {
 
   id?: string;
-  group:Group;
+  group: Group;
 
   serverState?: Observable<SnapCastServerStatusResponse>;
   selectedClient: Client;
@@ -21,7 +22,8 @@ export class DeviceDetailsPage implements OnInit {
 
   constructor(
     private avtivateRoute: ActivatedRoute,
-    private snapcastService: SnapcastService
+    private snapcastService: SnapcastService,
+    private coverDateService: CoverDataService
   ) { }
 
   async ngOnInit() {
@@ -96,12 +98,13 @@ export class DeviceDetailsPage implements OnInit {
     });
   }
 
-   convertCoverDataBase64(coverData: string, extension: string): string {
-    if (!coverData) {
-      return '';
-    }
-    // Convert base64 data to a data URL
-    return `data:image/${extension};base64,${coverData}`;
+  convertCoverDataBase64(coverData: string, extension: string): string {
+    return this.coverDateService.convertCoverDataBase64(coverData, extension);
+
+  }
+
+  onCoverImageError(event: Event): void {
+    this.coverDateService.onCoverImageError(event);
   }
 
 

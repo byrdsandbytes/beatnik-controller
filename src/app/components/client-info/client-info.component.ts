@@ -10,6 +10,7 @@ import { CamillaDspService } from 'src/app/services/camilla-dsp.service';
 import { SnapcastService } from 'src/app/services/snapcast.service';
 import { SoundcardPickerComponent } from '../soundcard-picker/soundcard-picker.component';
 import { AlertController, ModalController } from '@ionic/angular';
+import { ChooseSpeakersComponent } from '../choose-speakers/choose-speakers.component';
 
 @Component({
   selector: 'app-client-info',
@@ -43,7 +44,10 @@ export class ClientInfoComponent implements OnInit {
     this.serverState = this.snapcastService.state$;
     this.camillaDspUrl = await this.getCamillaDspUrl();
     this.getHardwareInfo();
+    this.refreshSnapcastStatus();
   }
+
+
 
 
   async getCamillaDspUrl(): Promise<string> {
@@ -263,4 +267,27 @@ export class ClientInfoComponent implements OnInit {
       }
     });
   }
+
+
+  async chooseSpeakers() {
+    console.log('Client Info Component: Opening speaker selection for client:', this.client?.id);
+    const modal = await this.modalController.create({
+      component: ChooseSpeakersComponent,
+      id: 'choose-speakers-modal',
+      componentProps: {
+        clientId: this.client?.id
+      }
+    });
+    await modal.present();
+
+    const { data } = await modal.onDidDismiss();
+    if (data && data.selectedId) {
+      console.log('Client Info Component: Speaker selected:', data.selectedId);
+    } else {
+      console.log('Client Info Component: Speaker selection cancelled or no selection made');
+    }
+  }
 }
+
+
+

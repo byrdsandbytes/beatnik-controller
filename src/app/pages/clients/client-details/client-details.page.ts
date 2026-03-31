@@ -3,7 +3,6 @@ import { ActivatedRoute } from '@angular/router';
 import { Preferences } from '@capacitor/preferences';
 import { AlertController, ModalController } from '@ionic/angular';
 import { firstValueFrom, Observable } from 'rxjs';
-import { ChooseSpeakersComponent } from 'src/app/components/choose-speakers/choose-speakers.component';
 import { SoundcardPickerComponent } from 'src/app/components/soundcard-picker/soundcard-picker.component';
 import { SUPPORTED_HATS } from 'src/app/constant/hat.constant';
 import { UserPreference } from 'src/app/enum/user-preference.enum';

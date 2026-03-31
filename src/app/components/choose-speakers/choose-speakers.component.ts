@@ -1,8 +1,6 @@
-import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Component, Input, OnInit } from '@angular/core';
-import { FormsModule } from '@angular/forms';
-import { IonicModule, ModalController } from '@ionic/angular';
+import { ModalController } from '@ionic/angular';
 import { first, firstValueFrom } from 'rxjs';
 import { Speaker } from 'src/app/model/speaker.model';
 import { SnapcastService } from 'src/app/services/snapcast.service';
@@ -10,14 +8,8 @@ import { SnapcastService } from 'src/app/services/snapcast.service';
 @Component({
   selector: 'app-choose-speakers',
   templateUrl: './choose-speakers.component.html',
-  styleUrls: ['./choose-speakers.component.scss'],
-  // import ionic module here if needed
-  imports: [
-    IonicModule,
-    FormsModule,
-    CommonModule
-  ],
-  standalone: true
+  styleUrls: ['./choose-speakers.component.scss'],  
+  standalone: false
 })
 export class ChooseSpeakersComponent implements OnInit {
 

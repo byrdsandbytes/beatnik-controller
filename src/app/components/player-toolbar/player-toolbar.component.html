@@ -29,7 +29,7 @@
       </ion-item> -->
         <ng-container *ngFor="let group of state.server.groups">
           <ng-container *ngIf="group.clients[0].connected">
-            <ion-item *ngIf="group.stream_id === stream.id && stream.status=='playing'" lines="none" color="dark">
+            <ion-item *ngIf="group.stream_id === stream.id" lines="none" color="dark">
               <ion-label>
                 <p>
                   <app-client-name [group]="group"></app-client-name>

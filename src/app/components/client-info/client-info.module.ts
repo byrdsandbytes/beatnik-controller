@@ -5,6 +5,7 @@ import { ClientInfoComponent } from './client-info.component';
 import { FormsModule } from '@angular/forms';
 import { CamillaDspModule } from '../camilla-dsp/camilla-dsp.module';
 import { SoundcardPickerModule } from '../soundcard-picker/soundcard-picker.module';
+import { ChooseSpeakersModule } from '../choose-speakers/choose-speakers.module';
 
 
 
@@ -17,7 +18,8 @@ import { SoundcardPickerModule } from '../soundcard-picker/soundcard-picker.modu
     IonicModule,
     FormsModule,
     CamillaDspModule,
-    SoundcardPickerModule
+    SoundcardPickerModule,
+    ChooseSpeakersModule
   ],
   exports: [
     ClientInfoComponent

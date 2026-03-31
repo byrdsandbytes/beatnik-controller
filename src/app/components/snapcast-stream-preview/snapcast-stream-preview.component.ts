@@ -1,5 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { Stream } from 'src/app/model/snapcast.model';
+import { CoverDataService } from 'src/app/services/cover-data.service';
 
 @Component({
   selector: 'app-snapcast-stream-preview',
@@ -10,17 +11,19 @@ import { Stream } from 'src/app/model/snapcast.model';
 export class SnapcastStreamPreviewComponent  implements OnInit {
   @Input() stream?: Stream;
 
-  constructor() { }
+  constructor(
+    private coverDateService: CoverDataService
+  ) { }
 
   ngOnInit() {}
 
   
   convertCoverDataBase64(coverData: string, extension: string): string {
-    if (!coverData) {
-      return '';
-    }
-    // Convert base64 data to a data URL
-    return `data:image/${extension};base64,${coverData}`;
+    return this.coverDateService.convertCoverDataBase64(coverData, extension);
+  }
+
+  onCoverImageError(event: Event): void {
+    this.coverDateService.onCoverImageError(event);
   }
 
 }
