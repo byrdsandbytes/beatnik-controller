@@ -1,8 +1,8 @@
-<ion-content color="dark">
-  <ion-toolbar class="play-toolbar" color="dark">
+<ion-content color="primary">
+  <ion-toolbar class="play-toolbar" color="primary">
     <ng-container *ngIf="(displayState$|async) as state ">
       <ng-container *ngFor="let stream of state.server.streams">
-        <ion-item *ngIf="stream.properties.metadata" class="ion-padding-top" lines="none" color="dark">
+        <ion-item *ngIf="stream.properties.metadata" class="ion-padding-top" lines="none" color="primary">
           <ion-thumbnail slot="start">
             <img [src]="stream.properties.metadata.artData
       ? convertCoverDataBase64(stream.properties.metadata.artData.data, stream.properties.metadata.artData.extension)
@@ -29,7 +29,7 @@
       </ion-item> -->
         <ng-container *ngFor="let group of state.server.groups">
           <ng-container *ngIf="group.clients[0].connected">
-            <ion-item *ngIf="group.stream_id === stream.id" lines="none" color="dark">
+            <ion-item *ngIf="group.stream_id === stream.id" lines="none" color="primary">
               <ion-label>
                 <p>
                   <app-client-name [group]="group"></app-client-name>
