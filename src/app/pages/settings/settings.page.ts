@@ -59,22 +59,47 @@ export class SettingsPage implements OnInit {
   }
 
   async connectToServer() {
-    // disocnnect first if already connected and timeout 2 seconds
     // Logic to connect to the server using the serverUrl
     console.log('Connecting to server at:', this.serverUrl);
 
     // show loading indicator
     const loading = await this.loadingController.create({
-      message: 'Connecting to server...',
+      message: 'Establishing connection to server...',
     });
     await loading.present();
-    const result = await this.snapcastService.connect(this.serverUrl!);
-    timeout(2000);
-    console.log('Connection result:', result);
-    // get serverstaus to verify connection
+
     try {
-      const status = await firstValueFrom(this.snapcastService.getServerStatus());
-      console.log('Successfully connected to server', status);
+      // Disconnect first to clean up any existing or stalled connections
+      if (this.snapcastService.disconnect) {
+        this.snapcastService.disconnect();
+        // Brief delay to ensure cleanup
+        await new Promise(resolve => setTimeout(resolve, 5500));
+      }
+
+      try {
+        const connectionResult = await this.snapcastService.connect(this.serverUrl!);
+        console.log('Connection result:', connectionResult);
+        loading.message = 'Connected to server, verifying status...';
+        await new Promise(resolve => setTimeout(resolve, 5500));
+
+      } catch (error) {
+        console.error('Error during connection attempt:', error);
+        throw error; // Rethrow to be caught by outer catch
+      }
+
+      try {
+        loading.message = 'Retrieving server status...';
+        const status = await firstValueFrom(this.snapcastService.getServerStatus().pipe(timeout(5000)));
+        console.log('Successfully connected to server', status);
+      } catch (error) {
+        console.error('Failed to get server status after connection:', error);
+        throw new Error('Connected to server but failed to retrieve status. Please check the server and try again.');
+      }
+
+      // get server status to verify connection
+      // const status = await firstValueFrom(this.snapcastService.getServerStatus());
+      // console.log('Successfully connected to server', status);
+
       const toast = await this.toastController.create({
         message: 'Successfully connected to server',
         duration: 2000,

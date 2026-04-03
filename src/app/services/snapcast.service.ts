@@ -105,9 +105,10 @@ class JsonRpcSocket {
   constructor(private reconnectIntervalMs: number = 3000) {}
 
   connect(url: string, onOpen?: () => void): void {
+    console.info(`[JsonRpcSocket] Attempting to connect to ${url}...`);
     if (this.ws$ && !this.ws$.closed) return;
 
-    // Clean up previous attempts
+    // // Clean up previous attempts
     this.disconnect(false); 
 
     const config: WebSocketSubjectConfig<SnapcastWebSocketMessage> = {
@@ -139,12 +140,19 @@ class JsonRpcSocket {
     this.socketSubscription = this.ws$.pipe(
       catchError(err => {
         console.error('[JsonRpcSocket] Stream Error', err);
-        // The closeObserver will trigger reconnection logic
+        this.connected$.next(false);
+        this.ws$ = undefined;
+        this.scheduleReconnect(url, onOpen);
         return EMPTY; 
       })
     ).subscribe({
       next: (msg) => this.handleMessage(msg),
-      error: (err) => console.error('[JsonRpcSocket] Fatal Error', err)
+      error: (err) => {
+        console.error('[JsonRpcSocket] Fatal Error', err);
+        this.connected$.next(false);
+        this.ws$ = undefined;
+        this.scheduleReconnect(url, onOpen);
+      }
     });
   }
 
@@ -362,6 +370,11 @@ export class SnapcastService implements OnDestroy {
 
   async connect(host = environment.snapcastServerUrl, port = 1780, overrideUserPreference = false): Promise<void> {
     let finalHost = host;
+    console.log('SnapcastService: Initiating connection...', { host, port, overrideUserPreference });
+
+    // purge any existing connections to ensure clean state
+    this.disconnect();
+    await new Promise(resolve => setTimeout(resolve, 500)); // Brief delay to ensure cleanup
     
     // Check User Preferences
     if (!overrideUserPreference) {
@@ -372,6 +385,7 @@ export class SnapcastService implements OnDestroy {
     const wsUrl = `ws://${finalHost}:${port}/jsonrpc`;
     
     this.socket.connect(wsUrl, () => {
+      console.log('SnapcastService: Successfully connected to', wsUrl);
       // On Connect success:
       this.refreshState();
     });
