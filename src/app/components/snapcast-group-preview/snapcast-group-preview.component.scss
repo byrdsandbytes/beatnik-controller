@@ -8,13 +8,14 @@
         // background-position: top right;
         // background-repeat: no-repeat;
         width: 90%;
-        border-radius: 8px;
+        border-radius: 0px;
         box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.1);
         position: absolute;
         top: 0;
         right: 5%;
         z-index: 1;
         opacity: 0.7;
+        background-color: var(--ion-color-dark);
     }
 
     .img-container{
@@ -42,4 +43,8 @@
         // add filter
         // filter: brightness(1.4);
     }
+}
+
+ion-card{
+    box-shadow: none;
 }

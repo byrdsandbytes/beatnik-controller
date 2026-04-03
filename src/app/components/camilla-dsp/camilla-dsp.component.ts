@@ -1,6 +1,7 @@
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { CamillaDspConfig, MixerSource, SignalLevels } from 'src/app/model/camilla-dsp.model';
+import { BeatnikHardwareService } from 'src/app/services/beatnik-hardware.service';
 import { CamillaDspService, ConnectionStatus } from 'src/app/services/camilla-dsp.service';
 
 @Component({
@@ -21,12 +22,23 @@ export class CamillaDspComponent implements OnInit, OnDestroy {
 
     levels: SignalLevels | null = null;
     currentVolume: number = 0;
+    availableCamillaConfigs: string[] = [];
+    selectedCamillaConfig: string | null = null;
+    currentCamillaConfigFile: string | null = null;
+    isLoadingCamillaConfigs = false;
+    isSavingCamillaConfig = false;
+    camillaConfigMessage = '';
+    camillaConfigError = '';
 
     private levelSubscription: Subscription | undefined;
 
-    constructor(private camillaService: CamillaDspService) { }
+    constructor(
+        private camillaService: CamillaDspService,
+        private beatnikHardwareService: BeatnikHardwareService
+    ) { }
 
     async ngOnInit() {
+        this.loadCamillaConfigState();
         this.connect();
         // Subscribe to connection status changes
         this.subscriptions.add(
@@ -75,6 +87,99 @@ export class CamillaDspComponent implements OnInit, OnDestroy {
         //     this.getCaptureSignalLevels();
 
         // }, 800);
+    }
+
+    private getHardwareHost(): string | null {
+        if (!this.url) {
+            return null;
+        }
+
+        try {
+            return new URL(this.url).hostname;
+        } catch (error) {
+            console.error('Failed to parse CamillaDSP URL for hardware API access:', error);
+            return null;
+        }
+    }
+
+    loadCamillaConfigState() {
+        const host = this.getHardwareHost();
+        if (!host) {
+            this.camillaConfigError = 'Unable to determine device host for CamillaDSP config API.';
+            return;
+        }
+
+        this.isLoadingCamillaConfigs = true;
+        this.camillaConfigError = '';
+        this.camillaConfigMessage = '';
+
+        this.subscriptions.add(
+            this.beatnikHardwareService.getCamillaConfigs(host).subscribe({
+                next: (response) => {
+                    this.availableCamillaConfigs = response.configs ?? [];
+                    this.syncSelectedCamillaConfig();
+                    this.isLoadingCamillaConfigs = false;
+                },
+                error: (error) => {
+                    console.error('Failed to load available CamillaDSP configs:', error);
+                    this.camillaConfigError = 'Failed to load available CamillaDSP configs.';
+                    this.isLoadingCamillaConfigs = false;
+                }
+            })
+        );
+
+        this.subscriptions.add(
+            this.beatnikHardwareService.getDefaultCamillaConfig(host).subscribe({
+                next: (response) => {
+                    this.currentCamillaConfigFile = response.fileName;
+                    this.syncSelectedCamillaConfig();
+                },
+                error: (error) => {
+                    console.error('Failed to load default CamillaDSP config:', error);
+                    this.camillaConfigError = 'Failed to load current default CamillaDSP config.';
+                }
+            })
+        );
+    }
+
+    private syncSelectedCamillaConfig() {
+        if (this.currentCamillaConfigFile && this.availableCamillaConfigs.includes(this.currentCamillaConfigFile)) {
+            this.selectedCamillaConfig = this.currentCamillaConfigFile;
+            return;
+        }
+
+        if (!this.selectedCamillaConfig && this.availableCamillaConfigs.length > 0) {
+            this.selectedCamillaConfig = this.availableCamillaConfigs[0];
+        }
+    }
+
+    saveDefaultCamillaConfig() {
+        const host = this.getHardwareHost();
+
+        if (!host || !this.selectedCamillaConfig) {
+            this.camillaConfigError = 'Please choose a CamillaDSP config before saving.';
+            return;
+        }
+
+        this.isSavingCamillaConfig = true;
+        this.camillaConfigError = '';
+        this.camillaConfigMessage = '';
+
+        this.subscriptions.add(
+            this.beatnikHardwareService.setDefaultCamillaConfig(this.selectedCamillaConfig, host).subscribe({
+                next: (response) => {
+                    this.currentCamillaConfigFile = response.fileName;
+                    this.selectedCamillaConfig = response.fileName;
+                    this.camillaConfigMessage = `Default config set to ${response.fileName}.`;
+                    this.isSavingCamillaConfig = false;
+                },
+                error: (error) => {
+                    console.error('Failed to update default CamillaDSP config:', error);
+                    this.camillaConfigError = error?.error?.error ?? 'Failed to update default CamillaDSP config.';
+                    this.isSavingCamillaConfig = false;
+                }
+            })
+        );
     }
 
 
@@ -169,4 +274,6 @@ export class CamillaDspComponent implements OnInit, OnDestroy {
         console.log('CamillaDspComponent: Leaving page, cleaning up resources if needed');
         this.ngOnDestroy();
     }
+
+   
 }

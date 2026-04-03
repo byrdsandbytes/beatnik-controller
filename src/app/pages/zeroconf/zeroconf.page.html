@@ -33,27 +33,7 @@
 
 
 <ion-content>
-  
-  <!-- <ion-list>
-    <ion-list-header>
-      <ion-label>Discovered Devices</ion-label>
-    </ion-list-header>
 
-    <ion-item *ngFor="let device of foundDevices">
-      <ion-label>
-        <h2>{{ device.name }}</h2>
-        <p>Host: {{ device.hostname }}</p>
-        <p>IP: {{ device.ipv4Addresses[0] }}:{{ device.port }}</p>
-      </ion-label>
-    </ion-item>
-
-    <ion-item *ngIf="isScanning && foundDevices.length === 0">
-      <ion-label class="ion-text-center">
-        <ion-spinner name="crescent"></ion-spinner>
-        <p>Scanning for devices...</p>
-      </ion-label>
-    </ion-item>
-  </ion-list> -->
 
   <div *ngIf="(services$ | async) as services">
     <ion-list>
@@ -64,23 +44,27 @@
       <ion-item *ngIf="services.length === 0 && isScanning">
         <ion-label>Searching for services...</ion-label>
       </ion-item>
-      
+
       <ion-item *ngFor="let service of services">
         <ion-label>
           <h2>{{ service.hostname }}</h2>
           <p>{{ service.name }}</p>
           <p>{{ service.type }}</p>
           <p>{{ service.ipv4Addresses[0] }}:{{ service.port }}</p>
-           <ng-container *ngIf="service.type === SERVICE_BEATNIK">
+          <ng-container *ngIf="service.type === SERVICE_BEATNIK">
             <p>Beatnik Device - MAC: {{ service.txtRecord['mac'] }}</p>
-             <p>Beatnik Pi: {{ service.txtRecord['model'] }}</p>
-             <p>Beatnik Version: {{ service.txtRecord['version'] }}</p>
-             <p>RAM: {{ service.txtRecord['ram'] }}</p>
-           </ng-container>
+            <p>Beatnik Pi: {{ service.txtRecord['model'] }}</p>
+            <p>Beatnik Version: {{ service.txtRecord['version'] }}</p>
+            <p>RAM: {{ service.txtRecord['ram'] }}</p>
+          </ng-container>
         </ion-label>
         <ng-container *ngIf="service.type === SERVICE_BEATNIK">
           <!-- <p>{{service.hostname}}</p> -->
-          <ion-button fill="outline" slot="end" [routerLink]="['/clients', service.txtRecord['mac']]">View Device</ion-button>
+          <ion-button fill="outline" slot="end" [routerLink]="['/clients', service.txtRecord['mac']]">View
+            Device</ion-button>
+        </ng-container>
+        <ng-container *ngIf="service.type === SERVICE_SNAPCAST">
+          <ion-button fill="outline" slot="end" (click)="setAsServer(service)">Set as Server</ion-button>
         </ng-container>
       </ion-item>
     </ion-list>
@@ -96,7 +80,13 @@
         <p>No services found.</p>
       </ion-label>
     </ion-item>
+
   </div>
   <ion-button expand="full" (click)="scanForServices()">Scan for Services</ion-button>
-  
+  <ion-item>
+    <ion-label class="ion-text-center">
+      <p>Note: ZeroConf Scan does not work in Web Browser. iOS and Android only.</p>
+    </ion-label>
+  </ion-item>
+
 </ion-content>

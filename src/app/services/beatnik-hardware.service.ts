@@ -19,12 +19,31 @@ export interface HardwareStatus {
   currentConfig: HatProfile | null;
   detectedHardware: HatProfile | null;
   isMatch: boolean;
+  eepromReadDisabled: boolean;
+  camillaConfigFile: string | null;
 }
 
 export interface ApplyResponse {
   status: string;
   message: string;
   rebootRequired: boolean;
+}
+
+export interface CamillaConfigListResponse {
+  configs: string[];
+}
+
+export interface CamillaDefaultConfigResponse {
+  fileName: string | null;
+}
+
+export interface SetCamillaDefaultConfigRequest {
+  fileName: string;
+}
+
+export interface SetCamillaDefaultConfigResponse {
+  status: string;
+  fileName: string;
 }
 
 @Injectable({
@@ -50,6 +69,30 @@ export class BeatnikHardwareService {
    */
   getStatus(host: string): Observable<HardwareStatus> {
     return this.http.get<HardwareStatus>(`${this.getApiUrl(host)}/status`);
+  }
+
+  /**
+   * Get all available CamillaDSP config files
+   */
+  getCamillaConfigs(host: string): Observable<CamillaConfigListResponse> {
+    return this.http.get<CamillaConfigListResponse>(`${this.getApiUrl(host)}/camilla/configs`);
+  }
+
+  /**
+   * Get the active default CamillaDSP config file
+   */
+  getDefaultCamillaConfig(host: string): Observable<CamillaDefaultConfigResponse> {
+    return this.http.get<CamillaDefaultConfigResponse>(`${this.getApiUrl(host)}/camilla/configs/default`);
+  }
+
+  /**
+   * Set the default CamillaDSP config file
+   */
+  setDefaultCamillaConfig(fileName: string, host: string): Observable<SetCamillaDefaultConfigResponse> {
+    return this.http.put<SetCamillaDefaultConfigResponse>(
+      `${this.getApiUrl(host)}/camilla/configs/default`,
+      { fileName } satisfies SetCamillaDefaultConfigRequest
+    );
   }
 
   /**

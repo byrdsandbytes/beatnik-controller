@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Observable } from 'rxjs';
 import { SnapcastWebsocketNotification } from 'src/app/model/snapcast-websocket-notification.model';
 import { SnapCastServerStatusResponse } from 'src/app/model/snapcast.model';
+import { CoverDataService } from 'src/app/services/cover-data.service';
 import { SnapcastService } from 'src/app/services/snapcast.service';
 
 @Component({
@@ -15,6 +16,7 @@ export class StreamsPage implements OnInit {
 
   constructor(
     private readonly snapcastService: SnapcastService,
+    private readonly coverDateService: CoverDataService
   ) { }
 
   ngOnInit() {
@@ -22,7 +24,11 @@ export class StreamsPage implements OnInit {
   }
 
   convertBase64ToImage(base64String: string, format: string): string {
-    return `data:image/${format};base64,${base64String}`;
+    return this.coverDateService.convertCoverDataBase64(base64String, format);
+  }
+
+  onCoverImageError(event: Event): void {
+    this.coverDateService.onCoverImageError(event);
   }
 
 }

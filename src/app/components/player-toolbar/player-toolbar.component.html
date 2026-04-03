@@ -1,18 +1,20 @@
 <ion-content color="dark">
-<ion-toolbar class="play-toolbar" color="dark">
-  <ng-container *ngIf="(displayState$|async) as state ">
-    <ng-container *ngFor="let stream of state.server.streams">
-      <ion-item *ngIf="stream.properties.metadata" class="ion-padding-top"  lines="none" color="dark">
-        <ion-thumbnail slot="start">
-          <img *ngIf="stream.properties.metadata.artData as artData" [src]="convertCoverDataBase64(artData.data, artData.extension)" alt="cover image">
-        </ion-thumbnail>
-        <ion-label *ngIf="stream.properties.metadata">
-          <p>{{stream.id}}</p>
-          <h2> {{ stream.properties.metadata.title }}</h2>
-          <p>{{ stream.properties.metadata.artist }}</p>
+  <ion-toolbar class="play-toolbar" color="dark">
+    <ng-container *ngIf="(displayState$|async) as state ">
+      <ng-container *ngFor="let stream of state.server.streams">
+        <ion-item *ngIf="stream.properties.metadata" class="ion-padding-top" lines="none" color="dark">
+          <ion-thumbnail slot="start">
+            <img [src]="stream.properties.metadata.artData
+      ? convertCoverDataBase64(stream.properties.metadata.artData.data, stream.properties.metadata.artData.extension)
+      : 'assets/images/cover-fallback.png'" (error)="onCoverImageError($event)" alt="cover image">
+          </ion-thumbnail>
+          <ion-label *ngIf="stream.properties.metadata">
+            <p>{{stream.id}}</p>
+            <h2> {{ stream.properties.metadata.title }}</h2>
+            <p>{{ stream.properties.metadata.artist }}</p>
 
-        </ion-label>
-        <!-- <ion-button *ngIf="stream.properties.canControl" class="round-button" (click)="pauseStream(stream.id)">
+          </ion-label>
+          <!-- <ion-button *ngIf="stream.properties.canControl" class="round-button" (click)="pauseStream(stream.id)">
           <ng-container [ngSwitch]="stream.status">
             <ion-icon *ngSwitchCase="'playing'" slot="icon-only" name="pause"></ion-icon>
             <ion-icon *ngSwitchCase="'idle'" slot="icon-only" name="play"></ion-icon>
@@ -20,36 +22,39 @@
         </ion-button> -->
 
 
-      </ion-item>
-      <!-- <ion-item *ngIf="stream.properties.metadata && stream.status=='playing'" color="dark" lines="none">
+        </ion-item>
+        <!-- <ion-item *ngIf="stream.properties.metadata && stream.status=='playing'" color="dark" lines="none">
         <app-snapcast-stream-volume-control class="stream-range" (streamVolumeChange)="streamVolumeChanged()"
           [stream]="stream" [groups]="state.server.groups "></app-snapcast-stream-volume-control>
       </ion-item> -->
-      <ng-container *ngFor="let group of state.server.groups">
-        <ng-container *ngIf="group.clients[0].connected">
-          <ion-item *ngIf="group.stream_id === stream.id && stream.status=='playing'" lines="none" color="dark">
-            <ion-label>
-              <p>{{ group.name || group.id }}</p>
-              <p>Clients: {{ group.clients.length }}</p>
-              <ng-container *ngFor="let client of group.clients">
-                <ion-range *ngIf="client.config.volume" color="light" min="0" max="100" step="1"
-                  [ngModel]="client.config.volume.percent" (ionKnobMoveStart)="knobMoveStartEvent($event)" (ionKnobMoveEnd)="knobMoveEndEvent($event)" (ionInput)="changeVolumeForClient(client, $event)">
-                  <ion-icon slot="start" size="small" name="volume-mute"></ion-icon>
-                  <ion-icon slot="end" size="small" name="volume-high"></ion-icon>
-                </ion-range>
-              </ng-container>
+        <ng-container *ngFor="let group of state.server.groups">
+          <ng-container *ngIf="group.clients[0].connected">
+            <ion-item *ngIf="group.stream_id === stream.id" lines="none" color="dark">
+              <ion-label>
+                <p>
+                  <app-client-name [group]="group"></app-client-name>
+                </p>
+                <p>Clients: {{ group.clients.length }}</p>
+                <ng-container *ngFor="let client of group.clients">
+                  <ion-range *ngIf="client.config.volume" color="light" min="0" max="100" step="1"
+                    [ngModel]="client.config.volume.percent" (ionKnobMoveStart)="knobMoveStartEvent($event)"
+                    (ionKnobMoveEnd)="knobMoveEndEvent($event)" (ionInput)="changeVolumeForClient(client, $event)">
+                    <ion-icon slot="start" size="small" name="volume-mute"></ion-icon>
+                    <ion-icon slot="end" size="small" name="volume-high"></ion-icon>
+                  </ion-range>
+                </ng-container>
 
-            </ion-label>
-          </ion-item>
+              </ion-label>
+            </ion-item>
+          </ng-container>
+
         </ng-container>
-
       </ng-container>
     </ng-container>
-  </ng-container>
 
-  <div class="spacer">
-    
-  </div>
+    <div class="spacer">
 
-</ion-toolbar>
+    </div>
+
+  </ion-toolbar>
 </ion-content>

@@ -10,6 +10,7 @@ import { CamillaDspService } from 'src/app/services/camilla-dsp.service';
 import { SnapcastService } from 'src/app/services/snapcast.service';
 import { SoundcardPickerComponent } from '../soundcard-picker/soundcard-picker.component';
 import { AlertController, ModalController } from '@ionic/angular';
+import { ChooseSpeakersComponent } from '../choose-speakers/choose-speakers.component';
 
 @Component({
   selector: 'app-client-info',
@@ -43,7 +44,10 @@ export class ClientInfoComponent implements OnInit {
     this.serverState = this.snapcastService.state$;
     this.camillaDspUrl = await this.getCamillaDspUrl();
     this.getHardwareInfo();
+    this.refreshSnapcastStatus();
   }
+
+
 
 
   async getCamillaDspUrl(): Promise<string> {
@@ -233,7 +237,7 @@ export class ClientInfoComponent implements OnInit {
     }
   }
 
-   async refreshSnapcastStatus() {
+  async refreshSnapcastStatus() {
     if (!this.client) {
       console.error('Client Info Component: No client available to refresh Snapcast status');
       return;
@@ -248,6 +252,42 @@ export class ClientInfoComponent implements OnInit {
     }
   }
 
+  rebootDevice() {
+    if (!this.client) {
+      console.error('Client Info Component: No client available to reboot');
+      return;
+    }
+    const localHostName = this.client.host.name + '.local';
+    this.beatnikHardwareService.reboot(localHostName).subscribe({
+      next: () => {
+        console.log(`Client Info Component: Successfully triggered reboot for client ${this.client?.id}`);
+      },
+      error: (err) => {
+        console.error(`Client Info Component: Failed to trigger reboot for client ${this.client?.id}`, err);
+      }
+    });
+  }
 
 
+  async chooseSpeakers() {
+    console.log('Client Info Component: Opening speaker selection for client:', this.client?.id);
+    const modal = await this.modalController.create({
+      component: ChooseSpeakersComponent,
+      id: 'choose-speakers-modal',
+      componentProps: {
+        clientId: this.client?.id
+      }
+    });
+    await modal.present();
+
+    const { data } = await modal.onDidDismiss();
+    if (data && data.selectedId) {
+      console.log('Client Info Component: Speaker selected:', data.selectedId);
+    } else {
+      console.log('Client Info Component: Speaker selection cancelled or no selection made');
+    }
+  }
 }
+
+
+

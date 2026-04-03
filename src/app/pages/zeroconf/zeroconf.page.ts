@@ -2,6 +2,9 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Observable } from 'rxjs';
 import { ZeroConf, ZeroConfService as ZeroConfServiceModel } from 'capacitor-zeroconf';
 import { ZeroconfService } from '../../services/zero-conf.service';
+import { Preferences } from '@capacitor/preferences';
+import { UserPreference } from '../../enum/user-preference.enum';
+import { AlertController } from '@ionic/angular';
 
 
 @Component({
@@ -16,7 +19,10 @@ export class ZeroconfPage implements OnDestroy {
   readonly SERVICE_BEATNIK = '_beatnik._tcp.';
   isScanning = false;
 
-  constructor(private zeroconf: ZeroconfService) {
+
+  constructor(private zeroconf: ZeroconfService,
+    private alertController: AlertController
+  ) {
     this.services$ = this.zeroconf.services$;
   }
 
@@ -27,7 +33,7 @@ export class ZeroconfPage implements OnDestroy {
   async scanForServices(): Promise<void> {
     this.isScanning = true;
     try {
-     
+
       await this.zeroconf.watch(this.SERVICE_SNAPCAST);
       console.log(`Started scanning for services of type: ${this.SERVICE_SNAPCAST}`);
       await this.zeroconf.watch(this.SERVICE_BEATNIK);
@@ -57,6 +63,37 @@ export class ZeroconfPage implements OnDestroy {
     }
   }
 
+  async setAsServer(service: ZeroConfServiceModel): Promise<void> {
+    const alert = await this.alertController.create({
+      header: 'Set Snapcast Server',
+      message: `Do you want to set ${service.name} as the Snapcast server?`,
+      buttons: [
+        {
+          text: 'Cancel',
+          role: 'cancel'
+        },
+        {
+          text: 'Set as Server',
+          handler: async () => {
+             await this.saveServerUrl(service);
+          }
+        }
+      ]
+    });
+
+    await alert.present();
+  }
+
+  private async saveServerUrl(service: ZeroConfServiceModel): Promise<void> {
+    const url = service.ipv4Addresses[0];
+    await Preferences.set({
+      key: UserPreference.SERVER_URL,
+      value: url,
+    });
+    console.log('Server URL set to:', url); 
+
+  }
+
   // Example of publishing a service
   // this.zeroconf.publish({
   //   type: '_my-app._tcp.',
@@ -69,4 +106,6 @@ export class ZeroconfPage implements OnDestroy {
   ngOnDestroy() {
     this.stopScan();
   }
+
+
 }

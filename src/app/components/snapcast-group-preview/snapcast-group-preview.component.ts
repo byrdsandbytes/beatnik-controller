@@ -2,6 +2,7 @@ import { Component, Input, OnChanges, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { Group, Stream } from 'src/app/model/snapcast.model';
 import { Speaker } from 'src/app/model/speaker.model';
+import { CoverDataService } from 'src/app/services/cover-data.service';
 
 @Component({
   selector: 'app-snapcast-group-preview',
@@ -9,7 +10,7 @@ import { Speaker } from 'src/app/model/speaker.model';
   styleUrls: ['./snapcast-group-preview.component.scss'],
   standalone: false
 })
-export class SnapcastGroupPreviewComponent  implements OnInit, OnChanges {
+export class SnapcastGroupPreviewComponent implements OnInit, OnChanges {
 
   @Input() group?: Group;
   @Input() streams?: Stream[] | null;
@@ -19,7 +20,8 @@ export class SnapcastGroupPreviewComponent  implements OnInit, OnChanges {
   activeSpeaker?: Speaker;
 
   constructor(
-    private router: Router
+    private router: Router,
+    private coverDateService: CoverDataService
   ) { }
 
   ngOnInit() {
@@ -64,13 +66,15 @@ export class SnapcastGroupPreviewComponent  implements OnInit, OnChanges {
     }
   }
 
-  convertCoverDataBase64(coverData: string, extension: string): string {
-    if (!coverData) {
-      return '';
-    }
-    // Convert base64 data to a data URL
-    return `data:image/${extension};base64,${coverData}`;
+   convertCoverDataBase64(coverData: string, extension: string): string {
+    return this.coverDateService.convertCoverDataBase64(coverData, extension);
   }
+
+   onCoverImageError(event: Event): void {
+    this.coverDateService.onCoverImageError(event);
+  }
+
+ 
 
   getActiveSpeaker(): Speaker | undefined {
     if (!this.group || !this.speakerData) {
