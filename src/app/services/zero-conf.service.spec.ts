@@ -1,13 +1,13 @@
 import { TestBed } from '@angular/core/testing';
 
-import { ZeroConfService } from './zero-conf.service';
+import { ZeroconfService } from './zero-conf.service';
 
-describe('ZeroConfService', () => {
-  let service: ZeroConfService;
+describe('ZeroconfService', () => {
+  let service: ZeroconfService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({});
-    service = TestBed.inject(ZeroConfService);
+    service = TestBed.inject(ZeroconfService);
   });
 
   it('should be created', () => {
