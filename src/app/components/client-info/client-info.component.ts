@@ -6,6 +6,7 @@ import { UserPreference } from 'src/app/enum/user-preference.enum';
 import { SnapCastServerStatusResponse, Client } from 'src/app/model/snapcast.model';
 import { BeatnikHardwareService, HardwareStatus } from 'src/app/services/beatnik-hardware.service';
 import { BeatnikSnapcastService, SnapcastActionResponse } from 'src/app/services/beatnik-snapcast.service';
+import { BeatnikSystemService } from 'src/app/services/beatnik-system.service';
 import { CamillaDspService } from 'src/app/services/camilla-dsp.service';
 import { SnapcastService } from 'src/app/services/snapcast.service';
 import { SoundcardPickerComponent } from '../soundcard-picker/soundcard-picker.component';
@@ -36,6 +37,7 @@ export class ClientInfoComponent implements OnInit {
     private modalController: ModalController,
     private beatnikHardwareService: BeatnikHardwareService,
     private beatnikSnapcastService: BeatnikSnapcastService,
+    private beatnikSystemService: BeatnikSystemService,
     private camillaService: CamillaDspService,
     private alertController: AlertController
   ) { }
@@ -286,6 +288,51 @@ export class ClientInfoComponent implements OnInit {
     } else {
       console.log('Client Info Component: Speaker selection cancelled or no selection made');
     }
+  }
+
+  async testGetSystemInfo() {
+    if (!this.client) return;
+    const localHostName = await this.getUrl();
+    this.beatnikSystemService.getInfo(localHostName).subscribe({
+      next: (info) => console.log('System Info:', info),
+      error: (err) => console.error('Failed to get system info:', err)
+    });
+  }
+
+  async testLedSetColor() {
+    if (!this.client) return;
+    const localHostName = await this.getUrl();
+    this.beatnikSystemService.setLedState({ command: 'set_color', params: { r: 1, g: 0, b: 0 } }, localHostName).subscribe({
+      next: (res) => console.log('LED Set Color:', res),
+      error: (err) => console.error('Failed to set LED color:', err)
+    });
+  }
+
+  async testLedPulse() {
+    if (!this.client) return;
+    const localHostName = await this.getUrl();
+    this.beatnikSystemService.setLedState({ command: 'pulse', params: { on_color: [0, 1, 0], off_color: [0, 0, 1], fade_in: 1, fade_out: 1 } }, localHostName).subscribe({
+      next: (res) => console.log('LED Pulse:', res),
+      error: (err) => console.error('Failed to pulse LED:', err)
+    });
+  }
+
+  async testLedBlink() {
+    if (!this.client) return;
+    const localHostName = await this.getUrl();
+    this.beatnikSystemService.setLedState({ command: 'blink', params: { color: [1, 1, 0], on_time: 0.5, off_time: 0.5 } }, localHostName).subscribe({
+      next: (res) => console.log('LED Blink:', res),
+      error: (err) => console.error('Failed to blink LED:', err)
+    });
+  }
+
+  async testLedOff() {
+    if (!this.client) return;
+    const localHostName = await this.getUrl();
+    this.beatnikSystemService.setLedState({ command: 'off' }, localHostName).subscribe({
+      next: (res) => console.log('LED Off:', res),
+      error: (err) => console.error('Failed to turn off LED:', err)
+    });
   }
 }
 
