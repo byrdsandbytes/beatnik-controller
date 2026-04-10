@@ -185,8 +185,16 @@ export class PlayerToolbarComponent implements OnInit, OnChanges, OnDestroy {
     this.coverDateService.onCoverImageError(event);
   }
 
+  trackByStream(index: number, stream: Stream): string {
+    return stream.id;
+  }
 
+  trackByGroup(index: number, group: Group): string {
+    return group.id;
+  }
 
-
+  trackByClient(index: number, client: Client): string {
+    return client.id;
+  }
 
 }
