@@ -3,7 +3,7 @@
     <ion-buttons slot="start">
       <ion-back-button defaultHref="/tabs"></ion-back-button>
     </ion-buttons>
-    <ion-title>volume-presets</ion-title>
+    <ion-title>Volume Presets</ion-title>
   </ion-toolbar>
 </ion-header>
 
@@ -13,37 +13,58 @@
       <ion-title size="large">Volume Presets</ion-title>
     </ion-toolbar>
   </ion-header>
-  <ng-container>
-    <ion-list-header>
-      Existin Presets
-    </ion-list-header>
-    <!-- swipable item with options  -->
-     <ion-card *ngFor="let preset of existingPresets" color="primary" (click)="applyPreset(preset)">
-    <ion-item-sliding >
-      <ion-item color="primary">
-          <ion-card-header>
-            <ion-card-title>{{preset.presetName}}</ion-card-title>
-            <ion-card-subtitle>
-              {{preset.presetDescription}}
-            </ion-card-subtitle>
-          </ion-card-header>
-          <ion-card-content>
-          </ion-card-content>
-      </ion-item>
-      <ion-item-options side="end">
-        <ion-item-option color="danger" (click)="deletePreset(preset)">
-          <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
-        </ion-item-option>
-      </ion-item-options>
-      <ion-item-options side="start">
-        <ion-item-option color="success" (click)="editPreset(preset)">
-          <ion-icon slot="icon-only" name="pencil-outline"></ion-icon>
-        </ion-item-option>
-      </ion-item-options>
-    </ion-item-sliding>
-    </ion-card>
-    
-  </ng-container>
 
-  <ion-button expand="block" routerLink="/volume-preset-edit">Create / Capture Preset</ion-button>
+  <!-- Empty State -->
+  <div class="empty-state" *ngIf="existingPresets.length === 0" style="text-align: center; margin-top: 40px; padding: 20px;">
+    <ion-icon name="options-outline" style="font-size: 64px; color: var(--ion-color-medium);"></ion-icon>
+    <h2 style="color: var(--ion-color-medium); margin-top: 16px; font-weight: 600;">No Presets Yet</h2>
+    <p style="color: var(--ion-color-medium);">Create a volume preset to quickly recall your group levels.</p>
+  </div>
+
+  <!-- Presets List -->
+  <ng-container *ngIf="existingPresets.length > 0">
+    <div style="padding: 16px 16px 8px 16px;">
+      <ion-note color="medium" style="font-size: 0.95em; display: block; line-height: 1.4;">
+        Apply your saved volume levels across all groups with a single tap. Swipe left to edit or delete a preset.
+      </ion-note>
+    </div>
+
+    <ion-list-header style="margin-top: 0; min-height: 36px; padding-top: 4px;">
+      <ion-label>Saved Presets</ion-label>
+    </ion-list-header>
+
+    <!-- Swipable item with options -->
+    <ion-card *ngFor="let preset of existingPresets" color="primary" style="margin-top: 8px; margin-bottom: 12px;">
+      <ion-item-sliding>
+        <ion-item color="primary" button (click)="applyPreset(preset)" detail="false" lines="none">
+          <ion-icon slot="start" name="options-outline"></ion-icon>
+          <ion-label>
+            <h2 style="font-weight: 600; font-size: 1.1em;">{{preset.presetName}}</h2>
+            <p *ngIf="preset.presetDescription" style="color: rgba(255, 255, 255, 0.75);">{{preset.presetDescription}}</p>
+          </ion-label>
+        </ion-item>
+
+        <ion-item-options side="end">
+          <ion-item-option color="danger" (click)="deletePreset(preset)">
+            <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
+          </ion-item-option>
+        </ion-item-options>
+        
+        <ion-item-options side="start">
+          <ion-item-option color="success" (click)="editPreset(preset)">
+            <ion-icon slot="icon-only" name="pencil-outline"></ion-icon>
+          </ion-item-option>
+        </ion-item-options>
+      </ion-item-sliding>
+    </ion-card>
+  </ng-container>
 </ion-content>
+
+<ion-footer class="ion-no-border">
+  <ion-toolbar>
+    <ion-button expand="block" shape="round" style="margin: 8px 16px 16px 16px;" routerLink="/volume-preset-edit">
+      <ion-icon slot="start" name="add-circle-outline"></ion-icon>
+      Create / Capture Preset
+    </ion-button>
+  </ion-toolbar>
+</ion-footer>
