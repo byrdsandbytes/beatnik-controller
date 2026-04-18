@@ -1,7 +1,9 @@
 import { Component, OnInit } from '@angular/core';
-import { AlertController } from '@ionic/angular';
+import { Router } from '@angular/router';
+import { ToastController } from '@ionic/angular';
+import { Haptics, ImpactStyle } from '@capacitor/haptics';
 import { VolumePresetsService } from '../../services/volume-presets.service';
-import { VolumePreset, VolumePresetData } from '../../model/volume-presets.model';
+import { VolumePreset } from '../../model/volume-presets.model';
 
 @Component({
   selector: 'app-volume-presets',
@@ -11,79 +13,19 @@ import { VolumePreset, VolumePresetData } from '../../model/volume-presets.model
 })
 export class VolumePresetsPage implements OnInit {
   
-
-  caputredPreset: VolumePreset = { presetName: '', data: [] };
-
   existingPresets: VolumePreset[] = [];
 
   constructor(
     private volumePresetsService: VolumePresetsService,
-    private alertController: AlertController,
+    private router: Router,
+    private toastController: ToastController,
   ) { }
 
-  async ngOnInit() {
+  ngOnInit() {
+  }
+
+  async ionViewWillEnter() {
     await this.loadPresetFromUserPreferences();
-  }
-
-  async capturePreset() {
-    const preset = await this.volumePresetsService.capturePreset();
-    if (preset) {
-      console.log('Captured Volume Preset:', preset);
-      this.caputredPreset = preset;
-    }
-  }
-
-  async savePresetInUserPreferences() {
-    const name = await this.promtNameAlert();
-    if (!name) {
-      console.warn('VolumePresetsPage: Preset name is required to save preset');
-      return;
-    }
-    this.caputredPreset.presetName = name.presetName;
-    this.caputredPreset.presetDescription = name.presetDescription || '';
-    
-    try {
-      this.existingPresets = await this.volumePresetsService.savePreset(this.caputredPreset);
-      console.log('Volume preset saved to user preferences');
-      this.caputredPreset = { presetName: '', presetDescription: '', data: [] }; // Clear the captured preset after saving
-    } catch (error) {
-      console.error('VolumePresetsPage: Failed to save preset', error);
-    }
-  }
-
-  async promtNameAlert(): Promise<{presetName: string, presetDescription?: string} | null> {
-    const alert = await this.alertController.create({
-      header: 'Save Volume Preset',
-      inputs: [
-        {
-          name: 'presetName',
-          type: 'text',
-          placeholder: 'Enter preset name'
-        },
-        {
-          name: 'presetDescription',
-          type: 'text',
-          placeholder: 'Enter preset description (optional)'
-        }
-      ],
-      buttons: [
-        {
-          text: 'Cancel',
-          role: 'cancel'
-        },
-        {
-          text: 'Save',
-          handler: (data: any) => {
-            this.caputredPreset.presetDescription = data.presetDescription || '';
-            return { presetName: data.presetName, presetDescription: data.presetDescription };
-          }
-        }
-      ]
-    });
-
-    await alert.present();
-    const { data } = await alert.onDidDismiss();
-    return data?.values || null;
   }
 
   async loadPresetFromUserPreferences() {
@@ -92,7 +34,35 @@ export class VolumePresetsPage implements OnInit {
   }
 
   async applyPreset(preset: VolumePreset) {
-    await this.volumePresetsService.applyPreset(preset);
+    try {
+      await this.volumePresetsService.applyPreset(preset);
+      
+      await Haptics.impact({ style: ImpactStyle.Light });
+      
+      const toast = await this.toastController.create({
+        message: `Preset "${preset.presetName}" applied`,
+        duration: 2000,
+        position: 'bottom',
+        color: 'success',
+        icon: 'checkmark-circle-outline'
+      });
+      await toast.present();
+    } catch (error) {
+      console.error('Failed to apply preset', error);
+      
+      const errorToast = await this.toastController.create({
+        message: `Failed to apply preset "${preset.presetName}"`,
+        duration: 3000,
+        position: 'bottom',
+        color: 'danger',
+        icon: 'alert-circle-outline'
+      });
+      await errorToast.present();
+    }
+  }
+
+  editPreset(preset: VolumePreset) {
+    this.router.navigate(['/volume-preset-edit'], { state: { preset } });
   }
 
   async deletePreset(preset: VolumePreset) {

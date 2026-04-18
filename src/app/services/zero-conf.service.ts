@@ -11,7 +11,7 @@ import { distinctUntilChanged, scan } from 'rxjs/operators';
 })
 export class ZeroconfService implements OnDestroy {
   private readonly servicesSubject = new BehaviorSubject<ZeroConfService[]>([]);
-  
+
   // Expose the list of services as an observable
   public readonly services$: Observable<ZeroConfService[]> = this.servicesSubject.asObservable();
 
@@ -19,7 +19,8 @@ export class ZeroconfService implements OnDestroy {
     // Listen for discovery events and update the services list
     ZeroConf.addListener('discover', (result: any) => {
       this.ngZone.run(() => {
-        console.log('[ZeroConf] Discover event:', result);
+        // Force the object into a readable string for Capacitor's console
+        console.log('[ZeroConf] Discover event:', JSON.stringify(result, null, 2));
         this.handleDiscoveryEvent(result);
       });
     });
@@ -28,7 +29,7 @@ export class ZeroconfService implements OnDestroy {
   private handleDiscoveryEvent(result: ZeroConfWatchResult) {
     const currentServices = this.servicesSubject.getValue();
     const service = result.service;
-    
+
     switch (result.action) {
       case 'added':
         // The service has been discovered but not yet resolved.
@@ -60,6 +61,16 @@ export class ZeroconfService implements OnDestroy {
     this.servicesSubject.next([]);
     console.log(`[ZeroConf] Watching for type: ${type}`);
     await ZeroConf.watch({ type, domain });
+  }
+
+  // Start watching for multiple service types
+  async watchMultiple(types: string[], domain = 'local.') {
+    this.servicesSubject.next([]);
+    const promises = types.map(type => {
+      console.log(`[ZeroConf] Watching for type: ${type}`);
+      return ZeroConf.watch({ type, domain });
+    });
+    await Promise.all(promises);
   }
 
   // Publish a new service

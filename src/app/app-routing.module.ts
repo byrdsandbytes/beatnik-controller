@@ -94,6 +94,10 @@ const routes: Routes = [
     path: 'volume-presets',
     loadChildren: () => import('./pages/volume-presets/volume-presets.module').then( m => m.VolumePresetsPageModule)
   },
+  {
+    path: 'volume-preset-edit',
+    loadChildren: () => import('./pages/volume-preset-edit/volume-preset-edit.module').then( m => m.VolumePresetEditPageModule)
+  },
 
 
 ];

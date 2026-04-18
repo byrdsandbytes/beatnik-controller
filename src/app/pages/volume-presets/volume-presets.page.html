@@ -36,7 +36,7 @@
         </ion-item-option>
       </ion-item-options>
       <ion-item-options side="start">
-        <ion-item-option color="success">
+        <ion-item-option color="success" (click)="editPreset(preset)">
           <ion-icon slot="icon-only" name="pencil-outline"></ion-icon>
         </ion-item-option>
       </ion-item-options>
@@ -45,31 +45,5 @@
     
   </ng-container>
 
-
-
-  <ng-container *ngIf="caputredPreset">
-
-    <ion-list-header>
-      {{caputredPreset.presetName}}
-
-
-    </ion-list-header>
-    <ion-card *ngFor="let preset of caputredPreset.data">
-      <ion-card-header>
-        <ion-card-subtitle>
-          Group: {{ preset.groupName }} ({{preset.clientId}})
-        </ion-card-subtitle>
-      </ion-card-header>
-      <ion-card-content>
-        <ion-item>
-          <ion-label slot="start">Volume: </ion-label>
-          <ion-input type="number" slot="end" [(ngModel)]="preset.volumePercent"> </ion-input>
-          <ion-label slot="end">%</ion-label>
-        </ion-item>
-      </ion-card-content>
-    </ion-card>
-  </ng-container>
-
-  <ion-button expand="block" (click)="savePresetInUserPreferences()">Save Preset</ion-button>
-  <ion-button expand="block" (click)="capturePreset()">Capture Preset</ion-button>
+  <ion-button expand="block" routerLink="/volume-preset-edit">Create / Capture Preset</ion-button>
 </ion-content>
