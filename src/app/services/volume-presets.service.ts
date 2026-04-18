@@ -58,7 +58,7 @@ export class VolumePresetsService {
   async applyPreset(preset: VolumePreset): Promise<void> {
     for (const client of preset.data) {
       try {
-        await this.snapcastService.setClientVolumePercent(client.clientId, client.volumePercent).toPromise();
+        await this.snapcastService.smoothClientVolumeTransition(client.clientId, client.volumePercent).toPromise();
         console.log(`Applied volume ${client.volumePercent}% to client ${client.clientId}`);
       } catch (error) {
         console.error(`VolumePresetsService: Failed to apply volume for client ${client.clientId}`, error);

@@ -423,6 +423,78 @@ export class SnapcastService implements OnDestroy {
     return this.socket.request('Client.SetVolume', { id, volume });
   }
 
+  /**
+   * Smoothly transitions the volume from the current level to a target percentage.
+   * This sends multiple requests incrementally spaced apart so the Server doesn't get flooded.
+   */
+  public smoothClientVolumeTransition(id: string, targetPercent: number, durationMs: number = 800): Observable<void> {
+    return new Observable<void>((subscriber) => {
+      if (targetPercent < 0 || targetPercent > 100) {
+        subscriber.error(new Error('Target volume must be 0-100'));
+        return () => {};
+      }
+
+      const client = this.findClientInState(id);
+      if (!client) {
+        subscriber.error(new Error(`Client ${id} not found locally`));
+        return () => {};
+      }
+
+      const startPercent = client.config.volume.percent;
+      const difference = targetPercent - startPercent;
+      
+      // If we are already there, just complete.
+      if (difference === 0) {
+        subscriber.next();
+        subscriber.complete();
+        return () => {};
+      }
+
+      // Time per step to avoid flooding the websocket (e.g., 50ms)
+      const stepIntervalMs = 50; 
+      const totalSteps = Math.max(1, Math.floor(durationMs / stepIntervalMs));
+      const stepPercent = difference / totalSteps;
+      
+      let currentStep = 0;
+      let subscription: Subscription | null = null;
+      let timeoutId: any;
+
+      const performStep = () => {
+        currentStep++;
+        
+        let nextPercent = startPercent + (stepPercent * currentStep);
+        
+        // Snap to exactly the target level on the last step
+        if (currentStep >= totalSteps) {
+          nextPercent = targetPercent;
+        }
+
+        // Send the request
+        subscription = this.setClientVolumePercent(id, Math.round(nextPercent)).subscribe({
+          next: () => {
+            if (currentStep < totalSteps) {
+               // Schedule next step
+               timeoutId = setTimeout(performStep, stepIntervalMs);
+            } else {
+               subscriber.next();
+               subscriber.complete();
+            }
+          },
+          error: (err) => subscriber.error(err)
+        });
+      };
+
+      // Kick off the first step
+      performStep();
+
+      // Clean up if the user unsubscribes midway through
+      return () => {
+        if (timeoutId) clearTimeout(timeoutId);
+        if (subscription) subscription.unsubscribe();
+      };
+    });
+  }
+
   public setClientName(id: string, name: string) {
     return this.socket.request('Client.SetName', { id, name });
   }
