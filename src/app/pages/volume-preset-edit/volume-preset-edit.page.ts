@@ -11,7 +11,7 @@ import { VolumePreset } from '../../model/volume-presets.model';
   standalone: false
 })
 export class VolumePresetEditPage implements OnInit {
-  caputredPreset: VolumePreset = { presetName: '', data: [] };
+  caputredPreset: VolumePreset = { id: crypto.randomUUID(), presetName: '', data: [] };
   isEditMode: boolean = false;
   originalPresetName: string = '';
 
@@ -65,11 +65,6 @@ export class VolumePresetEditPage implements OnInit {
       }
       this.caputredPreset.presetName = confirmState.presetName;
       this.caputredPreset.presetDescription = confirmState.presetDescription || '';
-      
-      // If we renamed it, we should probably delete the old one first
-      if (this.originalPresetName !== this.caputredPreset.presetName) {
-        await this.volumePresetsService.deletePreset({ presetName: this.originalPresetName, data: [] });
-      }
     }
     
     try {
