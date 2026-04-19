@@ -27,7 +27,7 @@
     </ion-header>
     <div class="fab-row row jsutify-content-center align-items-center">
       <div class="col col-4 col-lg-2 fab-container">
-        <ion-fab-button class="custom-fab-button" color="light" (click)="openModal()">
+        <ion-fab-button class="custom-fab-button" color="light" routerLink="/volume-presets">
           <ion-icon [name]="numberOfPlayingClients>0?'volume-high':'volume-high-outline'"></ion-icon>
         </ion-fab-button>
         <div class="fab-label">{{numberOfPlayingClients +"/"+ totalClients}} Client(s) playing</div>

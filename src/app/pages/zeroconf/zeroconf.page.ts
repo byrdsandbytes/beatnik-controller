@@ -33,11 +33,8 @@ export class ZeroconfPage implements OnDestroy {
   async scanForServices(): Promise<void> {
     this.isScanning = true;
     try {
-
-      await this.zeroconf.watch(this.SERVICE_SNAPCAST);
-      console.log(`Started scanning for services of type: ${this.SERVICE_SNAPCAST}`);
-      await this.zeroconf.watch(this.SERVICE_BEATNIK);
-      console.log(`Started scanning for services of type: ${this.SERVICE_BEATNIK}`);
+      await this.zeroconf.watchMultiple([this.SERVICE_SNAPCAST, this.SERVICE_BEATNIK]);
+      console.log(`Started scanning for services of types: ${this.SERVICE_SNAPCAST}, ${this.SERVICE_BEATNIK}`);
     }
     catch (error) {
       console.error('Error starting service scan:', error);

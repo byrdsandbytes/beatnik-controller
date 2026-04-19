@@ -7,13 +7,15 @@ import { IonicModule } from '@ionic/angular';
 import { StreamDetailsPageRoutingModule } from './stream-details-routing.module';
 
 import { StreamDetailsPage } from './stream-details.page';
+import { CamillaDspModule } from 'src/app/components/camilla-dsp/camilla-dsp.module';
 
 @NgModule({
   imports: [
     CommonModule,
     FormsModule,
     IonicModule,
-    StreamDetailsPageRoutingModule
+    StreamDetailsPageRoutingModule,
+    CamillaDspModule
   ],
   declarations: [StreamDetailsPage]
 })

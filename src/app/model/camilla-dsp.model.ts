@@ -3,8 +3,8 @@ export interface CamillaDspConfig {
   description: string | null;
   devices: Devices;
   mixers: { [key: string]: Mixer };
-  filters: { [key: string]: Filter };
-  processors: any;
+  filters: { [key: string]: Filter } | null;
+  processors: { [key: string]: Processor } | null;
   pipeline: Pipeline[];
 }
 
@@ -53,10 +53,30 @@ export interface BiquadParameters {
   gain: number;
 }
 
+export interface Processor {
+  type: string;
+  description: string | null;
+  parameters: CompressorParameters;
+}
+
+export interface CompressorParameters {
+  channels: number;
+  monitor_channels: number | null;
+  process_channels: number | null;
+  attack: number;
+  release: number;
+  threshold: number;
+  factor: number;
+  makeup_gain: number;
+  soft_clip: boolean | null;
+  clip_limit: number | null;
+}
+
 export interface Pipeline {
   type: string;
-  channel: number;
-  names: string[];
+  channel?: number;
+  name?: string;
+  names?: string[];
   description: string | null;
   bypassed: boolean | null;
 }

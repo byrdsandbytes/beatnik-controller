@@ -1,6 +1,6 @@
 // player-toolbar.component.ts
 import { Component, OnInit, OnDestroy, OnChanges, SimpleChanges } from '@angular/core'; // OnChanges und SimpleChanges hinzugefügt
-import { Observable, Subscription, tap, firstValueFrom } from 'rxjs'; // firstValueFrom hinzugefügt
+import { Observable, Subscription, tap, firstValueFrom, map } from 'rxjs'; // firstValueFrom hinzugefügt
 import { Group, Stream, ServerDetail, Client, SnapCastServerStatusResponse } from 'src/app/model/snapcast.model'; // Client importiert für Typisierung
 import { SnapcastService } from 'src/app/services/snapcast.service';
 import { Haptics, ImpactStyle, NotificationType } from '@capacitor/haptics';
@@ -21,8 +21,10 @@ export class PlayerToolbarComponent implements OnInit, OnChanges, OnDestroy {
   private subscriptions = new Subscription();
 
   // Make sure it's this device that changes the volume. If multiple devices are connected, we want to avoid conflicts.
-  private knobMoveStart = false;
-  private knobMoveEnd = false;
+  private draggingClients = new Map<string, boolean>();
+  private lastDragEndTimes = new Map<string, number>();
+  private optimisticVolumes = new Map<string, number>();
+  private readonly VOLUME_COOLDOWN_MS = 5000;
 
 
 
@@ -35,7 +37,35 @@ export class PlayerToolbarComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.displayState$ = this.snapcastService.state$
+    this.displayState$ = this.snapcastService.state$.pipe(
+      map(state => {
+        if (!state) return state;
+
+        // Deep clone to avoid mutating the service's state
+        const modifiedState = JSON.parse(JSON.stringify(state));
+
+        modifiedState.server.groups.forEach((group: Group) => {
+          group.clients.forEach((client: Client) => {
+            const isDragging = this.draggingClients.get(client.id);
+            const lastDragEnd = this.lastDragEndTimes.get(client.id) || 0;
+            const inCooldown = (Date.now() - lastDragEnd) < this.VOLUME_COOLDOWN_MS;
+
+            if (isDragging || inCooldown) {
+              // Retain optimistic volume to prevent jumping backward
+              const optVol = this.optimisticVolumes.get(client.id);
+              if (optVol !== undefined) {
+                client.config.volume.percent = optVol;
+              }
+            } else {
+              // Store the definitive server truth if we are out of cooldown
+              this.optimisticVolumes.set(client.id, client.config.volume.percent);
+            }
+          });
+        });
+
+        return modifiedState;
+      })
+    );
     this.snapcastService.connect();
   }
 
@@ -49,8 +79,8 @@ export class PlayerToolbarComponent implements OnInit, OnChanges, OnDestroy {
    * @param event The event emitted from the range slider (e.g., ionChange).
    */
   changeVolumeForClient(client: Client, event: any): void {
-    if (!this.knobMoveStart) {
-      console.warn('PlayerToolbarComponent: changeVolumeForClient called without knobMoveStart. Ignoring event:', event);
+    if (!this.draggingClients.get(client.id)) {
+      console.warn(`PlayerToolbarComponent: changeVolumeForClient called without knobMoveStart for ${client.id}. Ignoring event.`, event);
       return;
     }
     // Step 1: Robustly extract the numerical value from the event.
@@ -69,6 +99,9 @@ export class PlayerToolbarComponent implements OnInit, OnChanges, OnDestroy {
       console.error('PlayerToolbarComponent: Volume value is not a number:', event);
       return;
     }
+
+    // Immediately track the optimistic volume so the local view freezes on the current slider value
+    this.optimisticVolumes.set(client.id, newVolume);
 
     console.log(`PlayerToolbarComponent: Setting desired volume for client ${client.id} to ${newVolume}`);
 
@@ -136,16 +169,15 @@ export class PlayerToolbarComponent implements OnInit, OnChanges, OnDestroy {
     return this.coverDateService.convertCoverDataBase64(coverData, extension);
   }
 
-  knobMoveStartEvent(event: any): void {
-    console.log('Knob move started:', event);
-    this.knobMoveStart = true;
-    this.knobMoveEnd = false;
+  knobMoveStartEvent(clientId: string, event: any): void {
+    console.log(`Knob move started for client ${clientId}:`, event);
+    this.draggingClients.set(clientId, true);
   }
 
-  knobMoveEndEvent(event: any): void {
-    console.log('Knob move ended:', event);
-    this.knobMoveEnd = true;
-    this.knobMoveStart = false;
+  knobMoveEndEvent(clientId: string, event: any): void {
+    console.log(`Knob move ended for client ${clientId}:`, event);
+    this.draggingClients.set(clientId, false);
+    this.lastDragEndTimes.set(clientId, Date.now());
     // Optionally, you can add haptic feedback here
   }
 
@@ -153,8 +185,16 @@ export class PlayerToolbarComponent implements OnInit, OnChanges, OnDestroy {
     this.coverDateService.onCoverImageError(event);
   }
 
+  trackByStream(index: number, stream: Stream): string {
+    return stream.id;
+  }
 
+  trackByGroup(index: number, group: Group): string {
+    return group.id;
+  }
 
-
+  trackByClient(index: number, client: Client): string {
+    return client.id;
+  }
 
 }

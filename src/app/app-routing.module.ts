@@ -90,6 +90,14 @@ const routes: Routes = [
     path: 'setup-device-group-name/:ip',
     loadChildren: () => import('./pages/setup/setup-device-group-name/setup-device-group-name.module').then( m => m.SetupDeviceGroupNamePageModule)
   },
+  {
+    path: 'volume-presets',
+    loadChildren: () => import('./pages/volume-presets/volume-presets.module').then( m => m.VolumePresetsPageModule)
+  },
+  {
+    path: 'volume-preset-edit',
+    loadChildren: () => import('./pages/volume-preset-edit/volume-preset-edit.module').then( m => m.VolumePresetEditPageModule)
+  },
 
 
 ];

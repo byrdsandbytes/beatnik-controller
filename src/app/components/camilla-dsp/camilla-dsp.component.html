@@ -228,7 +228,33 @@
                     </ng-container>
                 </div>
             </ion-card>
+            
+
         </div>
+        <!-- Add processors -->
+        <div *ngIf="parsedConfig">
+            <ion-list-header color="primary">
+                <ion-label>
+                    Processors
+                </ion-label>
+            </ion-list-header>
+            <ion-card class="ion-no-margin ion-padding" color="primary"
+                *ngFor="let processor of parsedConfig.processors | keyvalue">
+                
+                <ion-card-header>
+                    <ion-card-subtitle>
+                        {{ processor.key }}
+                    </ion-card-subtitle>
+                </ion-card-header>
+                test
+                <ion-item color="primary" *ngFor="let param of processor.value.parameters | keyvalue">
+                    <ion-label slot="start">{{ param.key }}:</ion-label>
+                    <ion-input type="number" slot="end" [(ngModel)]="param.value"
+                        (ionChange)="updateProcessorParameter(processor.key, param.key, param.value)"></ion-input>
+                </ion-item>
+                <!-- <ion-item color="primary"> Type: {{ processor.value.type }} </ion-item> -->
+                <!-- Add more processor parameters here as needed -->
+            </ion-card>
     </div>
 </div>
 
@@ -255,12 +281,12 @@
         <ion-button (click)="getCaptureSignalLevels()">Get Capture Signal Levels</ion-button>
         <ion-button (click)="setUpdateInterval(100)">Set update Interval</ion-button>
         <ion-button (click)="getVolume()">Get Volume</ion-button> -->
-            <!-- <pre class="bg-gray-100 p-4 rounded mt-4 overflow-auto">
+            <pre class="bg-gray-100 p-4 rounded mt-4 overflow-auto">
                 {{ lastMessage | json }}
                 </pre>
             <pre class="bg-gray-100 p-4 rounded mt-4 overflow-auto">
                 {{ parsedConfig | json }}
-                </pre> -->
+                </pre>
         </div>
     </ion-accordion>
 </ion-accordion-group>

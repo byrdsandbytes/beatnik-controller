@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+import { Preferences } from '@capacitor/preferences';
 import { Observable } from 'rxjs';
+import { UserPreference } from 'src/app/enum/user-preference.enum';
 import { SnapCastServerStatusResponse, Stream } from 'src/app/model/snapcast.model';
 import { SnapcastService } from 'src/app/services/snapcast.service';
 
@@ -15,6 +17,11 @@ export class StreamDetailsPage implements OnInit {
   streamId?: string;
   serverState?: Observable<SnapCastServerStatusResponse>;
   stream?: Stream;
+
+  streamCamillaDSPPort: number  = 1235;
+  serverUrl: string = '';
+
+
 
 
   constructor(
@@ -33,6 +40,7 @@ export class StreamDetailsPage implements OnInit {
     console.log('StreamDetailsPage: ID from route parameters:', this.streamId);
     this.serverState = this.snapcastService.state$;
     this.subscribeToStream(this.streamId);
+    this.getCamillaDspUrl();
   }
 
   subscribeToStream(streamId: string): void {
@@ -49,6 +57,18 @@ export class StreamDetailsPage implements OnInit {
         this.stream = stream;
       }
     });
+  }
+
+  // get serverUrl from UserPreferences and append camillaDSP port
+  async getCamillaDspUrl(): Promise<string> {
+   let url: string;
+    await Preferences.get({ key: UserPreference.SERVER_URL }).then((result) => {
+      url = result.value || '';
+    });
+    const camillaPort = this.streamCamillaDSPPort || 1235; // Default port if not set
+    const websocket = "ws://" + url?.replace(/(^\w+:|^)\/\//, '') + `:${camillaPort}`;
+    this.serverUrl = websocket;
+    return websocket;
   }
 
 }

@@ -275,5 +275,28 @@ export class CamillaDspComponent implements OnInit, OnDestroy {
         this.ngOnDestroy();
     }
 
+    updateProcessorParameter(processorKey: string, paramKey: string, newValue: any) {
+        if (!this.parsedConfig) {
+            console.error('No configuration loaded.');
+            return;
+        }
+
+        const processor = this.parsedConfig.processors?.[processorKey];
+        if (!processor) {
+            console.error(`Processor with key ${processorKey} not found.`);
+            return;
+        }
+
+        // Update the parameter locally
+        (processor.parameters as any)[paramKey] = newValue;
+
+        // format the conffigJson to send to CamillaDSP
+        console.log('Updated processor parameter:', processorKey, paramKey, newValue);
+        console.log('Updated configuration to send:', this.parsedConfig);
+
+        // send the full configJson back to CamillaDSP
+        this.camillaService.sendCommand('SetConfigJson', JSON.stringify(this.parsedConfig));
+    }   
+
    
 }

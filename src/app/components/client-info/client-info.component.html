@@ -145,6 +145,26 @@
     Choose Speakers
   </ion-button>
 
+  <!-- Test Buttons for new System API -->
+  <ion-item-divider>
+    <ion-label>Hardware API Test</ion-label>
+  </ion-item-divider>
+  
+  <ion-button expand="full" color="medium" (click)="testGetSystemInfo()">
+    Get System Info (Console)
+  </ion-button>
+  <ion-button expand="full" color="danger" (click)="testLedSetColor()">
+    LED: Solid Red
+  </ion-button>
+  <ion-button expand="full" color="success" (click)="testLedPulse()">
+    LED: Pulse Green/Blue
+  </ion-button>
+  <ion-button expand="full" color="warning" (click)="testLedBlink()">
+    LED: Blink Yellow
+  </ion-button>
+  <ion-button expand="full" color="dark" (click)="testLedOff()">
+    LED: Turn Off
+  </ion-button>
 
 </ng-container>
 <ng-container *ngIf="segment === 'camilla-dsp'">

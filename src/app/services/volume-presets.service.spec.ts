@@ -1,13 +1,13 @@
 import { TestBed } from '@angular/core/testing';
 
-import { ZeroconfService } from './zero-conf.service';
+import { VolumePresetsService } from './volume-presets.service';
 
-describe('ZeroconfService', () => {
-  let service: ZeroconfService;
+describe('VolumePresetsService', () => {
+  let service: VolumePresetsService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({});
-    service = TestBed.inject(ZeroconfService);
+    service = TestBed.inject(VolumePresetsService);
   });
 
   it('should be created', () => {
