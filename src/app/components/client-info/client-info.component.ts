@@ -6,11 +6,11 @@ import { UserPreference } from 'src/app/enum/user-preference.enum';
 import { SnapCastServerStatusResponse, Client } from 'src/app/model/snapcast.model';
 import { BeatnikHardwareService, HardwareStatus } from 'src/app/services/beatnik-hardware.service';
 import { BeatnikSnapcastService, SnapcastActionResponse } from 'src/app/services/beatnik-snapcast.service';
-import { BeatnikSystemService } from 'src/app/services/beatnik-system.service';
+import { BeatnikSystemService, SystemInfo } from 'src/app/services/beatnik-system.service';
 import { CamillaDspService } from 'src/app/services/camilla-dsp.service';
 import { SnapcastService } from 'src/app/services/snapcast.service';
 import { SoundcardPickerComponent } from '../soundcard-picker/soundcard-picker.component';
-import { AlertController, ModalController } from '@ionic/angular';
+import { AlertController, ModalController, ToastController } from '@ionic/angular';
 import { ChooseSpeakersComponent } from '../choose-speakers/choose-speakers.component';
 
 @Component({
@@ -25,11 +25,12 @@ export class ClientInfoComponent implements OnInit {
   serverState?: Observable<SnapCastServerStatusResponse>;
   segment: 'details' | 'soundcard' | 'camilla-dsp' | 'settings' = 'camilla-dsp';
   hardwareStatus$: Observable<HardwareStatus>;
+  systemInfo$?: Observable<SystemInfo>;
   hats = Object.values(SUPPORTED_HATS);
   camillaDspUrl: string = '';
   snapcastServerStatus?: SnapcastActionResponse;
-
-
+  
+  isLoading: { [key: string]: boolean } = {};
 
 
   constructor(
@@ -39,13 +40,15 @@ export class ClientInfoComponent implements OnInit {
     private beatnikSnapcastService: BeatnikSnapcastService,
     private beatnikSystemService: BeatnikSystemService,
     private camillaService: CamillaDspService,
-    private alertController: AlertController
+    private alertController: AlertController,
+    private toastController: ToastController
   ) { }
 
   async ngOnInit() {
     this.serverState = this.snapcastService.state$;
     this.camillaDspUrl = await this.getCamillaDspUrl();
     this.getHardwareInfo();
+    this.getSystemInfo();
     this.refreshSnapcastStatus();
   }
 
@@ -209,18 +212,33 @@ export class ClientInfoComponent implements OnInit {
     await alert.present();
   }
 
+  async presentToast(message: string, color: 'success' | 'danger' | 'warning' | 'primary' = 'success') {
+    const toast = await this.toastController.create({
+      message,
+      duration: 2000,
+      color,
+      position: 'bottom'
+    });
+    toast.present();
+  }
+
   async disableSnapcastServer() {
     if (!this.client) {
       console.error('Client Info Component: No client available to disable Snapcast server');
       return;
     }
+    this.isLoading['disableSnapcast'] = true;
     const localHostName = this.client.host.name + '.local';
     try {
       const response = await firstValueFrom(this.beatnikSnapcastService.disable(localHostName));
       console.log(`Client Info Component: Disabled Snapcast server for client ${this.client.id}:`, response);
       this.snapcastServerStatus = response;
+      this.presentToast('Snapcast Server Disabled', 'success');
     } catch (error) {
       console.error(`Client Info Component: Failed to disable Snapcast server for client ${this.client.id}`, error);
+      this.presentToast('Failed to Disable Snapcast', 'danger');
+    } finally {
+      this.isLoading['disableSnapcast'] = false;
     }
   }
 
@@ -229,13 +247,18 @@ export class ClientInfoComponent implements OnInit {
       console.error('Client Info Component: No client available to enable Snapcast server');
       return;
     }
+    this.isLoading['enableSnapcast'] = true;
     const localHostName = this.client.host.name + '.local';
     try {
       const response = await firstValueFrom(this.beatnikSnapcastService.enable(localHostName));
       console.log(`Client Info Component: Enabled Snapcast server for client ${this.client.id}:`, response);
       this.snapcastServerStatus = response;
+      this.presentToast('Snapcast Server Enabled', 'success');
     } catch (error) {
       console.error(`Client Info Component: Failed to enable Snapcast server for client ${this.client.id}`, error);
+      this.presentToast('Failed to Enable Snapcast', 'danger');
+    } finally {
+      this.isLoading['enableSnapcast'] = false;
     }
   }
 
@@ -244,13 +267,18 @@ export class ClientInfoComponent implements OnInit {
       console.error('Client Info Component: No client available to refresh Snapcast status');
       return;
     }
+    this.isLoading['refreshSnapcast'] = true;
     const localHostName = this.client.host.name + '.local';
     try {
       const status = await firstValueFrom(this.beatnikSnapcastService.getStatus(localHostName));
       console.log(`Client Info Component: Snapcast status for client ${this.client.id}:`, status);
       this.snapcastServerStatus = { ...status, success: true, message: 'Status retrieved successfully' };
+      // this.presentToast('Snapcast Status Refreshed', 'success');
     } catch (error) {
       console.error(`Client Info Component: Failed to get Snapcast status for client ${this.client.id}`, error);
+      this.presentToast('Failed to Refresh Snapcast Status', 'danger');
+    } finally {
+      this.isLoading['refreshSnapcast'] = false;
     }
   }
 
@@ -259,13 +287,18 @@ export class ClientInfoComponent implements OnInit {
       console.error('Client Info Component: No client available to reboot');
       return;
     }
+    this.isLoading['reboot'] = true;
     const localHostName = this.client.host.name + '.local';
     this.beatnikHardwareService.reboot(localHostName).subscribe({
       next: () => {
         console.log(`Client Info Component: Successfully triggered reboot for client ${this.client?.id}`);
+        this.isLoading['reboot'] = false;
+        this.presentToast('Device Reboot Initiated', 'success');
       },
       error: (err) => {
         console.error(`Client Info Component: Failed to trigger reboot for client ${this.client?.id}`, err);
+        this.isLoading['reboot'] = false;
+        this.presentToast('Failed to Reboot Device', 'danger');
       }
     });
   }
@@ -290,48 +323,21 @@ export class ClientInfoComponent implements OnInit {
     }
   }
 
-  async testGetSystemInfo() {
+  async getSystemInfo() {
     if (!this.client) return;
+    this.isLoading['systemInfo'] = true;
     const localHostName = await this.getUrl();
-    this.beatnikSystemService.getInfo(localHostName).subscribe({
-      next: (info) => console.log('System Info:', info),
-      error: (err) => console.error('Failed to get system info:', err)
-    });
-  }
-
-  async testLedSetColor() {
-    if (!this.client) return;
-    const localHostName = await this.getUrl();
-    this.beatnikSystemService.setLedState({ command: 'set_color', params: { r: 1, g: 0, b: 0 } }, localHostName).subscribe({
-      next: (res) => console.log('LED Set Color:', res),
-      error: (err) => console.error('Failed to set LED color:', err)
-    });
-  }
-
-  async testLedPulse() {
-    if (!this.client) return;
-    const localHostName = await this.getUrl();
-    this.beatnikSystemService.setLedState({ command: 'pulse', params: { on_color: [0, 1, 0], off_color: [0, 0, 1], fade_in: 1, fade_out: 1 } }, localHostName).subscribe({
-      next: (res) => console.log('LED Pulse:', res),
-      error: (err) => console.error('Failed to pulse LED:', err)
-    });
-  }
-
-  async testLedBlink() {
-    if (!this.client) return;
-    const localHostName = await this.getUrl();
-    this.beatnikSystemService.setLedState({ command: 'blink', params: { color: [1, 1, 0], on_time: 0.5, off_time: 0.5 } }, localHostName).subscribe({
-      next: (res) => console.log('LED Blink:', res),
-      error: (err) => console.error('Failed to blink LED:', err)
-    });
-  }
-
-  async testLedOff() {
-    if (!this.client) return;
-    const localHostName = await this.getUrl();
-    this.beatnikSystemService.setLedState({ command: 'off' }, localHostName).subscribe({
-      next: (res) => console.log('LED Off:', res),
-      error: (err) => console.error('Failed to turn off LED:', err)
+    this.systemInfo$ = this.beatnikSystemService.getInfo(localHostName);
+    this.systemInfo$.subscribe({
+      next: (info) => {
+        console.log('System Info:', info);
+        this.isLoading['systemInfo'] = false;
+      },
+      error: (err) => {
+        console.error('Failed to get system info:', err);
+        this.isLoading['systemInfo'] = false;
+        this.presentToast('Failed to retrieve System Info', 'danger');
+      }
     });
   }
 }
