@@ -1,4 +1,4 @@
-<ion-card  class="card ion-text-center" color="light" (click)="navToGroupDetails()">
+<ion-card class="card ion-text-center" color="light" (click)="navToGroupDetails()">
   <div class="img-container">
     <ng-container *ngIf="activeSpeaker else defaultImage">
       <img [src]="activeSpeaker.image" class="img" alt="{{ activeSpeaker.manufacturer }} {{ activeSpeaker.model }}">
@@ -9,7 +9,7 @@
   </div>
 
 
-  <ng-container *ngIf="activeStream && activeStream.properties.metadata else noStream">
+  <ng-container *ngIf="activeStream && activeStream.properties.metadata else noStreamData">
 
     <img *ngIf="activeStream.properties.metadata.artData as artData"
       [src]="convertCoverDataBase64(artData.data, artData.extension)" class="cover">
@@ -25,6 +25,7 @@
       </ng-container>
 
     </ng-conainer>
+
     <ng-container *ngFor="let client of group.clients">
       <ng-container [ngSwitch]="client.connected">
         <ng-container *ngSwitchCase="true">
@@ -47,7 +48,9 @@
     </ion-card-content>
   </ng-container>
 
-  <ng-template #noStream>
+  <ng-template #noStreamData>
+    <!-- placeholder image or icon for no stream data -->
+    <img [src]="'assets/placeholder/cover_art_placeholder.svg'" class="cover" alt="Placeholder Image">
     <ion-icon class="status-icon" name="stop-circle"></ion-icon>
 
     <ng-container *ngFor="let client of group.clients">
@@ -66,7 +69,9 @@
       <!-- <ion-card-subtitle>{{group.name? group.name:group.id}}</ion-card-subtitle> -->
     </ion-card-header>
     <ion-card-content>
-      <p>No active stream</p>
+      <p>No stream data available</p>
+      <p>
+      <p>{{activeStream.uri.query.name}}</p>
     </ion-card-content>
   </ng-template>
 </ion-card>
