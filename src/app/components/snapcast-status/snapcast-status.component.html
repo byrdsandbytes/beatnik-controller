@@ -61,9 +61,9 @@
       </ion-accordion>
     </ion-accordion-group>
     <!-- reboot server and all clients -->
-     <ion-button color="primary" expand="block" (click)="rebootServer()">Reboot Server</ion-button>
-     <ion-button color="primary" expand="block" (click)="rebootClients()">Reboot All Clients</ion-button>
-    <ion-button color="primary" expand="block" (click)="rebootServerAndClients()">Reboot Server and All Clients</ion-button>
+     <ion-button color="primary" expand="block" (click)="showRebootServerAlert()">Reboot Server</ion-button>
+     <ion-button color="primary" expand="block" (click)="showRebootClientsAlert()">Reboot All Clients</ion-button>
+    <ion-button color="primary" expand="block" (click)="showRebootServerAndClientsAlert()">Reboot Server and All Clients</ion-button>
   </ng-container>
 
   <ng-template #loadingOrError>

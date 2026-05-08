@@ -6,7 +6,7 @@ import { Group, Client, Stream, ServerDetail, SnapCastServerStatusResponse } fro
 import { BeatnikHardwareService } from 'src/app/services/beatnik-hardware.service';
 import { UserPreference } from 'src/app/enum/user-preference.enum';
 import { Preferences } from '@capacitor/preferences';
-import { ToastController } from '@ionic/angular';
+import { AlertController, ToastController } from '@ionic/angular';
 
 @Component({
   selector: 'app-snapcast-status',
@@ -26,7 +26,8 @@ export class SnapcastStatusComponent implements OnInit, OnDestroy {
   constructor(
     public snapcastService: SnapcastService,
     private beatnikHardwareService: BeatnikHardwareService,
-    private toastController: ToastController ) {
+    private toastController: ToastController,
+    private alertController: AlertController) {
 
   }
 
@@ -200,6 +201,67 @@ export class SnapcastStatusComponent implements OnInit, OnDestroy {
 
   cleanIpAddress(ip: string): string {
     return ip.replace('::ffff:', '');
+  }
+
+  async showRebootServerAndClientsAlert(): Promise<void> {
+    const alert = await this.alertController.create({
+      header: 'Confirm Reboot',
+      message: 'Are you sure you want to reboot the server and all clients? This will cause temporary disruption of audio playback.',
+      buttons: [
+        {
+          text: 'Cancel',
+          role: 'cancel'
+        },
+        {
+          text: 'Reboot',
+          handler: () => {
+            this.rebootServerAndClients();
+          }
+        }
+      ]
+    });
+
+    await alert.present();
+  }
+
+  async showRebootClientsAlert(): Promise<void> {
+    const alert = await this.alertController.create({
+      header: 'Confirm Reboot',
+      message: 'Are you sure you want to reboot all clients? This will cause temporary disruption of audio playback on all clients.',
+      buttons: [
+        {
+          text: 'Cancel',
+          role: 'cancel'
+        },
+        {
+          text: 'Reboot',
+          handler: () => {
+            this.rebootClients();
+          }
+        }
+      ]
+    });
+
+    await alert.present();
+  }
+
+  showRebootServerAlert(): void {
+    this.alertController.create({
+      header: 'Confirm Reboot',
+      message: 'Are you sure you want to reboot the server? This will cause temporary disruption of audio playback.',
+      buttons: [
+        {
+          text: 'Cancel',
+          role: 'cancel'
+        },
+        {
+          text: 'Reboot',
+          handler: () => {
+            this.rebootServer();
+          }
+        }
+      ]
+    }).then(alert => alert.present());
   }
 
   ngOnDestroy(): void {
