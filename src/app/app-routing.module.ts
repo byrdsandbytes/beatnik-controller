@@ -100,11 +100,11 @@ const routes: Routes = [
   },
   {
     path: 'stream-presets',
-    loadChildren: () => import('./pages/stream-presets/stream-presets.module').then( m => m.StreamPresetsPageModule)
+    loadChildren: () => import('./pages/streams/stream-presets/stream-presets.module').then( m => m.StreamPresetsPageModule)
   },
   {
     path: 'stream-preset-edit',
-    loadChildren: () => import('./pages/stream-preset-edit/stream-preset-edit.module').then( m => m.StreamPresetEditPageModule)
+    loadChildren: () => import('./pages/streams/stream-preset-edit/stream-preset-edit.module').then( m => m.StreamPresetEditPageModule)
   },
 
 

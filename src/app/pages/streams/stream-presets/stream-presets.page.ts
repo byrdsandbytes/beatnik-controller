@@ -2,9 +2,9 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { ToastController } from '@ionic/angular';
 import { Haptics, ImpactStyle } from '@capacitor/haptics';
-import { StreamPresetsService } from '../../services/stream-presets.service';
-import { StreamPreset } from '../../model/stream-presets.model';
-import { SnapcastService } from '../../services/snapcast.service';
+import { StreamPresetsService } from '../../../services/stream-presets.service';
+import { StreamPreset } from '../../../model/stream-presets.model';
+import { SnapcastService } from '../../../services/snapcast.service';
 import { firstValueFrom } from 'rxjs';
 
 @Component({
