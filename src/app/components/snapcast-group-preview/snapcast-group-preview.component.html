@@ -50,7 +50,14 @@
 
   <ng-template #noStreamData>
     <!-- placeholder image or icon for no stream data -->
-    <img [src]="'assets/placeholder/cover_art_placeholder.svg'" class="cover" alt="Placeholder Image">
+    <img *ngIf="activeStream.uri.query.name != 'Hof-Bar-Radio'" [src]="'assets/placeholder/cover_art_placeholder.svg'"
+      class="cover" alt="Placeholder Image">
+    <div *ngIf="activeStream.uri.query.name === 'Hof-Bar-Radio'" class="hof-bar-container">
+      <img class="hof-bar-logo"
+        src="https://hof-bar.ch/media/pages/home/eff04a2d37-1778599198/morph-_transparent_v2.gif" 
+        alt="Placeholder Image">
+
+    </div>
     <ion-icon class="status-icon" name="stop-circle"></ion-icon>
 
     <ng-container *ngFor="let client of group.clients">
@@ -69,9 +76,10 @@
       <!-- <ion-card-subtitle>{{group.name? group.name:group.id}}</ion-card-subtitle> -->
     </ion-card-header>
     <ion-card-content>
-      <p>No stream data available</p>
-      <p>
+
       <p>{{activeStream.uri.query.name}}</p>
+      <p class="no-data-label">No stream data available</p>
+      <p>
     </ion-card-content>
   </ng-template>
 </ion-card>

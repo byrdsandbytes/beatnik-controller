@@ -2,7 +2,8 @@
   <ion-toolbar class="play-toolbar" color="primary">
     <ng-container *ngIf="(displayState$|async) as state ">
       <ng-container *ngFor="let stream of state.server.streams; trackBy: trackByStream">
-        <ion-item *ngIf="stream.properties.metadata" class="ion-padding-top" lines="none" color="primary">
+        <ion-item *ngIf="stream.properties.metadata else noMetadata" class="ion-padding-top" lines="none"
+          color="primary">
           <ion-thumbnail slot="start">
             <img [src]="stream.properties.metadata.artData
       ? convertCoverDataBase64(stream.properties.metadata.artData.data, stream.properties.metadata.artData.extension)
@@ -23,6 +24,26 @@
 
 
         </ion-item>
+        <ng-template #noMetadata>
+          <ion-item *ngIf="stream.status =='playing'" class="ion-padding-top" lines="none" color="primary">
+            <ion-thumbnail slot="start">
+              <img *ngIf="stream.uri.query.name != 'Hof-Bar-Radio'"
+                [src]="'assets/placeholder/cover_art_placeholder.svg'" class="cover" alt="Placeholder Image">
+              <div *ngIf="stream.uri.query.name === 'Hof-Bar-Radio'" class="hof-bar-container">
+                <img class="hof-bar-logo"
+                  src="https://hof-bar.ch/media/pages/home/eff04a2d37-1778599198/morph-_transparent_v2.gif"
+                  alt="Placeholder Image">
+
+              </div>
+            </ion-thumbnail>
+            <ion-label>
+              <p>{{stream.uri.query.name}}</p>
+              <h2>Unknown Title</h2>
+              <p>Unknown Artist</p>
+
+            </ion-label>
+          </ion-item>
+        </ng-template>
         <!-- <ion-item *ngIf="stream.properties.metadata && stream.status=='playing'" color="dark" lines="none">
         <app-snapcast-stream-volume-control class="stream-range" (streamVolumeChange)="streamVolumeChanged()"
           [stream]="stream" [groups]="state.server.groups "></app-snapcast-stream-volume-control>
@@ -38,7 +59,8 @@
                 <ng-container *ngFor="let client of group.clients; trackBy: trackByClient">
                   <ion-range *ngIf="client.config.volume" color="light" min="0" max="100" step="1"
                     [ngModel]="client.config.volume.percent" (ionKnobMoveStart)="knobMoveStartEvent(client.id, $event)"
-                    (ionKnobMoveEnd)="knobMoveEndEvent(client.id, $event)" (ionInput)="changeVolumeForClient(client, $event)">
+                    (ionKnobMoveEnd)="knobMoveEndEvent(client.id, $event)"
+                    (ionInput)="changeVolumeForClient(client, $event)">
                     <ion-icon slot="start" size="small" name="volume-mute"></ion-icon>
                     <ion-icon slot="end" size="small" name="volume-high"></ion-icon>
                   </ion-range>

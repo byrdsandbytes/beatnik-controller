@@ -28,4 +28,13 @@
   .spacer{
     height: 60px;
   }
+
+  .hof-bar-container{
+    background-color: var (--ion-color-light);
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 2px;
+  }
   
