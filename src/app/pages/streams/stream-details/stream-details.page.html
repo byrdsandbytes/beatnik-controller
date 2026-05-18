@@ -17,11 +17,65 @@
     </ion-header>
 
 
+
+    <app-camilla-dsp *ngIf="serverUrl && stream.uri.query.name =='Line-In'" [url]="serverUrl"></app-camilla-dsp>
+
+
+    <!-- mopidy -->
+    <ng-container *ngIf="stream.uri.query.name =='Hof-Bar-Radio'">
+      <ion-card *ngIf="{ track: currentTrack$ | async } as data">
+        <ion-card-header>
+          <ion-card-subtitle>Mopidy Player</ion-card-subtitle>
+          <ion-card-title *ngIf="data.track && data.track !== 'Idle'">{{ data.track }}</ion-card-title>
+          <ion-card-title *ngIf="!data.track || data.track === 'Idle'">Ready to Play</ion-card-title>
+        </ion-card-header>
+
+        <ion-card-content>
+          <p *ngIf="!data.track || data.track === 'Idle'">Select a stream or press play to start listening.</p>
+
+          <div class="ion-text-center ion-margin-top">
+            <!-- <ion-button fill="clear" color="dark" (click)="mopidy.previous()">
+            <ion-icon slot="icon-only" name="play-skip-back"></ion-icon>
+          </ion-button> -->
+
+            <ion-button fill="clear" color="dark" (click)="mopidy.stop()">
+              <ion-icon slot="icon-only" name="stop"></ion-icon>
+            </ion-button>
+
+            <ion-button fill="solid" color="primary" shape="round" (click)="mopidy.play()"
+              class="ion-margin-horizontal">
+              <ion-icon slot="icon-only" name="play"></ion-icon>
+            </ion-button>
+
+            <ion-button fill="outline" color="primary" shape="round" (click)="mopidy.pause()">
+              <ion-icon slot="icon-only" name="pause"></ion-icon>
+            </ion-button>
+
+            <!-- <ion-button fill="clear" color="dark" (click)="mopidy.next()">
+            <ion-icon slot="icon-only" name="play-skip-forward"></ion-icon>
+          </ion-button> -->
+          </div>
+        </ion-card-content>
+      </ion-card>
+
+      <ion-card *ngIf="stream.uri.query.name == 'Hof-Bar-Radio'">
+        <ion-card-header>
+          <ion-card-subtitle>Hof-Bar Radio</ion-card-subtitle>
+        </ion-card-header>
+        <ion-card-content>
+          <ion-button expand="block" (click)="mopidy.playHofbarStream()" color="primary">
+            <ion-icon slot="start" name="radio"></ion-icon>
+            Play Hofbar Radio
+          </ion-button>
+        </ion-card-content>
+      </ion-card>
+    </ng-container>
+
     <ion-accordion-group>
       <ion-accordion value="{{ stream.id }}">
         <ion-item slot="header">
           <ion-label>
-            <h2>{{ stream.id }}</h2>
+            <h2>{{ stream.id }} (JSON)</h2>
             <p>{{ stream.uri.query.devicename }}</p>
           </ion-label>
         </ion-item>
@@ -30,10 +84,9 @@
         </ion-item>
       </ion-accordion>
     </ion-accordion-group>
-    <app-camilla-dsp *ngIf="serverUrl" [url]="serverUrl" ></app-camilla-dsp>
-
 
   </div>
+
 
   <ng-template #noStream>
     <ion-header collapse="condense">
@@ -45,6 +98,5 @@
       <p>Please select a stream to view its details.</p>
     </div>
   </ng-template>
-
 
 </ion-content>
