@@ -16,6 +16,13 @@
       </ion-toolbar>
     </ion-header>
 
+    <div *ngIf="stream.uri.query.name === 'Hof-Bar-Radio'" class="hof-bar-container">
+      <img class="hof-bar-logo"
+        src="https://hof-bar.ch/media/pages/home/eff04a2d37-1778599198/morph-_transparent_v2.gif" 
+        alt="Placeholder Image">
+
+    </div>
+
 
 
     <app-camilla-dsp *ngIf="serverUrl && stream.uri.query.name =='Line-In'" [url]="serverUrl"></app-camilla-dsp>
@@ -23,7 +30,7 @@
 
     <!-- mopidy -->
     <ng-container *ngIf="stream.uri.query.name =='Hof-Bar-Radio'">
-      <ion-card *ngIf="{ track: currentTrack$ | async } as data">
+      <div *ngIf="{ track: currentTrack$ | async } as data">
         <ion-card-header>
           <ion-card-subtitle>Mopidy Player</ion-card-subtitle>
           <ion-card-title *ngIf="data.track && data.track !== 'Idle'">{{ data.track }}</ion-card-title>
@@ -56,19 +63,19 @@
           </ion-button> -->
           </div>
         </ion-card-content>
-      </ion-card>
+      </div>
 
-      <ion-card *ngIf="stream.uri.query.name == 'Hof-Bar-Radio'">
+      <div *ngIf="stream.uri.query.name == 'Hof-Bar-Radio'">
         <ion-card-header>
           <ion-card-subtitle>Hof-Bar Radio</ion-card-subtitle>
         </ion-card-header>
         <ion-card-content>
           <ion-button expand="block" (click)="playHofBarRadio()" color="primary">
             <ion-icon slot="start" name="radio"></ion-icon>
-            Play Hofbar Radio
+            Initialize Hof-Bar Radio
           </ion-button>
         </ion-card-content>
-      </ion-card>
+      </div>
     </ng-container>
     
 
