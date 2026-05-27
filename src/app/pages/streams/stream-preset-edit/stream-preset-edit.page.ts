@@ -1,22 +1,26 @@
 import { Component, OnInit } from '@angular/core';
 import { AlertController } from '@ionic/angular';
 import { Router } from '@angular/router';
-import { VolumePresetsService } from '../../services/volume-presets.service';
-import { VolumePreset } from '../../model/volume-presets.model';
+import { StreamPresetsService } from '../../../services/stream-presets.service';
+import { StreamPreset } from '../../../model/stream-presets.model';
+import { SnapcastService } from '../../../services/snapcast.service';
+import { firstValueFrom } from 'rxjs';
 
 @Component({
-  selector: 'app-volume-preset-edit',
-  templateUrl: './volume-preset-edit.page.html',
-  styleUrls: ['./volume-preset-edit.page.scss'],
+  selector: 'app-stream-preset-edit',
+  templateUrl: './stream-preset-edit.page.html',
+  styleUrls: ['./stream-preset-edit.page.scss'],
   standalone: false
 })
-export class VolumePresetEditPage implements OnInit {
-  caputredPreset: VolumePreset = { id: crypto.randomUUID(), presetName: '', data: [] };
+export class StreamPresetEditPage implements OnInit {
+  caputredPreset: StreamPreset = { id: crypto.randomUUID(), presetName: '', data: [] };
   isEditMode: boolean = false;
   originalPresetName: string = '';
+  availableStreams: any[] = [];
 
   constructor(
-    private volumePresetsService: VolumePresetsService,
+    private streamPresetsService: StreamPresetsService,
+    private snapcastService: SnapcastService,
     private alertController: AlertController,
     private router: Router
   ) {
@@ -31,15 +35,23 @@ export class VolumePresetEditPage implements OnInit {
   }
 
   async ngOnInit() {
+    await this.loadAvailableStreams();
     if (!this.isEditMode) {
       await this.capturePreset();
     }
   }
 
+  async loadAvailableStreams() {
+    const currentState = await firstValueFrom(this.snapcastService.getServerStatus());
+    if (currentState && currentState.server) {
+      this.availableStreams = currentState.server.streams;
+    }
+  }
+
   async capturePreset() {
-    const preset = await this.volumePresetsService.capturePreset();
+    const preset = await this.streamPresetsService.capturePreset();
     if (preset) {
-      console.log('Captured Volume Preset:', preset);
+      console.log('Captured Stream Preset:', preset);
       // Keep existing name/description if re-capturing in edit mode
       this.caputredPreset = {
         ...this.caputredPreset,
@@ -52,7 +64,7 @@ export class VolumePresetEditPage implements OnInit {
     if (!this.isEditMode) {
       const name = await this.promtNameAlert();
       if (!name) {
-        console.warn('VolumePresetEditPage: Preset name is required to save');
+        console.warn('StreamPresetEditPage: Preset name is required to save');
         return;
       }
       this.caputredPreset.presetName = name.presetName;
@@ -68,17 +80,17 @@ export class VolumePresetEditPage implements OnInit {
     }
     
     try {
-      await this.volumePresetsService.savePreset(this.caputredPreset);
-      console.log('Volume preset saved to user preferences');
-      this.router.navigate(['/volume-presets'], { replaceUrl: true });
+      await this.streamPresetsService.savePreset(this.caputredPreset);
+      console.log('Stream preset saved to user preferences');
+      this.router.navigate(['/stream-presets'], { replaceUrl: true });
     } catch (error) {
-      console.error('VolumePresetEditPage: Failed to save preset', error);
+      console.error('StreamPresetEditPage: Failed to save preset', error);
     }
   }
 
   async promtNameAlert(defaultName: string = '', defaultDescription: string = ''): Promise<{presetName: string, presetDescription?: string} | null> {
     const alert = await this.alertController.create({
-      header: 'Save Volume Preset',
+      header: 'Save Stream Preset',
       inputs: [
         {
           name: 'presetName',

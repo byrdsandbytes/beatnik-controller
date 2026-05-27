@@ -5,6 +5,8 @@ import { Observable } from 'rxjs';
 import { UserPreference } from 'src/app/enum/user-preference.enum';
 import { SnapCastServerStatusResponse, Stream } from 'src/app/model/snapcast.model';
 import { SnapcastService } from 'src/app/services/snapcast.service';
+import { MopidyService } from 'src/app/services/mopidy.service';
+import { ToastController } from '@ionic/angular';
 
 @Component({
   selector: 'app-stream-details',
@@ -18,16 +20,17 @@ export class StreamDetailsPage implements OnInit {
   serverState?: Observable<SnapCastServerStatusResponse>;
   stream?: Stream;
 
-  streamCamillaDSPPort: number  = 1235;
+  streamCamillaDSPPort: number = 1235;
   serverUrl: string = '';
 
-
+  currentTrack$ = this.mopidy.currentTrack$;
 
 
   constructor(
     private activatedRoute: ActivatedRoute,
-    private snapcastService: SnapcastService
-
+    private snapcastService: SnapcastService,
+    public mopidy: MopidyService,
+    private toastController: ToastController
   ) { }
 
   ngOnInit(
@@ -61,7 +64,7 @@ export class StreamDetailsPage implements OnInit {
 
   // get serverUrl from UserPreferences and append camillaDSP port
   async getCamillaDspUrl(): Promise<string> {
-   let url: string;
+    let url: string;
     await Preferences.get({ key: UserPreference.SERVER_URL }).then((result) => {
       url = result.value || '';
     });
@@ -69,6 +72,31 @@ export class StreamDetailsPage implements OnInit {
     const websocket = "ws://" + url?.replace(/(^\w+:|^)\/\//, '') + `:${camillaPort}`;
     this.serverUrl = websocket;
     return websocket;
+  }
+
+
+  async playHofBarRadio() {
+    if (!this.stream) {
+      console.error('StreamDetailsPage: No stream available to play');
+      return;
+    }
+    this.presentToast('Initializing Hofbar Radio Stream, this may take a few seconds...');
+
+    try {
+      await this.mopidy.playHofbarStream();
+    } catch (error: any) {
+      console.error('Failed to play stream:', error);
+      this.presentToast(error.message || 'Failed to connect to media server.');
+    }
+  }
+
+  async presentToast(message: string) {
+    const toast = await this.toastController.create({
+      message,
+      duration: 2000,
+      position: 'bottom'
+    });
+    toast.present();
   }
 
 }

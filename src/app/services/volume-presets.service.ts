@@ -24,15 +24,33 @@ export class VolumePresetsService {
       groupId: currentState.server.groups.find((group: any) => group.clients?.some((c: any) => c.id === client.id))?.id || '',
       groupName: currentState.server.groups.find((group: any) => group.clients?.some((c: any) => c.id === client.id))?.name || '',
     }));
-    return { presetName: 'Preset_' + new Date().toISOString().replace(/[:.]/g, '-'), data: preset };
+    return { id: crypto.randomUUID(), presetName: 'Preset_' + new Date().toISOString().replace(/[:.]/g, '-'), data: preset };
   }
 
   async loadPresetsFromPreferences(): Promise<VolumePreset[]> {
     try {
       const result = await Preferences.get({ key: UserPreference.VOLUME_PRESETS });
       if (result.value) {
-        const preset = JSON.parse(result.value);
-        return Array.isArray(preset) ? preset : [preset];
+        let presets = JSON.parse(result.value);
+        let presetArray = Array.isArray(presets) ? presets : [presets];
+        let needsMigration = false;
+        
+        let migratedArray = presetArray.map((p: any) => {
+          if (!p.id) {
+            p.id = crypto.randomUUID();
+            needsMigration = true;
+          }
+          return p as VolumePreset;
+        });
+
+        if (needsMigration) {
+          await Preferences.set({
+            key: UserPreference.VOLUME_PRESETS,
+            value: JSON.stringify(migratedArray)
+          });
+        }
+        
+        return migratedArray;
       }
     } catch (error) {
       console.error('VolumePresetsService: Failed to load preset from user preferences', error);
@@ -42,7 +60,14 @@ export class VolumePresetsService {
 
   async savePreset(newPreset: VolumePreset): Promise<VolumePreset[]> {
     const existingPresets = await this.loadPresetsFromPreferences();
-    existingPresets.push(newPreset);
+    const existingIndex = existingPresets.findIndex((p: VolumePreset) => p.id === newPreset.id);
+    
+    if (existingIndex >= 0) {
+      existingPresets[existingIndex] = newPreset;
+    } else {
+      existingPresets.push(newPreset);
+    }
+
     try {
       await Preferences.set({
         key: UserPreference.VOLUME_PRESETS,
@@ -68,7 +93,7 @@ export class VolumePresetsService {
 
   async deletePreset(preset: VolumePreset): Promise<VolumePreset[]> {
     let existingPresets = await this.loadPresetsFromPreferences();
-    existingPresets = existingPresets.filter((p: VolumePreset) => p.presetName !== preset.presetName);
+    existingPresets = existingPresets.filter((p: VolumePreset) => p.id !== preset.id);
     try {
       await Preferences.set({
         key: UserPreference.VOLUME_PRESETS,

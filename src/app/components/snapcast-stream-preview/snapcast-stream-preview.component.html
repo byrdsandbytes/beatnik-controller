@@ -1,18 +1,26 @@
 <ng-container *ngIf="stream">
-  <ion-card>
+  <ion-card [routerLink]="['/streams', stream.id]" detail="false">
 
     <ion-card-header class="ion-text-center align-items-center">
 
+
       <ion-card-title>{{ stream.id }}</ion-card-title>
       <ion-card-subtitle>Stream Status: {{ stream.status }}</ion-card-subtitle>
-      <ion-icon [color]="stream.status=='idle'? 'medium':'primary'" class="stream-icon ion-margin" *ngIf="stream.uri.scheme as scheme"
-        [src]="'/assets/streams/' +scheme +'.svg'"></ion-icon>
+      <ion-icon [color]="stream.status=='idle'? 'medium':'primary'" class="stream-icon ion-margin"
+        *ngIf="stream.uri.scheme as scheme" [src]="'/assets/streams/' +scheme +'.svg'"></ion-icon>
+      <div *ngIf="stream.uri.query.name === 'Hof-Bar-Radio'" class="hof-bar-container">
+        <img class="hof-bar-logo"
+          src="https://hof-bar.ch/media/pages/home/eff04a2d37-1778599198/morph-_transparent_v2.gif"
+          alt="Placeholder Image">
+
+      </div>
 
     </ion-card-header>
 
     <div *ngIf="stream.properties.metadata as meta"
       class="d-flex flex-column align-items-center justify-content-center ion-text-center">
-      <img *ngIf="meta.artData as artData" class="cover-image" [src]="convertCoverDataBase64(artData.data, artData.extension)" alt="Album Art" />
+      <img *ngIf="meta.artData as artData" class="cover-image"
+        [src]="convertCoverDataBase64(artData.data, artData.extension)" alt="Album Art" />
 
 
       <p>{{ meta.album }}<br>

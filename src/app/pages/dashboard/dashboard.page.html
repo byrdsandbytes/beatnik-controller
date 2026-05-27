@@ -40,7 +40,7 @@
             date: 'dd.MM.yy HH:mm:ss' }}</div>
         </div>
         <div class="col col-4 col-lg-2 fab-container">
-          <ion-fab-button class="custom-fab-button" color="light" (click)="getPlayerStatus()">
+          <ion-fab-button class="custom-fab-button" color="light" routerLink="/stream-presets">
             <ion-icon [name]="numberOfPlayingStreams>0?'musical-note':'musical-note-outline'"></ion-icon>
           </ion-fab-button>
           <div class="fab-label">{{numberOfPlayingStreams +"/"+ totalStreams}} Stream(s) playing</div>

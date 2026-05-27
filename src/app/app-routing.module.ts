@@ -98,6 +98,14 @@ const routes: Routes = [
     path: 'volume-preset-edit',
     loadChildren: () => import('./pages/volume-preset-edit/volume-preset-edit.module').then( m => m.VolumePresetEditPageModule)
   },
+  {
+    path: 'stream-presets',
+    loadChildren: () => import('./pages/streams/stream-presets/stream-presets.module').then( m => m.StreamPresetsPageModule)
+  },
+  {
+    path: 'stream-preset-edit',
+    loadChildren: () => import('./pages/streams/stream-preset-edit/stream-preset-edit.module').then( m => m.StreamPresetEditPageModule)
+  },
 
 
 ];

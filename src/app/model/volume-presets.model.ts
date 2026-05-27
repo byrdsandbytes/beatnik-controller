@@ -6,6 +6,7 @@ export interface VolumePresetData {
 }
 
 export interface VolumePreset {
+  id: string;
   presetName: string;
   presetDescription?: string;
   data: VolumePresetData[];
