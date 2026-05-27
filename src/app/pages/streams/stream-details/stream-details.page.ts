@@ -6,6 +6,7 @@ import { UserPreference } from 'src/app/enum/user-preference.enum';
 import { SnapCastServerStatusResponse, Stream } from 'src/app/model/snapcast.model';
 import { SnapcastService } from 'src/app/services/snapcast.service';
 import { MopidyService } from 'src/app/services/mopidy.service';
+import { ToastController } from '@ionic/angular';
 
 @Component({
   selector: 'app-stream-details',
@@ -28,7 +29,8 @@ export class StreamDetailsPage implements OnInit {
   constructor(
     private activatedRoute: ActivatedRoute,
     private snapcastService: SnapcastService,
-    public mopidy: MopidyService
+    public mopidy: MopidyService,
+    private toastController: ToastController
   ) { }
 
   ngOnInit(
@@ -78,7 +80,23 @@ export class StreamDetailsPage implements OnInit {
       console.error('StreamDetailsPage: No stream available to play');
       return;
     }
-    this.mopidy.playHofbarStream();
+    this.presentToast('Initializing Hofbar Radio Stream, this may take a few seconds...');
+
+    try {
+      await this.mopidy.playHofbarStream();
+    } catch (error: any) {
+      console.error('Failed to play stream:', error);
+      this.presentToast(error.message || 'Failed to connect to media server.');
+    }
+  }
+
+  async presentToast(message: string) {
+    const toast = await this.toastController.create({
+      message,
+      duration: 2000,
+      position: 'bottom'
+    });
+    toast.present();
   }
 
 }

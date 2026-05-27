@@ -63,13 +63,14 @@
           <ion-card-subtitle>Hof-Bar Radio</ion-card-subtitle>
         </ion-card-header>
         <ion-card-content>
-          <ion-button expand="block" (click)="mopidy.playHofbarStream()" color="primary">
+          <ion-button expand="block" (click)="playHofBarRadio()" color="primary">
             <ion-icon slot="start" name="radio"></ion-icon>
             Play Hofbar Radio
           </ion-button>
         </ion-card-content>
       </ion-card>
     </ng-container>
+    
 
     <ion-accordion-group>
       <ion-accordion value="{{ stream.id }}">
