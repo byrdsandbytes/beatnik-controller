@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.5.6] - 2026-06-14
+
+### Added
+- Add pipe stream asset
+
+### Changed
+- Refine theme color definitions and variables
+
 ## [0.5.5] - 2026-05-27
 
 ### Added
