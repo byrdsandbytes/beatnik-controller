@@ -56,4 +56,12 @@ export class TabsPage implements OnInit, AfterViewInit {
   }
 
 
+  async closePlayerModalToInitialBreakpoint() {
+    const modal = await this.modalController.getTop();
+    if (modal) {
+      await modal.setCurrentBreakpoint(0.05);
+    }
+  }
+
+
 }
