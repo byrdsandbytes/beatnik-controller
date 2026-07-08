@@ -1,5 +1,20 @@
 # Changelog
 
+## [Unreleased]
+
+### Added
+- Add setting for auto scan
+- Add zeroconf clearing func
+
+### Changed
+- Improve fonting based on system font
+
+### Fixed
+- Fix volume presets
+- Clear services on page leave
+- Close modal on nav
+- Fix fonting overlay issues
+
 ## [0.5.6] - 2026-06-14
 
 ### Added
