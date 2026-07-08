@@ -56,7 +56,37 @@ This will pull the latest Docker image and start the application in the backgrou
 
 #### 4. Access the Application
 
-Open your web browser and navigate to `http://localhost:8181` or `http://your-hostname.local:8181`. You should now see the Beatnik Controller interface.
+Open your web browser and navigate to `http://your-hostname.local`. You should now see the Beatnik Controller interface.
+
+#### 5. Updating
+
+To update Beatnik Controller to the latest version, run the following commands in your cloned repository folder:
+
+```bash
+git pull
+docker compose pull
+docker compose up -d
+```
+
+#### 6. Using a Specific Version
+
+By default, the `docker-compose.yml` configuration uses the `latest` Docker image. The automated release pipeline also packages version-specific images when a new release is tagged. 
+
+If you prefer to install, use, or update to a specific locked version instead of `latest`, you can edit the `docker-compose.yml` file and replace `latest` with the desired version tag (for example, `v0.5.6`):
+
+```yaml
+services:
+  beatnik:
+    image: ghcr.io/byrdsandbytes/beatnik-controller:v0.5.6
+```
+
+Then pull the specific image and recreate the container to apply the version:
+
+```bash
+docker compose pull
+docker compose up -d
+```
+
 
 ### Method 2: Build from Source (for Developers)
 
