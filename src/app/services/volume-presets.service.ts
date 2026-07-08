@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { firstValueFrom } from 'rxjs';
+import { firstValueFrom, lastValueFrom } from 'rxjs';
 import { SnapcastService } from './snapcast.service';
 import { Preferences } from '@capacitor/preferences';
 import { UserPreference } from '../enum/user-preference.enum';
@@ -34,7 +34,7 @@ export class VolumePresetsService {
         let presets = JSON.parse(result.value);
         let presetArray = Array.isArray(presets) ? presets : [presets];
         let needsMigration = false;
-        
+
         let migratedArray = presetArray.map((p: any) => {
           if (!p.id) {
             p.id = crypto.randomUUID();
@@ -49,7 +49,7 @@ export class VolumePresetsService {
             value: JSON.stringify(migratedArray)
           });
         }
-        
+
         return migratedArray;
       }
     } catch (error) {
@@ -61,7 +61,7 @@ export class VolumePresetsService {
   async savePreset(newPreset: VolumePreset): Promise<VolumePreset[]> {
     const existingPresets = await this.loadPresetsFromPreferences();
     const existingIndex = existingPresets.findIndex((p: VolumePreset) => p.id === newPreset.id);
-    
+
     if (existingIndex >= 0) {
       existingPresets[existingIndex] = newPreset;
     } else {
@@ -81,15 +81,34 @@ export class VolumePresetsService {
   }
 
   async applyPreset(preset: VolumePreset): Promise<void> {
-    for (const client of preset.data) {
-      try {
-        await this.snapcastService.smoothClientVolumeTransition(client.clientId, client.volumePercent).toPromise();
-        console.log(`Applied volume ${client.volumePercent}% to client ${client.clientId}`);
-      } catch (error) {
-        console.error(`VolumePresetsService: Failed to apply volume for client ${client.clientId}`, error);
+
+    console.log('Refreshing server state...');
+    this.snapcastService.refreshState().subscribe({
+      next: async () => {
+        console.log('Server state refreshed successfully');
+        const now = new Date();
+        setTimeout(() => {
+        }, 100);
+        for (const client of preset.data) {
+          try {
+             firstValueFrom(this.snapcastService.smoothClientVolumeTransition(client.clientId, client.volumePercent));
+            console.log(`Applied volume ${client.volumePercent}% to client ${client.clientId}`);
+          } catch (error) {
+            console.error(`VolumePresetsService: Failed to apply volume for client ${client.clientId}`, error);
+          }
+        }
+        setTimeout(() => {
+        }, 1500);
+      },
+      error: (error) => {
+        console.error('Error refreshing server state:', error);
+        setTimeout(() => {
+          console.log('Server state refresh failed at ' + new Date().toLocaleTimeString());
+        }, 1500);
       }
-    }
+    });
   }
+
 
   async deletePreset(preset: VolumePreset): Promise<VolumePreset[]> {
     let existingPresets = await this.loadPresetsFromPreferences();

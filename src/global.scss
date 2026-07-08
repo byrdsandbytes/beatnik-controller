@@ -108,3 +108,22 @@ ion-tab-bar {
     src: url('assets/fonts/IBMPlexMono-Bold.ttf') format('truetype');
     font-display: swap;
   }
+
+
+  /* Remove the focus outline from the alert wrapper itself */
+ion-alert .alert-wrapper:focus {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* Remove focus outlines and shadows from the alert buttons */
+ion-alert .alert-button:focus,
+ion-alert .alert-button.ion-focused {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* Optional: Remove the grey tap highlight on iOS if that's also bothering you */
+ion-alert .alert-button {
+  -webkit-tap-highlight-color: transparent !important;
+}

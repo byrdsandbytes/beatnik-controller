@@ -1,5 +1,5 @@
 import { Component, HostListener, OnInit } from '@angular/core';
-import { ModalController, RefresherCustomEvent } from '@ionic/angular';
+import { AlertController, ModalController, RefresherCustomEvent } from '@ionic/angular';
 import { first, firstValueFrom, interval, Observable } from 'rxjs';
 import { Client, Group, ServerDetail, SnapCastServerStatusResponse, Stream } from 'src/app/model/snapcast.model';
 import { SnapcastService } from 'src/app/services/snapcast.service';
@@ -10,6 +10,7 @@ import { Preferences } from '@capacitor/preferences';
 import { UserPreference } from 'src/app/enum/user-preference.enum';
 import { Speaker } from 'src/app/model/speaker.model';
 import { HttpClient } from '@angular/common/http';
+import { ZeroconfService } from 'src/app/services/zero-conf.service';
 
 
 
@@ -73,11 +74,17 @@ export class DashboardPage implements OnInit {
 
   refreshingText: string = 'Refreshing... ';
 
+  readonly SERVICE_SNAPCAST = '_snapcast._tcp.';
+  scanForDevicesOnStartup: boolean = false;
+
 
 
   constructor(
     private snapcastService: SnapcastService,
-    private http: HttpClient
+    private http: HttpClient,
+    private zeroconfService: ZeroconfService,
+    private alertController: AlertController
+
   ) {
     // this.groups$ = this.snapcastService.groups$;
     // this.streams$ = this.snapcastService.streams$;
@@ -160,11 +167,13 @@ export class DashboardPage implements OnInit {
   // }
 
   noServerTimeout(): void {
-    // wait 10 seconds before timing out search for server
+    // wait 5 seconds before timing out search for server
     setTimeout(() => {
       if (this.isLoading) {
         this.isLoading = false;
-        console.error('No Snapcast server found after 10 seconds.');
+        console.error('No Snapcast server found after 5 seconds.');
+        this.checkUserPreferencesForAutomaticScan();
+
       }
     }, 10000);
 
@@ -255,7 +264,8 @@ export class DashboardPage implements OnInit {
       next: () => {
         console.log('Server state refreshed successfully');
         const now = new Date();
-        setTimeout(() => {          this.refreshingText = 'Server state refreshed successfully at ' + now.toLocaleTimeString();
+        setTimeout(() => {
+          this.refreshingText = 'Server state refreshed successfully at ' + now.toLocaleTimeString();
         }, 500);
         // this.refreshingText = 'Server state refreshed successfully at ' + now.toLocaleTimeString();
         // event.target.complete();
@@ -276,11 +286,73 @@ export class DashboardPage implements OnInit {
 
 
 
+  async scanForZeroConfServices(): Promise<void> {
+    try {
+      this.zeroconfService.watch(this.SERVICE_SNAPCAST)
+      console.log(`Started scanning for services of types: ${this.SERVICE_SNAPCAST}`);
+      // let's wait for a few seconds to allow the scan to discover services
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      const firstResult = await firstValueFrom(this.zeroconfService.services$);
+      console.log('First discovered services:', firstResult);
+      if (firstResult.length === 0) {
+        console.log('No services found. Stopping scan.');
+        await this.zeroconfService.stop();
+      } else {
+        console.log('Services found. Continuing to watch for more services.');
+        const serverIP = firstResult[0].ipv4Addresses[0];
+        const serverHostname = firstResult[0].hostname;
+        console.log('Setting discovered Snapcast server as the server URL:', serverIP);
+        const userPreferenceServerUrl = await Preferences.get({ key: UserPreference.SERVER_URL });
+        if (userPreferenceServerUrl.value !== serverIP && userPreferenceServerUrl.value !== serverHostname) {
+          const alert = await this.alertController.create({
+            header: 'Different Snapcast Server Found',
+            message: `We discovered a Snapcast server at ${serverIP} (${serverHostname}) that is different from your current preference. Do you want to set this as your Snapcast server?`,
+            buttons: [
+              {
+                text: 'Cancel',
+                role: 'cancel'
+              },
+              {
+                text: 'Set as Server',
+                handler: async () => {
+                  await Preferences.set({
+                    key: UserPreference.SERVER_URL,
+                    value: serverIP,
+                  });
+                  console.log('Server URL set to:', serverIP);
+                  this.ionViewWillEnter(); // Refresh the view to reflect the new server URL
+                  
+                }
+              }
+            ]
+          });
+          await alert.present();
+        } else {
+          console.log('Discovered server IP is the same as the current user preference. No action needed.');
+        }
+      }
 
+    }
+    catch (error) {
+      console.error('Error starting service scan:', error);
+    }
 
+  }
 
-
-
-
-
+  async checkUserPreferencesForAutomaticScan(): Promise<void> {
+    const result = await Preferences.get({ key: UserPreference.SCAN_FOR_DEVICES_ON_STARTUP });
+    this.scanForDevicesOnStartup = result.value === 'true' ? true : false;
+    if (this.scanForDevicesOnStartup) {
+      console.log('User preference indicates to scan for devices on startup. Starting scan...');
+      await this.scanForZeroConfServices();
+    } else {
+      console.log('User preference indicates NOT to scan for devices on startup.');
+    }
+  }
 }
+
+
+
+
+
+
