@@ -1,6 +1,6 @@
 # Changelog
 
-## [Unreleased]
+## [0.5.7] - 2026-07-08
 
 ### Added
 - Add setting for auto scan
