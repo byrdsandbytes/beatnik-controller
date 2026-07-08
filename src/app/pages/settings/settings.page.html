@@ -24,6 +24,10 @@
         <ion-input labelPlacement="floating" label="Server Url" (ionInput)="setServerUrl()" type="text"
           placeholder="Enter server URL" [(ngModel)]="serverUrl"></ion-input>
       </ion-item>
+      <ion-item>
+        <ion-label>Scan for devices on startup</ion-label>
+        <ion-toggle slot="end" [(ngModel)]="scanForDevicesOnStartup" (ionChange)="setScanForDevicesOnStartup()"></ion-toggle>
+      </ion-item>
 
     </ion-list>
     <ion-button expand="full" (click)="connectToServer()">Connect to Server</ion-button>

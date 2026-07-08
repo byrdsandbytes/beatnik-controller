@@ -93,6 +93,11 @@ export class ZeroconfService implements OnDestroy {
     console.log('[ZeroConf] Stopped all operations.');
   }
 
+  // clean old results from the service list
+  clearServices() {
+    this.servicesSubject.next([]);
+  }
+
   // Angular's OnDestroy lifecycle hook for cleanup
   ngOnDestroy() {
     this.stop();

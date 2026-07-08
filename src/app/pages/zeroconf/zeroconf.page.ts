@@ -102,6 +102,8 @@ export class ZeroconfPage implements OnDestroy {
   // Clean up when the component is destroyed
   ngOnDestroy() {
     this.stopScan();
+    // purge the results from the service list
+    this.zeroconf.clearServices();
   }
 
 

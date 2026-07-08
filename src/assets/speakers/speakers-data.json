@@ -5,28 +5,41 @@
       "image": "assets/speakers/img/KEF_Concerto_1971.webp",
       "manufacturer": "KEF",
       "model": "Concerto",
-      "year": 1971
+      "year": 1971,
+      "type": "floor-standing standing speakers"
     },
     {
       "id": "sp.2",
       "image": "assets/speakers/img/JSE_Infinite_Slope.webp",
       "manufacturer": "JSE",
       "model": "Infinite Slope",
-      "year": 1980
+      "year": 1980,
+      "type": "floor-standing standing speakers"
     },
     {
       "id": "rc.1",
       "image": "assets/speakers/img/Meridian_F80.webp",
       "manufacturer": "Meridian",
       "model": "F80",
-      "year": 2005
+      "year": 2005,
+      "type": "Audio Receiver"
+    },
+    {
+      "id": "rd.1",
+      "image": "assets/speakers/img/AEG_Super_1953.webp",
+      "manufacturer": "AEG",
+      "model": "Super",
+      "year": 1953,
+      "type": "Radio"
     },
     {
       "id": "sp.3",
-      "image": "assets/speakers/klipsch_kg4.jpg",
-      "manufacturer": "Pioneer",
-      "model": "CS-E500",
-      "year": 1980
+      "image": "assets/speakers/img/KEF_IQ7_2005.webp",
+      "manufacturer": "KEF",
+      "model": "IQ7",
+      "year": 2005,
+      "type": "floor-standing standing speakers"
     }
+
   ]
 }

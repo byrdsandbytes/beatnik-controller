@@ -16,6 +16,7 @@ export class SettingsPage implements OnInit {
 
   userName?: string
   serverUrl?: string
+  scanForDevicesOnStartup: boolean = false
 
 
 
@@ -38,6 +39,10 @@ export class SettingsPage implements OnInit {
     Preferences.get({ key: UserPreference.SERVER_URL }).then((result) => {
       this.serverUrl = result.value;
     });
+
+    Preferences.get({ key: UserPreference.SCAN_FOR_DEVICES_ON_STARTUP }).then((result) => {
+      this.scanForDevicesOnStartup = result.value === 'true' ? true : false;
+    });
   }
 
   setUserName() {
@@ -55,6 +60,15 @@ export class SettingsPage implements OnInit {
       value: this.serverUrl || '',
     }).then(() => {
       console.log('Server URL set to:', this.serverUrl);
+    });
+  }
+
+  setScanForDevicesOnStartup() {
+    Preferences.set({
+      key: UserPreference.SCAN_FOR_DEVICES_ON_STARTUP,
+      value: this.scanForDevicesOnStartup ? 'true' : 'false',
+    }).then(() => {
+      console.log('Scan for devices on startup set to:', this.scanForDevicesOnStartup);
     });
   }
 

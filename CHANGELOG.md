@@ -1,5 +1,20 @@
 # Changelog
 
+## [Unreleased]
+
+### Added
+- Add setting for auto scan
+- Add zeroconf clearing func
+
+### Changed
+- Improve fonting based on system font
+
+### Fixed
+- Fix volume presets
+- Clear services on page leave
+- Close modal on nav
+- Fix fonting overlay issues
+
 ## [0.5.6] - 2026-06-14
 
 ### Added
@@ -11,7 +26,7 @@
 ## [0.5.5] - 2026-05-27
 
 ### Added
-- Add Mopidy support, control, visuals, and presets
+- Add Mopidy (POC) support, control, visuals, and presets
 
 ## [0.5.4] - 2026-05-08
 

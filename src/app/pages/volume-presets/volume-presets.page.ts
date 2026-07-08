@@ -35,18 +35,26 @@ export class VolumePresetsPage implements OnInit {
 
   async applyPreset(preset: VolumePreset) {
     try {
+      const applyToast = await this.toastController.create({
+        message: `Applying preset "${preset.presetName}"...`,
+        duration: 2000,
+        position: 'bottom',
+        color: 'primary',
+        icon: 'sync-outline'
+      });
+      await applyToast.present();
       await this.volumePresetsService.applyPreset(preset);
       
       await Haptics.impact({ style: ImpactStyle.Light });
       
-      const toast = await this.toastController.create({
+      const successToast = await this.toastController.create({
         message: `Preset "${preset.presetName}" applied`,
         duration: 2000,
         position: 'bottom',
         color: 'success',
         icon: 'checkmark-circle-outline'
       });
-      await toast.present();
+      await successToast.present();
     } catch (error) {
       console.error('Failed to apply preset', error);
       

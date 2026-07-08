@@ -17,6 +17,7 @@ export class ChooseSpeakersComponent implements OnInit {
 
   selectedId: string | undefined;
   speakers: Speaker[] = [];
+  filteredSpeakers: Speaker[] = [];
 
   constructor(
     private modalController: ModalController,
@@ -49,6 +50,7 @@ export class ChooseSpeakersComponent implements OnInit {
         this.http.get<{ speakers: Speaker[] }>('assets/speakers/speakers-data.json')
       );
       this.speakers = response.speakers;
+      this.filteredSpeakers = [...this.speakers];
       console.log('Speakers loaded:', this.speakers);
       return this.speakers;
     } catch (error) {
@@ -68,6 +70,21 @@ export class ChooseSpeakersComponent implements OnInit {
       error: (error) => {
         console.error(`Failed to set speaker for client ${this.clientId}`, error);
       }
+    });
+  }
+
+  filterSpeakers(event: any) {
+    const searchTerm = event.target.value.toLowerCase();
+    
+    if (!searchTerm) {
+      this.filteredSpeakers = [...this.speakers];
+      return;
+    }
+    
+    this.filteredSpeakers = this.speakers.filter(speaker => {
+      const matchManufacturer = speaker.manufacturer?.toLowerCase().includes(searchTerm);
+      const matchModel = speaker.model?.toLowerCase().includes(searchTerm);
+      return matchManufacturer || matchModel;
     });
   }
 
