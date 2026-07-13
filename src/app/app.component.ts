@@ -54,27 +54,4 @@ export class AppComponent {
       });
     });
   }
-
-
-  async scanForZeroConfServices(): Promise<void> {
-    try {
-      await this.zeroconfService.watch(this.SERVICE_SNAPCAST);
-      console.log(`Started scanning for services of types: ${this.SERVICE_SNAPCAST}`);
-    }
-    catch (error) {
-      console.error('Error starting service scan:', error);
-    }
-
-  }
-
-  async checkUserPreferencesForAutomaticScan(): Promise<void> {
-    const result = await Preferences.get({ key: UserPreference.SCAN_FOR_DEVICES_ON_STARTUP });
-    this.scanForDevicesOnStartup = result.value === 'true' ? true : false;
-    if (this.scanForDevicesOnStartup) {
-      console.log('User preference indicates to scan for devices on startup. Starting scan...');
-      await this.scanForZeroConfServices();
-    } else {
-      console.log('User preference indicates NOT to scan for devices on startup.');
-    }
-  }
 }

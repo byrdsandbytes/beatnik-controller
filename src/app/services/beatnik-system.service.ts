@@ -8,6 +8,10 @@ export interface SystemInfo {
   totalRam: number;
   freeRam: number;
   temperature: number | null;
+  os: string;
+  macAddress: string | null;
+  storageType: string | null;
+  model: string;
 }
 
 export type LedCommand =
