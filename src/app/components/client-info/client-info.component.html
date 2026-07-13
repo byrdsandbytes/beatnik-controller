@@ -21,52 +21,100 @@
 <!-- </ion-toolbar> -->
 
 <ng-container *ngIf="segment === 'details'">
-  <ion-list *ngIf="serverState | async as state">
 
-    <ion-item>
-      <ion-label>
-        <h2>Snap Client Information</h2>
-        <p>Id: {{client.id}}</p>
-        <p *ngIf="client.lastSeen">{{client.lastSeen.sec * 1000 | date: 'long'}}</p>
-        <hr />
-        <h3>Host</h3>
-        <p>Name: {{client.host.name}}</p>
-        <p>OS: {{client.host.os}}</p>
-        <p>Architecture: {{client.host.arch}}</p>
-        <p>IP Address: {{cleanIpAddress(client.host.ip)}}</p>
-        <p>MAC Address: {{client.host.mac}}</p>
-        <hr />
-        <h3>Configuration</h3>
-        <p>Name: {{ client.config.name}}</p>
-        <p>Client ID: {{ client.id }}</p>
-        <p>Volume: {{ client.config.volume.percent || 'N/A' }}%</p>
-        <p>Muted: {{ client.config.volume.muted}}</p>
-        <p>Latency: {{ client.config.latency }} ms</p>
-        <p>Connected: {{ client.connected }}</p>
-        <p>Last Seen: {{ client.lastSeen.sec * 1000 | date : 'long' }}</p>
-        <p></p>
-      </ion-label>
-    </ion-item>
-    <ion-accordion-group *ngIf="client">
-      <ion-accordion value="{{ client.id }}">
-        <ion-item slot="header">
-          <ion-label>
-            <h2>{{ client.id }}</h2>
-            <p>Raw json</p>
-          </ion-label>
-        </ion-item>
-        <ion-item slot="content" lines="none" color="dark">
-          <pre>{{ client| json }}</pre>
-        </ion-item>
-      </ion-accordion>
-    </ion-accordion-group>
-    <!-- <ion-item>
+  <div class=container>
+
+    <div class="row justify-content-center align-items-center ion-text-center"
+      *ngIf="systemInfo$ | async as systemInfo">
+      <div class="col-6 col-lg-3 ion-text-center" *ngIf="systemInfo.temperature !== null">
+
+        <h2>{{ systemInfo.temperature | number:'1.0-2' }} °C</h2>
+        <p class="small-note">Device Temperature</p>
+
+      </div>
+      <div class="col-6 col-lg-3">
+        <h2>{{ systemInfo.totalRam - systemInfo.freeRam | number:'1.0-2' }} MB</h2>
+        <p class="small-note">RAM in use (of {{systemInfo.totalRam}} MB)</p>
+      </div>
+      <div class="col-6 col-lg-3" *ngIf="systemInfo.hostname">
+        <h2>{{ systemInfo.hostname }}</h2>
+        <p class="small-note">Hostname</p>
+      </div>
+      <div class="col-6 col-lg-3" *ngIf="systemInfo.ipAddresses">
+        <h2 style="font-size: 1.2rem;">
+          <ng-container *ngFor="let ip of systemInfo.ipAddresses">{{ ip }}<br /></ng-container>
+        </h2>
+        <p class="small-note">IP Addresses</p>
+      </div>
+
+      <div class="col-6 col-lg-3" *ngIf="systemInfo.os">
+        <h2>{{ systemInfo.os }}</h2>
+        <p class="small-note">OS</p>
+      </div>
+      <div class="col-6 col-lg-3" *ngIf="systemInfo.model">
+        <h2>{{ systemInfo.model }}</h2>
+        <p class="small-note">Model</p>
+      </div>
+      <div class="col-6 col-lg-3" *ngIf="systemInfo.storageType">
+        <h2>{{ systemInfo.storageType }}</h2>
+        <p class="small-note">Storage Type</p>
+      </div>
+      <div class="col-6 col-lg-3 " *ngIf="systemInfo.macAddress">
+        <h2 style="font-size: 1.2rem;">{{ systemInfo.macAddress }}</h2>
+        <p class="small-note">MAC Address</p>
+      </div>
+
+    </div>
+    <ng-container *ngIf="serverState | async as state">
+      <div class="row justify-content-center align-items-center ion-text-center">
+        <div class="col-6 col-lg-3" *ngIf="client.host.arch">
+          <h2>{{client.host.arch}}</h2>
+          <p class="small-note">Architecture</p>
+        </div>
+        <div class="col-6 col-lg-3">
+          <h2>{{ client.config.volume.percent || 'N/A' }}%</h2>
+          <p class="small-note">Volume</p>
+        </div>
+        <div class="col-6 col-lg-3">
+          <h2>{{ client.config.volume.muted }}</h2>
+          <p class="small-note">Muted</p>
+        </div>
+        <div class="col-6 col-lg-3" *ngIf="client.config.latency">
+          <h2>{{ client.config.latency }} ms</h2>
+          <p class="small-note">Latency</p>
+        </div>
+        <div class="col-6 col-lg-3">
+          <h2>{{ client.connected }}</h2>
+          <p class="small-note">Connected</p>
+        </div>
+        <div class="col-6 col-lg-3" *ngIf="client.lastSeen">
+          <h2>{{ client.lastSeen.sec * 1000 | date : 'long' }}</h2>
+          <p class="small-note">Last Seen</p>
+        </div>
+      </div>
+    </ng-container>
+  </div>
+
+
+  <ion-accordion-group *ngIf="client">
+    <ion-accordion value="{{ client.id }}">
+      <ion-item color="dark" slot="header">
+        <ion-label>
+          <h2>Snpcast Client ({{ client.id }})</h2>
+          <p>Raw json</p>
+        </ion-label>
+      </ion-item>
+      <ion-item slot="content" lines="none" color="dark">
+        <pre>{{ client| json }}</pre>
+      </ion-item>
+    </ion-accordion>
+  </ion-accordion-group>
+  <!-- <ion-item>
         <ion-label>
           <h2>Camilla DSP Information</h2> -->
 
 
 
-  </ion-list>
 </ng-container>
 
 <ng-container *ngIf="segment === 'soundcard'">
@@ -123,43 +171,17 @@
         <p>"Inactive" Means this device is configured to be a Beatnik / snapcast client. Clients will automatically try
           to connect to the server in your local Network.</p>
       </ng-container>
-      <p>{{ snapcastServerStatus.message}}</p>
+      <!-- <p>{{ snapcastServerStatus.message}}</p> -->
       <!-- <pre>{{ snapcastServerStatus | json }}</pre> -->
     </ion-label>
   </ion-item>
 
   <ion-item-divider>
-    <ion-label>System Info</ion-label>
+    <ion-label>Actions</ion-label>
   </ion-item-divider>
 
-  <ion-list *ngIf="systemInfo$ | async as systemInfo">
-    <ion-item>
-      <ion-label>
-        <h3>Hostname</h3>
-        <p>{{ systemInfo.hostname }}</p>
-      </ion-label>
-    </ion-item>
-    <ion-item>
-      <ion-label>
-        <h3>IP Addresses</h3>
-        <p *ngFor="let ip of systemInfo.ipAddresses">{{ ip }}</p>
-      </ion-label>
-    </ion-item>
-    <ion-item>
-      <ion-label>
-        <h3>RAM Usage</h3>
-        <p>{{ systemInfo.freeRam | number:'1.0-0' }} MB ({{ (systemInfo.freeRam / 1024) | number:'1.1-2' }} GB) Free /
-          {{ systemInfo.totalRam | number:'1.0-0' }} MB ({{ (systemInfo.totalRam / 1024) | number:'1.1-2' }} GB) Total
-        </p>
-      </ion-label>
-    </ion-item>
-    <ion-item *ngIf="systemInfo.temperature !== null">
-      <ion-label>
-        <h3>Temperature</h3>
-        <p>{{ systemInfo.temperature }} °C</p>
-      </ion-label>
-    </ion-item>
-  </ion-list>
+
+
 
   <div class="ion-padding-horizontal ion-padding-bottom">
     <ion-button expand="full" color="primary" (click)="refreshSnapcastStatus()"
@@ -168,14 +190,14 @@
       Refresh Snapcast Server Status
     </ion-button>
 
-    <ion-button expand="full" color="danger" (click)="disableSnapcastServer()"
-      [disabled]="isLoading['disableSnapcast']">
+    <ion-button *ngIf="snapcastServerStatus as status" expand="full" color="danger" (click)="disableSnapcastServer()"
+      [disabled]="isLoading['disableSnapcast'] || !status.active">
       <ion-spinner *ngIf="isLoading['disableSnapcast']" name="crescent" class="ion-margin-end"></ion-spinner>
       Disable Snapcast Server
     </ion-button>
 
-    <ion-button expand="full" color="secondary" (click)="enableSnapcastServer()"
-      [disabled]="isLoading['enableSnapcast']">
+    <ion-button *ngIf="snapcastServerStatus as status" expand="full" color="secondary" (click)="enableSnapcastServer()"
+      [disabled]="isLoading['enableSnapcast'] || status.active">
       <ion-spinner *ngIf="isLoading['enableSnapcast']" name="crescent" class="ion-margin-end"></ion-spinner>
       Enable Snapcast Server
     </ion-button>
