@@ -5,10 +5,17 @@
         <ion-item *ngIf="stream.properties.metadata else noMetadata" class="ion-padding-top" lines="none"
           color="primary">
           <ion-thumbnail slot="start">
-            <img [src]="stream.properties.metadata.artData
+            <img *ngIf="stream.properties.metadata.artData else noBase64" [src]="stream.properties.metadata.artData
       ? convertCoverDataBase64(stream.properties.metadata.artData.data, stream.properties.metadata.artData.extension)
       : 'assets/images/cover-fallback.png'" (error)="onCoverImageError($event)" alt="cover image">
           </ion-thumbnail>
+          <ng-template #noBase64>
+            <img *ngIf="stream.properties.metadata.artUrl else noArtUrl" [src]="stream.properties.metadata.artUrl"
+              (error)="onCoverImageError($event)" alt="cover image">
+            <ng-template #noArtUrl>
+              <img [src]="'assets/placeholder/cover_art_placeholder.svg'" alt="Placeholder Image">
+            </ng-template>
+          </ng-template>
           <ion-label *ngIf="stream.properties.metadata">
             <p>{{stream.id}}</p>
             <h2> {{ stream.properties.metadata.title }}</h2>
