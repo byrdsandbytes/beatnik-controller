@@ -11,8 +11,18 @@
 
   <ng-container *ngIf="activeStream && activeStream.properties.metadata else noStreamData">
 
-    <img *ngIf="activeStream.properties.metadata.artData as artData"
+    <img *ngIf="activeStream.properties.metadata.artData as artData; else noBase64"
       [src]="convertCoverDataBase64(artData.data, artData.extension)" class="cover">
+
+    <ng-template #noBase64>
+      <!-- try url if no url show placeholder -->
+      <img *ngIf="activeStream.properties.metadata.artUrl as artUrl; else noArtUrl" [src]="artUrl" class="cover"
+        alt="Album Art">
+      <ng-template #noArtUrl>
+        <img [src]="'assets/placeholder/cover_art_placeholder.svg'" class="cover" alt="Placeholder Image">
+      </ng-template>
+    </ng-template>
+
     <ng-conainer [ngSwitch]="activeStream.status">
       <ng-container *ngSwitchCase="'playing'">
         <ion-icon class="status-icon" name="play-circle"></ion-icon>

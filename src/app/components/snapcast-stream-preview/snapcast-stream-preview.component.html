@@ -19,8 +19,11 @@
 
     <div *ngIf="stream.properties.metadata as meta"
       class="d-flex flex-column align-items-center justify-content-center ion-text-center">
-      <img *ngIf="meta.artData as artData" class="cover-image"
+      <img *ngIf="meta.artData as artData; else noBase64" class="cover-image"
         [src]="convertCoverDataBase64(artData.data, artData.extension)" alt="Album Art" />
+      <ng-template #noBase64>
+        <img class="cover-image" src="/assets/streams/default-cover.svg" alt="Default Album Art" />
+      </ng-template>
 
 
       <p>{{ meta.album }}<br>

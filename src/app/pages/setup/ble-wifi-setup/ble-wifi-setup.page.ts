@@ -4,6 +4,8 @@ import { NavController } from '@ionic/angular';
 import { firstValueFrom, Observable } from 'rxjs';
 import { BeatnikBlenoService, BleNetwork, WifiStatus } from 'src/app/services/beatnik-bleno.service';
 import Swiper, { SwiperOptions } from 'swiper';
+import { Network, ConnectionStatus } from '@capacitor/network';
+
 
 @Component({
   selector: 'app-ble-wifi-setup',
@@ -35,13 +37,21 @@ export class BleWifiSetupPage implements OnInit {
   private swiperInstance: Swiper | undefined;
   public slideIndex: number = 0;
 
+  smartphoneNetworkStatus: ConnectionStatus | null = null;
+
   constructor(
     private beatikBlenoService: BeatnikBlenoService,
     private router: Router,
     private navCtrl: NavController
   ) { }
 
-  ngOnInit() {
+  async ngOnInit() {
+    this.smartphoneNetworkStatus = await Network.getStatus();
+    console.log('Initial smartphone network status:', this.smartphoneNetworkStatus);
+    Network.addListener('networkStatusChange', status => {
+      console.log('Network status changed', status);
+      this.smartphoneNetworkStatus = status;
+    });
   }
 
   async scanForServices() {
@@ -50,6 +60,7 @@ export class BleWifiSetupPage implements OnInit {
     const result = await this.beatikBlenoService.findAndConnectWithouhtDialog();
     console.log('Scan result:', result);
     this.subsribeToDeviceConnectionStatus();
+    
   }
 
   stopScan() {
