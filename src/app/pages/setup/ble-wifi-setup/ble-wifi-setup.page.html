@@ -28,10 +28,11 @@
           <div class="ion-margin">
             <ion-text color="medium">
               <p>
-                Plug in your Beatnik. Hold the setup button for 5 seconds until the LED pulses blue. Then tap "Scan
+                Plug in your Beatnik. Make sure you're connected to your home Wi-Fi. Hold the setup button for 5 seconds until the LED pulses blue. Then tap "Scan
                 for
                 Devices".
               </p>
+              <p *ngIf="smartphoneNetworkStatus">Your smartphone is currently {{ smartphoneNetworkStatus.connected ? 'connected' : 'disconnected' }} to {{smartphoneNetworkStatus.connectionType }}</p>
             </ion-text>
           </div>
           <div class="animation-container">
