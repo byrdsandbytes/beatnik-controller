@@ -43,4 +43,18 @@ export class BeatnikSnapcastService {
   disable(host: string): Observable<SnapcastActionResponse> {
     return this.http.post<SnapcastActionResponse>(`${this.getApiUrl(host)}/disable`, {});
   }
+
+  /**
+   * Restart Snapserver
+   */
+  restartServer(host: string): Observable<{ success: boolean; message: string }> {
+    return this.http.post<{ success: boolean; message: string }>(`${this.getApiUrl(host)}/restart-server`, {});
+  }
+
+  /**
+   * Restart Snapclient
+   */
+  restartClient(host: string): Observable<{ success: boolean; message: string }> {
+    return this.http.post<{ success: boolean; message: string }>(`${this.getApiUrl(host)}/restart-client`, {});
+  }
 }

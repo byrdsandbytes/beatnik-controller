@@ -340,6 +340,44 @@ export class ClientInfoComponent implements OnInit {
       }
     });
   }
+
+  async restartSnapcastServer() {
+    if (!this.client) return;
+    this.isLoading['restartSnapcast'] = true;
+    const localHostName = await this.getUrl();
+    this.beatnikSnapcastService.restartServer(localHostName).subscribe({
+      next: (response) => {
+        console.log('Successfully restarted Snapcast server:', response);
+        this.presentToast('Snapcast Server Restarted', 'success');
+        this.refreshSnapcastStatus();
+        this.isLoading['restartSnapcast'] = false;
+      },
+      error: (err) => {
+        console.error('Failed to restart Snapcast server:', err);
+        this.presentToast('Failed to Restart Snapcast Server', 'danger');
+        this.isLoading['restartSnapcast'] = false;
+      }
+    });
+  }
+
+  async restartSnapcastClient() {
+    if (!this.client) return;
+    this.isLoading['restartSnapcastClient'] = true;
+    const localHostName = await this.getUrl();
+    this.beatnikSnapcastService.restartClient(localHostName).subscribe({
+      next: (response) => {
+        console.log('Successfully restarted Snapcast client:', response);
+        this.presentToast('Snapcast Client Restarted', 'success');
+        this.refreshSnapcastStatus();
+        this.isLoading['restartSnapcastClient'] = false;
+      },
+      error: (err) => {
+        console.error('Failed to restart Snapcast client:', err);
+        this.presentToast('Failed to Restart Snapcast Client', 'danger');
+        this.isLoading['restartSnapcastClient'] = false;
+      }
+    });
+  }
 }
 
 

@@ -201,6 +201,17 @@
       <ion-spinner *ngIf="isLoading['enableSnapcast']" name="crescent" class="ion-margin-end"></ion-spinner>
       Enable Snapcast Server
     </ion-button>
+    <ion-button *ngIf="snapcastServerStatus as status" expand="full" color="warning" (click)="restartSnapcastServer()"
+      [disabled]="isLoading['restartSnapcast'] || !status.active">
+      <ion-spinner *ngIf="isLoading['restartSnapcast']" name="crescent" class="ion-margin-end"></ion-spinner>
+      Restart Snapcast Server
+    </ion-button>
+
+    <!-- restart client -->
+    <ion-button expand="full" color="warning" (click)="restartSnapcastClient()" [disabled]="isLoading['restartSnapcastClient']">
+      <ion-spinner *ngIf="isLoading['restartSnapcastClient']" name="crescent" class="ion-margin-end"></ion-spinner>
+      Restart Client
+    </ion-button>
 
     <ion-button expand="full" color="primary" (click)="chooseSpeakers()">
       Choose Speakers

@@ -1,12 +1,12 @@
 <ion-header [translucent]="true">
-  <ion-toolbar>
+  <ion-toolbar class="ion-no-border">
     <ion-buttons slot="start">
       <ion-button (click)="handleBack()">
         <ion-icon slot="start" name="chevron-back"></ion-icon>
         Back
       </ion-button>
     </ion-buttons>
-    <ion-title>ble-wifi-setup</ion-title>
+    <ion-title>Network Configuration</ion-title>
   </ion-toolbar>
 </ion-header>
 
@@ -28,11 +28,34 @@
           <div class="ion-margin">
             <ion-text color="medium">
               <p>
-                Plug in your Beatnik. Make sure you're connected to your home Wi-Fi. Hold the setup button for 5 seconds until the LED pulses blue. Then tap "Scan
+                Plug in your Beatnik. Make sure you're connected to your home Wi-Fi. Hold the setup button for 5 seconds
+                until the LED pulses blue. Then tap "Scan
                 for
                 Devices".
               </p>
-              <p *ngIf="smartphoneNetworkStatus">Your smartphone is currently {{ smartphoneNetworkStatus.connected ? 'connected' : 'disconnected' }} to {{smartphoneNetworkStatus.connectionType }}</p>
+              <ng-container *ngIf="smartphoneNetworkStatus">
+                <ng-switch [ngSwitch]="smartphoneNetworkStatus.connectionType">
+                  <ion-item lines="none" *ngSwitchCase="'wifi'">
+                    <ion-icon color="success" slot="start" name="checkmark-circle"></ion-icon>
+                    <ion-label>
+                      <p class="wifinote">
+                        Your smartphone is currently connected to {{smartphoneNetworkStatus.connectionType }}.
+                      </p>
+                    </ion-label>
+
+                  </ion-item>
+                  <ion-item lines="none" *ngSwitchCase="'cellular'">
+                    <ion-icon color="danger" slot="start" name="alert-circle"></ion-icon>
+                    <ion-label>
+                      <p class="wifinote">
+                        Your smartphone is currently disconnected from Wi-Fi. Please connect to your home Wi-Fi network
+                        before proceeding.
+                      </p>
+                    </ion-label>
+                  </ion-item>
+                </ng-switch>
+              </ng-container>
+
             </ion-text>
           </div>
           <div class="animation-container">
@@ -197,8 +220,8 @@
 
 </ion-content>
 
-<ion-footer>
-  <ion-toolbar color="light" class="ion-no-lines ion-padding-horizontal">
+<ion-footer class="ion-no-border">
+  <ion-toolbar color="light" class="ion-no-border ion-padding-horizontal">
     <div [ngSwitch]="slideIndex">
       <div *ngSwitchCase="0">
         <div>

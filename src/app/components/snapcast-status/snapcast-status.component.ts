@@ -7,6 +7,7 @@ import { BeatnikHardwareService } from 'src/app/services/beatnik-hardware.servic
 import { UserPreference } from 'src/app/enum/user-preference.enum';
 import { Preferences } from '@capacitor/preferences';
 import { AlertController, ToastController } from '@ionic/angular';
+import { BeatnikSnapcastService } from 'src/app/services/beatnik-snapcast.service';
 
 @Component({
   selector: 'app-snapcast-status',
@@ -26,6 +27,7 @@ export class SnapcastStatusComponent implements OnInit, OnDestroy {
   constructor(
     public snapcastService: SnapcastService,
     private beatnikHardwareService: BeatnikHardwareService,
+    private beatnikSnapcastService: BeatnikSnapcastService,
     private toastController: ToastController,
     private alertController: AlertController) {
 
@@ -263,6 +265,126 @@ export class SnapcastStatusComponent implements OnInit, OnDestroy {
       ]
     }).then(alert => alert.present());
   }
+
+  async showRestartSnapserverAndClientsAlert(): Promise<void> {
+    const alert = await this.alertController.create({
+      header: 'Confirm Restart',
+      message: 'Are you sure you want to restart the Snapserver and all Snapclients? This will cause temporary disruption of audio playback.',
+      buttons: [
+        {
+          text: 'Cancel',
+          role: 'cancel'
+        },
+        {
+          text: 'Restart',
+          handler: () => {
+            this.restartSnapserverAndClients();
+          }
+        }
+      ]
+    });
+
+    await alert.present();
+  }
+
+  async restartSnapserverAndClients(): Promise<void> {
+    await this.restartSnapserver();
+    // wait 5 seconds before restarting clients to give the server time to come back online
+    await new Promise(resolve => setTimeout(resolve, 5000));
+    await this.restartSnapclients();
+  }
+
+  async restartSnapserver(): Promise<void> {
+    const serverIp = await Preferences.get({ key: UserPreference.SERVER_URL }).then((result) => result.value);
+    if (!serverIp) {
+      console.error('No server IP found in user preferences.');
+      return;
+    }
+
+    this.isLoading['restartServer'] = true;
+    this.beatnikSnapcastService.restartServer(serverIp).subscribe({
+      next: () => {
+        console.log(`Successfully restarted Snapserver on server at IP ${serverIp}`);
+        this.isLoading['restartServer'] = false;
+        this.presentToast('Snapserver Restart Initiated', 'success');
+      },
+      error: (err) => {
+        console.error(`Failed to restart Snapserver on server at IP ${serverIp}`, err);
+        this.isLoading['restartServer'] = false;
+        this.presentToast('Failed to Restart Snapserver', 'danger');
+      }
+    });
+  }
+
+  async restartSnapclients(): Promise<void> {
+    const state = await firstValueFrom(this.displayState!);
+    if (!state) return;
+
+    const clientIps = state.server.groups.flatMap(group => group.clients?.map(client => client.host.ip) || []);
+    for (const ip of clientIps) {
+      const formattedIp = await this.getUrl(ip);
+
+      try {
+        // if ip adress is server ip from user preferences, skip restarting since it will be handled in restartSnapserver
+        const serverIp = await Preferences.get({ key: UserPreference.SERVER_URL }).then(result => result.value);
+        if (formattedIp === serverIp) {
+          console.log(`Skipping restart for client ${formattedIp} since it matches the server IP`);
+          continue;
+        }
+
+        this.isLoading[`restartClient-${formattedIp}`] = true;
+        await firstValueFrom(this.beatnikSnapcastService.restartClient(formattedIp));
+        console.log(`Successfully restarted Snapclient on client ${formattedIp}`);
+        this.isLoading[`restartClient-${formattedIp}`] = false;
+        this.presentToast(`Snapclient Restart Initiated for ${formattedIp}`, 'success');
+      } catch (err) {
+        console.error(`Failed to restart Snapclient on client ${formattedIp}`, err);
+        this.isLoading[`restartClient-${formattedIp}`] = false;
+        this.presentToast(`Failed to Restart Snapclient for ${formattedIp}`, 'danger');
+      }
+    }
+  }
+
+  showRestartSnapserverAlert(): void {
+    this.alertController.create({
+      header: 'Confirm Restart',
+      message: 'Are you sure you want to restart the Snapserver? This will cause temporary disruption of audio playback.',
+      buttons: [
+        {
+          text: 'Cancel',
+          role: 'cancel'
+        },
+        {
+          text: 'Restart',
+          handler: () => {
+            this.restartSnapserver();
+          }
+        }
+      ]
+    }).then(alert => alert.present());
+  }
+
+  showRestartSnapclientAlert(): void {
+    this.alertController.create({
+      header: 'Confirm Restart',
+      message: 'Are you sure you want to restart all Snapclients? This will cause temporary disruption of audio playback on all clients.',
+      buttons: [
+        {
+          text: 'Cancel',
+          role: 'cancel'
+        },
+        {
+          text: 'Restart',
+          handler: () => {
+            this.restartSnapclients();
+          }
+        }
+      ]
+    }).then(alert => alert.present());
+  }
+
+
+
 
   ngOnDestroy(): void {
     this.subscriptions.unsubscribe();

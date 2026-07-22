@@ -6,7 +6,7 @@ import { SnapcastService } from 'src/app/services/snapcast.service';
 import { ServerDetail, SnapCastServerStatusResponse } from 'src/app/model/snapcast.model';
 import { ActivatedRoute, Router } from '@angular/router';
 import Swiper, { SwiperOptions } from 'swiper';
-import { AlertController, NavController } from '@ionic/angular';
+import { AlertController, LoadingController, NavController } from '@ionic/angular';
 import { BeatnikHardwareService, HardwareStatus } from 'src/app/services/beatnik-hardware.service';
 import { BeatnikHardware } from 'src/app/model/beatnik-hardware.model';
 import { SUPPORTED_HATS } from 'src/app/constant/hat.constant';
@@ -36,7 +36,7 @@ export class SetupServerPage implements OnInit {
   ip: string | null = null;
   userPreferenceServerAdress: string = '';
 
-  isFirstDevice: boolean = true;
+  isFirstDevice: boolean = false;
 
   swiperConfig: SwiperOptions = {
     slidesPerView: 1,
@@ -52,6 +52,8 @@ export class SetupServerPage implements OnInit {
   hats = Object.values(SUPPORTED_HATS);
   manualHatId: string = '';
 
+  loadingDisplay: HTMLIonLoadingElement | null = null;
+
   constructor(
     private zeroconf: ZeroconfService,
     private snapcastService: SnapcastService,
@@ -60,7 +62,8 @@ export class SetupServerPage implements OnInit {
     private beatnikHardwareService: BeatnikHardwareService,
     private beatnikSnapcastService: BeatnikSnapcastService,
     private alertController: AlertController,
-    private router: Router
+    private router: Router,
+    private loadingController: LoadingController
   ) {
     this.services$ = this.zeroconf.services$;
   }
@@ -235,6 +238,13 @@ export class SetupServerPage implements OnInit {
   }
 
   async setupAsSnapcastServer(): Promise<void> {
+    this.showLoadingSpinner('Setting up this device as Snapcast server...');
+    if (!this.ip) {
+      console.error('No IP address provided for Snapcast server.');
+      this.loadingDisplay?.dismiss();
+      return;
+    }
+
     console.log('Setting up this device as Snapcast server...');
     this.beatnikSnapcastService.enable(this.ip || '').subscribe({
       next: (response) => {
@@ -242,10 +252,12 @@ export class SetupServerPage implements OnInit {
         console.log('Successfully enabled Snapserver on server at IP', this.ip, response);
         this.connectToSnapcast(this.selectedService);
         this.navToSetupSoundcard();
+        this.loadingDisplay?.dismiss();
 
       },
       error: (err) => {
         console.error('Failed to enable Snapserver on server at IP', this.ip, err);
+        this.loadingDisplay?.dismiss(); 
       }
     });
   }
@@ -260,19 +272,28 @@ export class SetupServerPage implements OnInit {
   }
 
   async setupAsSecondaryServer(): Promise<void> {
+    this.showLoadingSpinner('Setting up this device as secondary Snapcast server...');
+    if (!this.ip) {
+      console.error('No IP address provided for Snapcast server.');
+      this.loadingDisplay?.dismiss();
+      return;
+    }
     console.log('Setting up this device as secondary Snapcast server...');
     this.beatnikSnapcastService.enable(this.ip || '').subscribe({
       next: (response) => {
         console.log('Successfully enabled Snapserver on server at IP', this.ip, response);
         this.slideTo(2);
+        this.loadingDisplay?.dismiss();
       },
       error: (err) => {
         console.error('Failed to enable Snapserver on server at IP', this.ip, err);
+        this.loadingDisplay?.dismiss();
       }
     });
   }
 
   async setupAsSnapcastClient(): Promise<void> {
+    this.showLoadingSpinner('Setting up this device as Snapcast client...');
     if (!this.ip) {
       console.error('No IP address provided for Snapcast server.');
       return;
@@ -282,9 +303,11 @@ export class SetupServerPage implements OnInit {
       next: (response) => {
         console.log('Successfully disabled Snapserver on server at IP', this.ip, response);
         this.navToSetupSoundcard();
+        this.loadingDisplay?.dismiss();
       },
       error: (err) => {
         console.error('Failed to disable Snapserver on server at IP', this.ip, err);
+        this.loadingDisplay?.dismiss();
       }
     });
   }
@@ -357,6 +380,16 @@ export class SetupServerPage implements OnInit {
 
   navToSetupSoundcard() {
     this.router.navigateByUrl(`/setup-soundcard/${this.ip}`);
+  }
+
+  async showLoadingSpinner(text: string) {
+
+    this.loadingDisplay = await this.loadingController.create({
+      message: text,
+      spinner: 'dots',
+      backdropDismiss: false,
+    });
+    await this.loadingDisplay.present();
   }
 
 
