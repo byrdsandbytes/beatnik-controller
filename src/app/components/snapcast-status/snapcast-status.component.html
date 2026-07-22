@@ -59,11 +59,41 @@
           <pre>{{ state | json }}</pre>
         </div>
       </ion-accordion>
+      <!-- reboot server and all clients -->
+
+      <ion-accordion value="restart">
+        <ion-item slot="header" color="light">
+          <ion-label>Restart Snapserver and Snapclients</ion-label>
+        </ion-item>
+        <div class="ion-padding" slot="content" style="overflow-x: auto;">
+          <p>Restart the Snapserver and Snapclient services. This will not reboot your device.</p>
+          <!-- restarting services -->
+          <ion-button color="primary" expand="block" (click)="showRestartSnapserverAlert()">Restart
+            Snapserver</ion-button>
+          <ion-button color="primary" expand="block" (click)="showRestartSnapclientAlert()">Restart All
+            Snapclients</ion-button>
+          <ion-button color="primary" expand="block" (click)="showRestartSnapserverAndClientsAlert()">Restart Snapserver
+            and
+            All Snapclients</ion-button>
+        </div>
+      </ion-accordion>
+      <ion-accordion value="reboot">
+        <ion-item slot="header" color="light">
+          <ion-label>Reboot Server and Clients</ion-label>
+        </ion-item>
+        <div class="ion-padding" slot="content" style="overflow-x: auto;">
+          <p>Physically reboot your devices. Devices will rebbot and restart all Services.</p>
+          <ion-button color="danger" expand="block" (click)="showRebootServerAlert()">Reboot Server</ion-button>
+          <ion-button color="danger" expand="block" (click)="showRebootClientsAlert()">Reboot All Clients</ion-button>
+          <ion-button color="danger" expand="block" (click)="showRebootServerAndClientsAlert()">Reboot Server and All
+            Clients</ion-button>
+        </div>
+      </ion-accordion>
+
+
+
     </ion-accordion-group>
-    <!-- reboot server and all clients -->
-     <ion-button color="primary" expand="block" (click)="showRebootServerAlert()">Reboot Server</ion-button>
-     <ion-button color="primary" expand="block" (click)="showRebootClientsAlert()">Reboot All Clients</ion-button>
-    <ion-button color="primary" expand="block" (click)="showRebootServerAndClientsAlert()">Reboot Server and All Clients</ion-button>
+
   </ng-container>
 
   <ng-template #loadingOrError>
