@@ -62,7 +62,7 @@
 </ion-content>
 <ion-footer>
   <ion-toolbar color="light">
-    <ion-button expand="full" color="primary" (click)="completeSetup()">
+    <ion-button [disabled]="state ==='rebooting'" expand="full" color="primary" (click)="completeSetup()">
       <ion-icon name="checkmark-circle" slot="start"></ion-icon>
       Continue  
     </ion-button>
