@@ -85,6 +85,7 @@
         </ion-item>
       </ng-container>
     </ion-list>
+    <pre>{{ mdnsResults | json }}</pre>
     <ion-item *ngIf="isScanning && services.length === 0">
       <ion-label class="ion-text-center">
         <ion-spinner name="crescent"></ion-spinner>

@@ -73,6 +73,21 @@ export class ZeroconfService implements OnDestroy {
     await Promise.all(promises);
   }
 
+  // Stop watching for a specific service type
+  async unwatch(type: string, domain = 'local.') {
+    console.log(`[ZeroConf] Unwatching for type: ${type}`);
+    await ZeroConf.unwatch({ type, domain });
+  }
+
+  // Stop watching for multiple service types
+  async unwatchMultiple(types: string[], domain = 'local.') {
+    const promises = types.map(type => {
+      console.log(`[ZeroConf] Unwatching for type: ${type}`);
+      return ZeroConf.unwatch({ type, domain });
+    });
+    await Promise.all(promises);
+  }
+
   // Publish a new service
   // async publish(service: { type: string; name: string; port: number; props?: { [key: string]: string; } }) {
   //   await ZeroConf.register(service);
@@ -87,8 +102,8 @@ export class ZeroconfService implements OnDestroy {
 
   // Stop all operations and clean up
   async stop() {
-    await ZeroConf.stop();
-    await ZeroConf.close();
+    await ZeroConf.stop(); // Stops registration
+    await ZeroConf.close(); // Stops browser
     this.servicesSubject.next([]); // Clear the list
     console.log('[ZeroConf] Stopped all operations.');
   }

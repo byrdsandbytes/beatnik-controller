@@ -5,6 +5,9 @@ import { ZeroconfService } from '../../services/zero-conf.service';
 import { Preferences } from '@capacitor/preferences';
 import { UserPreference } from '../../enum/user-preference.enum';
 import { AlertController } from '@ionic/angular';
+import { mDNS, MdnsDiscoverResult } from '@byrds/capacitor-mdns';
+
+
 
 
 @Component({
@@ -18,6 +21,7 @@ export class ZeroconfPage implements OnDestroy {
   readonly SERVICE_SNAPCAST = '_snapcast._tcp.';
   readonly SERVICE_BEATNIK = '_beatnik._tcp.';
   isScanning = false;
+  mdnsResults: MdnsDiscoverResult;
 
 
   constructor(private zeroconf: ZeroconfService,
@@ -32,6 +36,7 @@ export class ZeroconfPage implements OnDestroy {
 
   async scanForServices(): Promise<void> {
     this.isScanning = true;
+    this.scanUsingMDNS();
     try {
       await this.zeroconf.watchMultiple([this.SERVICE_SNAPCAST, this.SERVICE_BEATNIK]);
       console.log(`Started scanning for services of types: ${this.SERVICE_SNAPCAST}, ${this.SERVICE_BEATNIK}`);
@@ -53,7 +58,9 @@ export class ZeroconfPage implements OnDestroy {
   async stopScan(): Promise<void> {
     this.isScanning = false;
     try {
-      await this.zeroconf.stop();
+      await this.zeroconf.unwatchMultiple([this.SERVICE_SNAPCAST, this.SERVICE_BEATNIK]);
+      this.zeroconf.clearServices();
+      
       console.log('Stopped scanning for services.');
     } catch (error) {
       console.error('Error stopping service scan:', error);
@@ -104,6 +111,18 @@ export class ZeroconfPage implements OnDestroy {
     this.stopScan();
     // purge the results from the service list
     this.zeroconf.clearServices();
+  }
+
+  ionViewWillLeave() {
+    this.stopScan();
+    // purge the results from the service list
+    this.zeroconf.clearServices();
+  }
+
+  async scanUsingMDNS() {
+    const result = await mDNS.discover({ type: this.SERVICE_BEATNIK, timeout: 3000 });
+    console.log('mDNS discovered services:', result);
+    this.mdnsResults = result;
   }
 
 
