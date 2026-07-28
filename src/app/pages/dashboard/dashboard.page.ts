@@ -10,9 +10,7 @@ import { Preferences } from '@capacitor/preferences';
 import { UserPreference } from 'src/app/enum/user-preference.enum';
 import { Speaker } from 'src/app/model/speaker.model';
 import { HttpClient } from '@angular/common/http';
-import { ZeroconfService } from 'src/app/services/zero-conf.service';
-
-
+import { CapMdnsService } from 'src/app/services/cap-mdns.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -82,13 +80,10 @@ export class DashboardPage implements OnInit {
   constructor(
     private snapcastService: SnapcastService,
     private http: HttpClient,
-    private zeroconfService: ZeroconfService,
+    private capMdnsService: CapMdnsService,
     private alertController: AlertController
 
   ) {
-    // this.groups$ = this.snapcastService.groups$;
-    // this.streams$ = this.snapcastService.streams$;
-    // this.serverDetails$ = this.snapcastService.serverDetails$;
   }
 
   async ngOnInit() {
@@ -288,19 +283,15 @@ export class DashboardPage implements OnInit {
 
   async scanForZeroConfServices(): Promise<void> {
     try {
-      this.zeroconfService.watch(this.SERVICE_SNAPCAST)
-      console.log(`Started scanning for services of types: ${this.SERVICE_SNAPCAST}`);
-      // let's wait for a few seconds to allow the scan to discover services
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      const firstResult = await firstValueFrom(this.zeroconfService.services$);
-      console.log('First discovered services:', firstResult);
-      if (firstResult.length === 0) {
-        console.log('No services found. Stopping scan.');
-        await this.zeroconfService.stop();
+      console.log(`Started scanning for services of type: ${this.SERVICE_SNAPCAST}`);
+      const mdnsResult = await this.capMdnsService.discover({ type: this.SERVICE_SNAPCAST, timeout: 5000 });
+      console.log('Discovered Snapcast services:', mdnsResult);
+      if (mdnsResult.services.length === 0) {
+        console.log('No services found.');
       } else {
-        console.log('Services found. Continuing to watch for more services.');
-        const serverIP = firstResult[0].ipv4Addresses[0];
-        const serverHostname = firstResult[0].hostname;
+        console.log('Services found.');
+        const serverIP = mdnsResult.services[0].hosts[0];
+        const serverHostname = mdnsResult.services[0].hostname;
         console.log('Setting discovered Snapcast server as the server URL:', serverIP);
         const userPreferenceServerUrl = await Preferences.get({ key: UserPreference.SERVER_URL });
         if (userPreferenceServerUrl.value !== serverIP && userPreferenceServerUrl.value !== serverHostname) {

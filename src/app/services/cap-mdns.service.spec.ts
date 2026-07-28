@@ -1,13 +1,13 @@
 import { TestBed } from '@angular/core/testing';
 
-import { ZeroconfService } from './zero-conf.service';
+import { CapMdnsService } from './cap-mdns.service';
 
-describe('ZeroconfService', () => {
-  let service: ZeroconfService;
+describe('CapMdnsService', () => {
+  let service: CapMdnsService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({});
-    service = TestBed.inject(ZeroconfService);
+    service = TestBed.inject(CapMdnsService);
   });
 
   it('should be created', () => {

@@ -1,11 +1,6 @@
 import { Component, NgZone } from '@angular/core';
 import { App } from '@capacitor/app';
 import { SnapcastService } from './services/snapcast.service';
-import { ZeroconfService } from './services/zero-conf.service';
-import { Observable } from 'rxjs';
-import { ZeroConf, ZeroConfService as ZeroConfServiceModel } from 'capacitor-zeroconf';
-import { Preferences } from '@capacitor/preferences';
-import { UserPreference } from './enum/user-preference.enum';
 
 
 @Component({
@@ -16,14 +11,12 @@ import { UserPreference } from './enum/user-preference.enum';
 })
 export class AppComponent {
   readonly SERVICE_SNAPCAST = '_snapcast._tcp.';
-  services$: Observable<ZeroConfServiceModel[]>;
   scanForDevicesOnStartup: boolean = false;
 
 
   constructor(
     private ngZone: NgZone,
     private snapcastService: SnapcastService,
-    private zeroconfService: ZeroconfService
   ) {
     this.initializeApp();
 
