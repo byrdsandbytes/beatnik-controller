@@ -1,6 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-// import { ZeroconfService } from 'src/app/services/zero-conf.service';
-// import { ZeroConf, ZeroConfService as ZeroConfServiceModel } from 'capacitor-zeroconf';
 import { firstValueFrom, Observable } from 'rxjs';
 import { SnapcastService } from 'src/app/services/snapcast.service';
 import { ServerDetail, SnapCastServerStatusResponse } from 'src/app/model/snapcast.model';
@@ -25,7 +23,6 @@ import { CapMdnsService } from 'src/app/services/cap-mdns.service';
 })
 export class SetupServerPage implements OnInit {
 
-  // services$: Observable<ZeroConfServiceModel[]>;
   beatnikmdnsResults: MdnsDiscoverResult;
   snapcastmdnsResults: MdnsDiscoverResult;
   selectedService: MdnsService | null = null;
@@ -59,8 +56,6 @@ export class SetupServerPage implements OnInit {
   loadingDisplay: HTMLIonLoadingElement | null = null;
 
   constructor(
-    // private zeroconf: ZeroconfService,
-    private capMdnsService: CapMdnsService,
     private snapcastService: SnapcastService,
     private activatedRoute: ActivatedRoute,
     private navCtrl: NavController,
@@ -68,7 +63,8 @@ export class SetupServerPage implements OnInit {
     private beatnikSnapcastService: BeatnikSnapcastService,
     private alertController: AlertController,
     private router: Router,
-    private loadingController: LoadingController
+    private loadingController: LoadingController,
+    private capMdnsService: CapMdnsService
   ) {
     // this.services$ = this.zeroconf.services$;
   }

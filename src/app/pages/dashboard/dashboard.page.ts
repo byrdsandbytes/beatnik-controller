@@ -11,9 +11,6 @@ import { UserPreference } from 'src/app/enum/user-preference.enum';
 import { Speaker } from 'src/app/model/speaker.model';
 import { HttpClient } from '@angular/common/http';
 import { CapMdnsService } from 'src/app/services/cap-mdns.service';
-// import { ZeroconfService } from 'src/app/services/zero-conf.service';
-
-
 
 @Component({
   selector: 'app-dashboard',
@@ -83,14 +80,10 @@ export class DashboardPage implements OnInit {
   constructor(
     private snapcastService: SnapcastService,
     private http: HttpClient,
-    // private zeroconfService: ZeroconfService,
     private capMdnsService: CapMdnsService,
     private alertController: AlertController
 
   ) {
-    // this.groups$ = this.snapcastService.groups$;
-    // this.streams$ = this.snapcastService.streams$;
-    // this.serverDetails$ = this.snapcastService.serverDetails$;
   }
 
   async ngOnInit() {

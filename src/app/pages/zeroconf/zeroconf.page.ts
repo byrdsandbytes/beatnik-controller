@@ -1,7 +1,5 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Observable } from 'rxjs';
-// import { ZeroConf, ZeroConfService as ZeroConfServiceModel } from 'capacitor-zeroconf';
-// import { ZeroconfService } from '../../services/zero-conf.service';
 import { Preferences } from '@capacitor/preferences';
 import { UserPreference } from '../../enum/user-preference.enum';
 import { AlertController } from '@ionic/angular';
@@ -25,13 +23,10 @@ export class ZeroconfPage implements OnInit, OnDestroy {
   beatnikmdnsResults: MdnsDiscoverResult;
   snapcastmdnsResults: MdnsDiscoverResult;
 
-
   constructor(
-    // private zeroconf: ZeroconfService,
     private alertController: AlertController,
     private capMdnsService: CapMdnsService
   ) {
-    // this.services$ = this.zeroconf.services$;
   }
 
   async ngOnInit() {
