@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { ZeroconfService } from 'src/app/services/zero-conf.service';
-import { ZeroConf, ZeroConfService as ZeroConfServiceModel } from 'capacitor-zeroconf';
+// import { ZeroconfService } from 'src/app/services/zero-conf.service';
+// import { ZeroConf, ZeroConfService as ZeroConfServiceModel } from 'capacitor-zeroconf';
 import { firstValueFrom, Observable } from 'rxjs';
 import { SnapcastService } from 'src/app/services/snapcast.service';
 import { ServerDetail, SnapCastServerStatusResponse } from 'src/app/model/snapcast.model';
@@ -13,6 +13,8 @@ import { SUPPORTED_HATS } from 'src/app/constant/hat.constant';
 import { BeatnikSnapcastService } from 'src/app/services/beatnik-snapcast.service';
 import { Preferences } from '@capacitor/preferences';
 import { UserPreference } from 'src/app/enum/user-preference.enum';
+import { MdnsDiscoverResult, MdnsService } from '@byrds/capacitor-mdns';
+import { CapMdnsService } from 'src/app/services/cap-mdns.service';
 
 
 @Component({
@@ -23,8 +25,10 @@ import { UserPreference } from 'src/app/enum/user-preference.enum';
 })
 export class SetupServerPage implements OnInit {
 
-  services$: Observable<ZeroConfServiceModel[]>;
-  selectedService: ZeroConfServiceModel | null = null;
+  // services$: Observable<ZeroConfServiceModel[]>;
+  beatnikmdnsResults: MdnsDiscoverResult;
+  snapcastmdnsResults: MdnsDiscoverResult;
+  selectedService: MdnsService | null = null;
   readonly SERVICE_SNAPCAST = '_snapcast._tcp.';
   readonly SERVICE_BEATNIK = '_beatnik._tcp.';
   isScanning = false;
@@ -55,7 +59,8 @@ export class SetupServerPage implements OnInit {
   loadingDisplay: HTMLIonLoadingElement | null = null;
 
   constructor(
-    private zeroconf: ZeroconfService,
+    // private zeroconf: ZeroconfService,
+    private capMdnsService: CapMdnsService,
     private snapcastService: SnapcastService,
     private activatedRoute: ActivatedRoute,
     private navCtrl: NavController,
@@ -65,27 +70,24 @@ export class SetupServerPage implements OnInit {
     private router: Router,
     private loadingController: LoadingController
   ) {
-    this.services$ = this.zeroconf.services$;
+    // this.services$ = this.zeroconf.services$;
   }
 
   async ngOnInit() {
     await this.getRouteIp();
     await this.getUserPreferencesServerName();
-    this.services$.subscribe(services => {
-      if (services.length > 0) {
-        this.selectedService = services[0];
-        // add timeout of 2 seconds before sliding to next slide
-        setTimeout(() => {
-          this.state = 'deviceFound';
-          this.statusText = 'Snapcast Server found!';
-          this.slideTo(1);
-        }, 2000);
-        // this.connectToSnapcast(services[0]);
-        this.checkIfThereIsExistingSnapcastServer();
-
-      }
-    });
-    this.scanForServices();
+    await this.scanForServices();
+    
+    if (this.snapcastmdnsResults && this.snapcastmdnsResults.services.length > 0) {
+      this.selectedService = this.snapcastmdnsResults.services[0];
+      // add timeout of 2 seconds before sliding to next slide
+      setTimeout(() => {
+        this.state = 'deviceFound';
+        this.statusText = 'Snapcast Server found!';
+        this.slideTo(1);
+      }, 2000);
+      this.checkIfThereIsExistingSnapcastServer();
+    }
     this.snapcastServerStatus = this.snapcastService.state$;
   }
 
@@ -135,18 +137,7 @@ export class SetupServerPage implements OnInit {
 
   async checkIfThereIsExistingSnapcastServer() {
     try {
-      const services = await firstValueFrom(this.services$);
-      // check if there is only the service found with the current device's ip
-      // if (services.length === 1) {
-      //   this.isFirstDevice = true;
-      // } else if (services.length > 1) {
-      //   this.isFirstDevice = false;
-      // } else {
-      //   this.isFirstDevice = true;
-      // }
-
-      //  check if there is more than one snapcasrt service found
-      const filteredServices = services.filter(service => service.type === this.SERVICE_SNAPCAST);
+      const filteredServices = this.snapcastmdnsResults?.services || [];
       if (filteredServices.length > 1) {
         console.log('Multiple Snapcast services found:', filteredServices);
         this.isFirstDevice = false;
@@ -163,34 +154,20 @@ export class SetupServerPage implements OnInit {
     this.isScanning = true;
     this.state = 'scanning';
     try {
-
-      await this.zeroconf.watch(this.SERVICE_SNAPCAST);
-      console.log(`Started scanning for services of type: ${this.SERVICE_SNAPCAST}`);
-      await this.zeroconf.watch(this.SERVICE_BEATNIK);
-      console.log(`Started scanning for services of type: ${this.SERVICE_BEATNIK}`);
+      this.snapcastmdnsResults = await this.capMdnsService.discover({ type: this.SERVICE_SNAPCAST, timeout: 5000 });
+      console.log('Discovered Snapcast services:', this.snapcastmdnsResults);
+      this.beatnikmdnsResults = await this.capMdnsService.discover({ type: this.SERVICE_BEATNIK, timeout: 5000 });
+      console.log('Discovered Beatnik services:', this.beatnikmdnsResults);
+      this.isScanning = false;
     }
     catch (error) {
       console.error('Error starting service scan:', error);
-    }
-  }
-
-  async getHostname(): Promise<void> {
-    try {
-      const result = await ZeroConf.getHostname();
-      console.log('Hostname:', result.hostname);
-    } catch (error) {
-      console.error('Error getting hostname:', error);
+      this.isScanning = false;
     }
   }
 
   async stopScan(): Promise<void> {
     this.isScanning = false;
-    try {
-      await this.zeroconf.stop();
-      console.log('Stopped scanning for services.');
-    } catch (error) {
-      console.error('Error stopping service scan:', error);
-    }
   }
 
   async openManualEntry(): Promise<void> {
@@ -198,23 +175,24 @@ export class SetupServerPage implements OnInit {
     console.log('Manual IP entry not implemented yet.');
   }
 
-  async selectService(service: ZeroConfServiceModel): Promise<void> {
+  async selectService(service: MdnsService): Promise<void> {
     // Logic to handle the selected service, e.g., save its IP and port
     console.log('Selected service:', service);
   }
 
-  async connectToSnapcast(service: ZeroConfServiceModel): Promise<void> {
+  async connectToSnapcast(service: MdnsService): Promise<void> {
+    if(!service) return;
     this.statusText = 'Connecting to Snapcast Server...';
     console.log('Connecting to Snapcast service:', service);
     console.log('hostname:', service.hostname);
     console.log('port:', service.port);
-    // remove any trailing dot from the hostname
-    if (service.hostname.endsWith('.')) {
+
+    if (service.hostname?.endsWith('.')) {
       service.hostname = service.hostname.slice(0, -1);
     }
 
     try {
-      await this.snapcastService.connect(service.ipv4Addresses[0], undefined, true);
+      await this.snapcastService.connect(service.hosts[0], undefined, true);
 
       console.log('Connected to service:', service);
     } catch (error) {

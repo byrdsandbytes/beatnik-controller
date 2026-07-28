@@ -69,24 +69,22 @@
 
           <!-- <div [ngSwitch]="isFirstDevice" class="ion-padding">
             <div *ngSwitchCase="true"> -->
-          <div *ngIf="(services$ | async) as services">
+          <div *ngIf="(snapcastmdnsResults) as snapcastResults">
             <ion-list-header>
               <ion-label>Discovered Servers</ion-label>
             </ion-list-header>
-            <ng-container *ngFor="let service of services">
-              <ion-item *ngIf="service.type == SERVICE_SNAPCAST" button (click)="selectService(service)">
+            <ng-container *ngFor="let service of snapcastResults.services">
+              <ion-item button (click)="selectService(service)">
                 <ion-label>
                   <h2>Beatnik / {{ service.name }} Server</h2>
                   <p>Host: {{ service.hostname }}</p>
-                  <p>IP: {{ service.ipv4Addresses[0] }}:{{ service.port }}</p>
-                  <ion-badge *ngIf="ip == service.ipv4Addresses[0]" color="success">This Device</ion-badge>
-                  <!-- trim the last dot from the hostname if it exists -->
+                  <p>IP: <span *ngFor="let host of service.hosts">{{ host }} </span>:{{ service.port }}</p>
+                  <ion-badge *ngIf="ip == service.hosts[0]" color="success">This Device</ion-badge>
+                  <!-- <ion-badge
+                    *ngIf="userPreferenceServerAdress === (service.hostname?.endsWith('.') ? service.hostname.slice(0, -1) : service.hostname)"
+                    color="primary">Current Server</ion-badge> -->
                   <ion-badge
-                    *ngIf="userPreferenceServerAdress  == (service.hostname.endsWith('.') ? service.hostname.slice(0, -1) : service.hostname)"
-                    color="primary">Current Server</ion-badge>
-                  <!-- trim port from the IP if it exists -->
-                  <ion-badge
-                    *ngIf="userPreferenceServerAdress  == (service.ipv4Addresses[0].split(':')[0].trim() || service.hostname)"
+                    *ngIf="userPreferenceServerAdress === (service.hosts[0] || service.hostname)"
                     color="primary">Current Server</ion-badge>
                 </ion-label>
               </ion-item>
@@ -94,23 +92,23 @@
             <ion-list-header>
               <ion-label>Beatnik Devices</ion-label>
             </ion-list-header>
-            <ng-container *ngFor="let service of services">
-              <ion-item *ngIf="service.type == SERVICE_BEATNIK" button (click)="selectService(service)">
-                <ion-label>
-                  <h2>Beatnik</h2>
-                  <p>Host: {{ service.hostname }}</p>
-                  <p>IP: {{ service.ipv4Addresses[0] }}:{{ service.port }}</p>
-                  <ion-badge *ngIf="ip == service.ipv4Addresses[0]" color="success">This Device</ion-badge>
-                  <!-- trim the last dot from the hostname if it exists -->
-                  <ion-badge
-                    *ngIf="userPreferenceServerAdress == (service.hostname.endsWith('.') ? service.hostname.slice(0, -1) : service.hostname)"
-                    color="primary">Current Server</ion-badge>
-                  <!-- trim port from the IP if it exists -->
-                  <ion-badge
-                    *ngIf="userPreferenceServerAdress == (service.ipv4Addresses[0].split(':')[0].trim() || service.hostname)"
-                    color="primary">Current Server</ion-badge>
-                </ion-label>
-              </ion-item>
+            <ng-container *ngIf="(beatnikmdnsResults) as beatnikResults">
+              <ng-container *ngFor="let service of beatnikResults.services">
+                <ion-item button (click)="selectService(service)">
+                  <ion-label>
+                    <h2>Beatnik</h2>
+                    <p>Host: {{ service.hostname }}</p>
+                    <p>IP: <span *ngFor="let host of service.hosts">{{ host }} </span>:{{ service.port }}</p>
+                    <ion-badge *ngIf="ip == service.hosts[0]" color="success">This Device</ion-badge>
+                    <!-- <ion-badge
+                      *ngIf="userPreferenceServerAdress === (service.hostname?.endsWith('.') ? service.hostname.slice(0, -1) : service.hostname)"
+                      color="primary">Current Server</ion-badge> -->
+                    <ion-badge
+                      *ngIf="userPreferenceServerAdress === (service.hosts[0] || service.hostname)"
+                      color="primary">Current Server</ion-badge>
+                  </ion-label>
+                </ion-item>
+              </ng-container>
             </ng-container>
           </div>
           <!-- </div>
