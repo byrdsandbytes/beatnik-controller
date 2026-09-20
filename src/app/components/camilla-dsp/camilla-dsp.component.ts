@@ -30,8 +30,6 @@ export class CamillaDspComponent implements OnInit, OnDestroy {
     camillaConfigMessage = '';
     camillaConfigError = '';
 
-    private levelSubscription: Subscription | undefined;
-
     constructor(
         private camillaService: CamillaDspService,
         private beatnikHardwareService: BeatnikHardwareService
@@ -73,20 +71,18 @@ export class CamillaDspComponent implements OnInit, OnDestroy {
                 } else if (message.GetSignalLevels) {
                     // this.levels = message.GetSignalLevels.value;
                     // console.log('Signal Levels received:', this.levels);
+                } else if (message.GetVolume) {
+                    this.currentVolume = message.GetVolume.value;
                 }
             })
         );
 
-        this.levelSubscription = this.camillaService.signalLevels$.subscribe(levels => {
-            // Service handles normalization, so we get the raw levels object directly
-            this.levels = levels;
-        });
-
-        // timeout to allow UI to update
-        // setTimeout(() => {
-        //     this.getCaptureSignalLevels();
-
-        // }, 800);
+        this.subscriptions.add(
+            this.camillaService.signalLevels$.subscribe(levels => {
+                // Service handles normalization, so we get the raw levels object directly
+                this.levels = levels;
+            })
+        );
     }
 
     private getHardwareHost(): string | null {
@@ -253,9 +249,8 @@ export class CamillaDspComponent implements OnInit, OnDestroy {
     }
 
     getVolume() {
+        // Response is applied reactively via the messages$ subscription in ngOnInit
         this.camillaService.sendCommand('GetVolume');
-        this.currentVolume = this.lastMessage.GetVolume?.value ?? this.currentVolume;
-        console.log('Current volume:', this.currentVolume);
     }
 
     setVolume(volume: number) {
@@ -263,16 +258,9 @@ export class CamillaDspComponent implements OnInit, OnDestroy {
     }
 
     ngOnDestroy() {
-        // Clean up subscriptions to prevent memory leaks
-        this.subscriptions.unsubscribe();
-        // Tell server to stop sending updates
-        this.camillaService.stopLevelUpdates();
+        // Disconnect before unsubscribing so no late message/status update fires after teardown
         this.camillaService.disconnect();
-    }
-
-    ionViewWillLeave() {
-        console.log('CamillaDspComponent: Leaving page, cleaning up resources if needed');
-        this.ngOnDestroy();
+        this.subscriptions.unsubscribe();
     }
 
     updateProcessorParameter(processorKey: string, paramKey: string, newValue: any) {

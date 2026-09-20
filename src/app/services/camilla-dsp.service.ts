@@ -1,7 +1,7 @@
-import { Injectable } from '@angular/core';
+import { Injectable, OnDestroy } from '@angular/core';
 import { webSocket, WebSocketSubject } from 'rxjs/webSocket';
-import { Subject, Observable, BehaviorSubject, timer, of } from 'rxjs';
-import { retryWhen, switchMap, tap, delayWhen, filter, map } from 'rxjs/operators';
+import { Subject, Observable, BehaviorSubject, timer, Subscription } from 'rxjs';
+import { retry, filter, map, takeUntil } from 'rxjs/operators';
 
 // Defines the possible connection states
 export type ConnectionStatus = 'Connected' | 'Connecting' | 'Disconnected' | 'Error';
@@ -15,8 +15,11 @@ interface CamillaDspCommand {
 @Injectable({
   providedIn: 'root',
 })
-export class CamillaDspService {
-  private socket$!: WebSocketSubject<any>;
+export class CamillaDspService implements OnDestroy {
+  private socket$: WebSocketSubject<any> | null = null;
+  private pipelineSubscription: Subscription | null = null;
+  // Emits to cancel any in-flight reconnect attempt (e.g. on manual disconnect)
+  private readonly stopReconnect$ = new Subject<void>();
   private messagesSubject = new Subject<any>();
   private connectionStatusSubject = new BehaviorSubject<ConnectionStatus>('Disconnected');
   private readonly RECONNECT_INTERVAL_MS = 5000;
@@ -36,13 +39,15 @@ export class CamillaDspService {
 
   /**
    * Establishes a connection to the CamillaDSP WebSocket server.
+   * Safe to call multiple times - ignored while already connected/connecting/retrying,
+   * to avoid stacking up duplicate sockets and subscriptions.
    * @param url The full WebSocket URL (e.g., 'ws://beatnik-client-amp.local:1234')
    */
   public connect(url: string): void {
-    // if (this.socket$ && !this.socket$.closed) {
-    //   console.log('Already connected.');
-    //   return;
-    // }
+    if (this.connectionStatusSubject.value !== 'Disconnected') {
+      console.log('CamillaDSP already connected/connecting; ignoring duplicate connect() call.');
+      return;
+    }
 
     this.connectionStatusSubject.next('Connecting');
     console.log(`Connecting to ${url}...`);
@@ -63,24 +68,21 @@ export class CamillaDspService {
       },
     });
 
-    this.socket$
+    this.pipelineSubscription = this.socket$
       .pipe(
-        // The retryWhen operator handles reconnection logic
-        retryWhen(errors =>
-          errors.pipe(
-            tap(err => {
-              console.error(`Connection error: ${err}. Retrying in ${this.RECONNECT_INTERVAL_MS / 1000}s...`);
-              this.connectionStatusSubject.next('Error');
-            }),
-            // Wait for the specified interval before trying to reconnect
-            delayWhen(() => timer(this.RECONNECT_INTERVAL_MS))
-          )
-        )
+        // Retries indefinitely with a fixed delay; takeUntil below lets disconnect() cancel it
+        retry({
+          delay: err => {
+            console.error(`Connection error: ${err}. Retrying in ${this.RECONNECT_INTERVAL_MS / 1000}s...`);
+            this.connectionStatusSubject.next('Error');
+            return timer(this.RECONNECT_INTERVAL_MS);
+          },
+        }),
+        takeUntil(this.stopReconnect$)
       )
       .subscribe({
         next: msg => this.messagesSubject.next(msg), // Forward messages to our subject
         error: err => {
-          // This block is less likely to be hit due to retryWhen, but good for unrecoverable errors
           console.error('WebSocket unrecoverable error:', err);
           this.connectionStatusSubject.next('Error');
         },
@@ -93,7 +95,7 @@ export class CamillaDspService {
    * @param params Optional parameters for the command.
    */
   public sendCommand(command: string, params: any = null): void {
-    if (this.connectionStatusSubject.value !== 'Connected') {
+    if (this.connectionStatusSubject.value !== 'Connected' || !this.socket$) {
       console.warn('Cannot send command while not connected.');
       return;
     }
@@ -136,12 +138,24 @@ export class CamillaDspService {
   }
 
   /**
-   * Closes the WebSocket connection gracefully.
+   * Closes the WebSocket connection gracefully and cancels any pending reconnect attempt.
    */
   public disconnect(): void {
-    if (this.socket$) {
-      this.stopLevelUpdates();
+    this.stopLevelUpdates();
+    this.stopReconnect$.next(); // cancel any in-flight retry delay so it doesn't reconnect afterwards
+    this.pipelineSubscription?.unsubscribe();
+    this.pipelineSubscription = null;
+    if (this.socket$ && !this.socket$.closed) {
       this.socket$.complete(); // This will trigger the closeObserver
     }
+    this.socket$ = null;
+    this.connectionStatusSubject.next('Disconnected');
+  }
+
+  ngOnDestroy(): void {
+    this.disconnect();
+    this.messagesSubject.complete();
+    this.connectionStatusSubject.complete();
+    this.stopReconnect$.complete();
   }
 }
