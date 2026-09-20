@@ -1,5 +1,29 @@
 # Changelog
 
+## [Unreleased]
+
+### Added
+- Add stream album art to toolbar
+- Add rebooting and restarting functions
+- Add loading spinners and wifi check in setup
+- Add formatting for system info
+
+### Changed
+- Replace zeroconf plugin with mdns plugin
+
+### Fixed
+- Fix zeroconf issues on Android
+- Fix issues during setup
+
+## [0.5.8] - 2026-07-20
+
+### Added
+- Add stream pic fallback
+
+### Changed
+- Format telemetry info
+- Update README
+
 ## [0.5.7] - 2026-07-08
 
 ### Added
