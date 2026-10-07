@@ -2,6 +2,14 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
+export interface NetworkQuality {
+  interface: string;
+  ssid: string | null;
+  linkQuality: number | null; // percentage, 0-100
+  signalLevel: number | null; // dBm
+  noiseLevel: number | null; // dBm
+}
+
 export interface SystemInfo {
   hostname: string;
   ipAddresses: string[];
@@ -12,6 +20,7 @@ export interface SystemInfo {
   macAddress: string | null;
   storageType: string | null;
   model: string;
+  networkQuality: NetworkQuality | null;
 }
 
 export type LedCommand =
