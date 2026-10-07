@@ -64,6 +64,25 @@
         <p class="small-note">MAC Address</p>
       </div>
 
+      <ng-container *ngIf="systemInfo.networkQuality as networkQuality">
+        <div class="col-6 col-lg-3" *ngIf="networkQuality.ssid">
+          <h2>{{ networkQuality.ssid }}</h2>
+          <p class="small-note">Wi-Fi SSID ({{ networkQuality.interface }})</p>
+        </div>
+        <div class="col-6 col-lg-3" *ngIf="networkQuality.linkQuality !== null">
+          <h2>{{ networkQuality.linkQuality }}%</h2>
+          <p class="small-note">Link Quality</p>
+        </div>
+        <div class="col-6 col-lg-3" *ngIf="networkQuality.signalLevel !== null">
+          <h2>{{ networkQuality.signalLevel }} dBm</h2>
+          <p class="small-note">Signal Level</p>
+        </div>
+        <div class="col-6 col-lg-3" *ngIf="networkQuality.noiseLevel !== null">
+          <h2>{{ networkQuality.noiseLevel }} dBm</h2>
+          <p class="small-note">Noise Level</p>
+        </div>
+      </ng-container>
+
     </div>
     <ng-container *ngIf="serverState | async as state">
       <div class="row justify-content-center align-items-center ion-text-center">
