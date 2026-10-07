@@ -5,6 +5,8 @@ import { Observable } from 'rxjs';
 export interface NetworkQuality {
   interface: string;
   ssid: string | null;
+  band: '2.4GHz' | '5GHz' | '6GHz' | null;
+  frequency: number | null; // MHz
   linkQuality: number | null; // percentage, 0-100
   signalLevel: number | null; // dBm
   noiseLevel: number | null; // dBm

@@ -69,6 +69,10 @@
           <h2>{{ networkQuality.ssid }}</h2>
           <p class="small-note">Wi-Fi SSID ({{ networkQuality.interface }})</p>
         </div>
+        <div class="col-6 col-lg-3" *ngIf="networkQuality.band">
+          <h2>{{ networkQuality.band }}</h2>
+          <p class="small-note">Band{{ networkQuality.frequency !== null ? ' (' + networkQuality.frequency + ' MHz)' : '' }}</p>
+        </div>
         <div class="col-6 col-lg-3" *ngIf="networkQuality.linkQuality !== null">
           <h2>{{ networkQuality.linkQuality }}%</h2>
           <p class="small-note">Link Quality</p>
