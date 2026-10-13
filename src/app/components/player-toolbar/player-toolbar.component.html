@@ -2,8 +2,9 @@
   <ion-toolbar class="play-toolbar" color="primary">
     <ng-container *ngIf="(displayState$|async) as state ">
       <ng-container *ngFor="let stream of state.server.streams; trackBy: trackByStream">
-        <ion-item *ngIf="stream.properties.metadata else noMetadata" class="ion-padding-top" lines="none"
-          color="primary">
+        <ng-container *ngIf="hasAssignedGroup(stream, state.server.groups)">
+          <ion-item *ngIf="stream.properties.metadata else noMetadata" class="ion-padding-top" lines="none"
+            color="primary">
           <ion-thumbnail slot="start">
             <img *ngIf="stream.properties.metadata.artData else noBase64" [src]="stream.properties.metadata.artData
       ? convertCoverDataBase64(stream.properties.metadata.artData.data, stream.properties.metadata.artData.extension)
@@ -32,7 +33,7 @@
 
         </ion-item>
         <ng-template #noMetadata>
-          <ion-item *ngIf="stream.status =='playing'" class="ion-padding-top" lines="none" color="primary">
+          <ion-item class="ion-padding-top" lines="none" color="primary">
             <ion-thumbnail slot="start">
               <img *ngIf="stream.uri.query.name != 'Hof-Bar-Radio'"
                 [src]="'assets/placeholder/cover_art_placeholder.svg'" class="cover" alt="Placeholder Image">
@@ -77,6 +78,7 @@
             </ion-item>
           </ng-container>
 
+        </ng-container>
         </ng-container>
       </ng-container>
     </ng-container>

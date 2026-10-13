@@ -197,4 +197,11 @@ export class PlayerToolbarComponent implements OnInit, OnChanges, OnDestroy {
     return client.id;
   }
 
+  hasAssignedGroup(stream: Stream, groups?: Group[]): boolean {
+    if (!groups || !stream) {
+      return false;
+    }
+    return groups.some(group => group.stream_id === stream.id);
+  }
+
 }
