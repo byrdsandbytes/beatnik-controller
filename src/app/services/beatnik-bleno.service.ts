@@ -2,10 +2,13 @@ import { Injectable } from '@angular/core';
 import { BleClient, ScanResult, dataViewToText, textToDataView, numbersToDataView } from '@capacitor-community/bluetooth-le';
 import { BehaviorSubject } from 'rxjs';
 
+export type WiFiBand = '2.4GHz' | '5GHz' | '6GHz' | 'unknown';
+
 export interface BleNetwork {
   ssid: string;
   quality: number;
   security: string;
+  band: WiFiBand;
 }
 
 export interface WifiStatus {

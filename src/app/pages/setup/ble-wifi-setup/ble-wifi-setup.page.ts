@@ -91,7 +91,7 @@ export class BleWifiSetupPage implements OnInit {
     this.statusText = 'Searching for available Wi-Fi networks...';
     // delay to allow UI to update
     setTimeout(() => {
-
+      
       this.availableNetworks$.subscribe(networks => {
         console.log('Available networks:', networks);
         if (networks.length > 0) {
