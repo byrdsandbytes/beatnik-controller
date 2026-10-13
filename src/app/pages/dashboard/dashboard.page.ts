@@ -170,7 +170,7 @@ export class DashboardPage implements OnInit {
         this.checkUserPreferencesForAutomaticScan();
 
       }
-    }, 10000);
+    }, 2000);
 
   }
 
