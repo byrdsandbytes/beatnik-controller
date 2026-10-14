@@ -1,4 +1,5 @@
-<ion-card class="card ion-text-center" color="light" (click)="navToGroupDetails()">
+<ion-card class="card ion-text-center" color="light" (click)="onCardClick()" (pointerdown)="onPressStart()" (pointerup)="cancelPress()"
+  (pointerleave)="cancelPress()" (pointercancel)="cancelPress()" (contextmenu)="$event.preventDefault()">
   <div class="img-container">
     <ng-container *ngIf="activeSpeaker else defaultImage">
       <img [src]="activeSpeaker.image" class="img" alt="{{ activeSpeaker.manufacturer }} {{ activeSpeaker.model }}">
