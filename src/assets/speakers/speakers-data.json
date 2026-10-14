@@ -6,7 +6,7 @@
       "manufacturer": "KEF",
       "model": "Concerto",
       "year": 1971,
-      "type": "floor-standing standing speakers"
+      "type": "Floor-standing"
     },
     {
       "id": "sp.2",
@@ -14,15 +14,34 @@
       "manufacturer": "JSE",
       "model": "Infinite Slope",
       "year": 1980,
-      "type": "floor-standing standing speakers"
+      "type": "Floor-standing"
     },
+   
+    {
+      "id": "sp.3",
+      "image": "assets/speakers/img/KEF_IQ7_2005.webp",
+      "manufacturer": "KEF",
+      "model": "IQ7",
+      "year": 2005,
+      "type": "Floor-standing"
+    }
+    ,
+    {
+      "id": "sp.4",
+      "image": "assets/speakers/img/JBL_xti20.webp",
+      "manufacturer": "JBL",
+      "model": "Xti20",
+      "year": 2000,
+      "type": "Bookshelf"
+    },
+
     {
       "id": "rc.1",
       "image": "assets/speakers/img/Meridian_F80.webp",
       "manufacturer": "Meridian",
       "model": "F80",
       "year": 2005,
-      "type": "Audio Receiver"
+      "type": "Receiver"
     },
     {
       "id": "rd.1",
@@ -31,14 +50,6 @@
       "model": "Super",
       "year": 1953,
       "type": "Radio"
-    },
-    {
-      "id": "sp.3",
-      "image": "assets/speakers/img/KEF_IQ7_2005.webp",
-      "manufacturer": "KEF",
-      "model": "IQ7",
-      "year": 2005,
-      "type": "floor-standing standing speakers"
     }
 
   ]
