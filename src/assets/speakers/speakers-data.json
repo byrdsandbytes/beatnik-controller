@@ -74,6 +74,14 @@
       "model": "Unibody PLA-CF",
       "year": 2026,
       "type": "Generic"
+    },
+    {
+      "id": "gen.3",
+      "image": "assets/speakers/img/empty.webp",
+      "manufacturer": "No Image",
+      "model": "",
+      "year": 2026,
+      "type": "Generic"
     }
 
 
