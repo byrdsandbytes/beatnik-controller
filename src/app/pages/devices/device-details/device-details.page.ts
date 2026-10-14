@@ -1,4 +1,8 @@
 import { Component, OnInit } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Speaker } from 'src/app/model/speaker.model';
+import { ModalController } from '@ionic/angular';
+import { ChooseSpeakersComponent } from 'src/app/components/choose-speakers/choose-speakers.component';
 import { ActivatedRoute } from '@angular/router';
 import { Observable } from 'rxjs';
 import { Client, Group, SnapCastServerStatusResponse, Stream } from 'src/app/model/snapcast.model';
@@ -18,13 +22,21 @@ export class DeviceDetailsPage implements OnInit {
 
   serverState?: Observable<SnapCastServerStatusResponse>;
   selectedClient: Client;
+  speakerData: Speaker[] = [];
 
 
   constructor(
     private avtivateRoute: ActivatedRoute,
     private snapcastService: SnapcastService,
-    private coverDateService: CoverDataService
+    private coverDateService: CoverDataService,
+    private http: HttpClient,
+    private modalController: ModalController
   ) { }
+
+  async ionViewWillEnter() {
+    console.log('ionViewWillEnter called');
+    this.loadSpeakerData();
+  }
 
   async ngOnInit() {
     this.serverState = this.snapcastService.state$;
@@ -51,6 +63,26 @@ export class DeviceDetailsPage implements OnInit {
 
   }
 
+
+  loadSpeakerData(): void {
+    this.http.get<{ speakers: Speaker[] }>('assets/speakers/speakers-data.json').subscribe({
+      next: (response) => this.speakerData = response.speakers,
+      error: (error) => console.error('DeviceDetailsPage: Error loading speaker data', error)
+    });
+  }
+
+  async chooseSpeakers(group: Group) {
+    const modal = await this.modalController.create({
+      component: ChooseSpeakersComponent,
+      id: 'choose-speakers-modal',
+      componentProps: { clientId: group.clients[0]?.id }
+    });
+
+    await modal.present();
+    await modal.onDidDismiss();
+    this.loadSpeakerData();
+    this.snapcastService.refreshState().subscribe();
+  }
 
   changeGroupName(newName: string): void {
     if (!this.id) {

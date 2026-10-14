@@ -125,27 +125,29 @@
           </ion-card-content>
         </div>
         <ng-template #noServer>
-          <div class="ion-text-center">
+          <div class="ion-text-center onboarding-card">
             <ion-card-header>
-              <ion-card-title>No Server Available</ion-card-title>
+              <ion-card-title>Set Up Your Beatnik</ion-card-title>
+              <ion-card-subtitle>No device connected yet</ion-card-subtitle>
             </ion-card-header>
             <ion-card-content>
-              Please check your Beatnik Pi server connection. No Server found at <b>{{userPreferenceServerUrl?
-                userPreferenceServerUrl:environment.snapcastServerUrl}}</b>
-              <br>
-              Wanna use a different server? Go to the <a routerLink="/zeroconf">Device Search</a> or set it manually <a
-                routerLink="/tabs/menu/settings">Settings</a>
-              <br>
-              Just wanna test test? Enable the Demo mode:
-
+              <p class="onboarding-hint">
+                Looks like you haven't connected any devices yet. (We did not find any on the network.)
+                You can add & configure a new device by tapping the button below.
+              </p>
             </ion-card-content>
-            <ion-button fill="clear" color="primary" routerLink="/zeroconf">
-              <ion-icon name="settings"></ion-icon> Setup Server
-            </ion-button>
-            <ion-button fill="clear" color="primary" (click)="enableDemoMode()">
-              <ion-icon name="play"></ion-icon> Enable Demo Mode
-            </ion-button>
 
+            <div class="onboarding-fab-wrapper">
+              <ion-fab-button class="onboarding-fab" color="primary" routerLink="/ble-wifi-setup">
+                <ion-icon name="add"></ion-icon>
+              </ion-fab-button>
+            </div>
+
+            <div class="secondary-actions ion-margin-top">
+              <ion-button fill="clear" size="small" color="medium" routerLink="/zeroconf">
+                <ion-icon slot="start" name="search-outline"></ion-icon> Search for existing Device on Network
+              </ion-button>
+            </div>
           </div>
         </ng-template>
       </div>

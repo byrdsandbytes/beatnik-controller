@@ -4,4 +4,5 @@ export interface Speaker {
     manufacturer: string;
     model: string;
     year: number;
+    type: string;
 }

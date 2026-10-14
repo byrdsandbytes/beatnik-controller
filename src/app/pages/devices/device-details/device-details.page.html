@@ -21,8 +21,9 @@
       <ng-container *ngIf="serverState | async as state">
         <div class="row justify-content-center">
           <div class="col-12 col-md-4 col-lg-3">
-            <app-snapcast-group-preview [group]="group" [streams]="state.server.streams"></app-snapcast-group-preview>
-
+            <app-snapcast-group-preview [group]="group" [streams]="state.server.streams"
+              [speakerData]="speakerData"
+              (longPress)="chooseSpeakers($event)"></app-snapcast-group-preview>
           </div>
         </div>
         <ion-card color="primary">

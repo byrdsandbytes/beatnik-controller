@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import packageJson from '../../../../package.json';
+import { SnapcastService } from 'src/app/services/snapcast.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-menu',
@@ -11,7 +13,10 @@ export class MenuPage implements OnInit {
 
   version: string = '0.0.0';
 
-  constructor() { }
+  constructor(
+    private snapcastService: SnapcastService,
+    private router: Router
+  ) { }
 
   ngOnInit() {
        this.version = packageJson.version;
@@ -21,6 +26,10 @@ export class MenuPage implements OnInit {
   async getVersion() {
     // get version from package.json
   }
-  
+
+  enableDemoMode() {
+    this.snapcastService.mockServerState();
+    this.router.navigate(['/tabs/dashboard']);
+  }
 
 }

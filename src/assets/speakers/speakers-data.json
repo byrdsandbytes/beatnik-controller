@@ -6,7 +6,7 @@
       "manufacturer": "KEF",
       "model": "Concerto",
       "year": 1971,
-      "type": "floor-standing standing speakers"
+      "type": "Floor-standing"
     },
     {
       "id": "sp.2",
@@ -14,15 +14,34 @@
       "manufacturer": "JSE",
       "model": "Infinite Slope",
       "year": 1980,
-      "type": "floor-standing standing speakers"
+      "type": "Floor-standing"
     },
+   
+    {
+      "id": "sp.3",
+      "image": "assets/speakers/img/KEF_IQ7_2005.webp",
+      "manufacturer": "KEF",
+      "model": "IQ7",
+      "year": 2005,
+      "type": "Floor-standing"
+    }
+    ,
+    {
+      "id": "sp.4",
+      "image": "assets/speakers/img/JBL_xti20.webp",
+      "manufacturer": "JBL",
+      "model": "Xti20",
+      "year": 2000,
+      "type": "Bookshelf"
+    },
+
     {
       "id": "rc.1",
       "image": "assets/speakers/img/Meridian_F80.webp",
       "manufacturer": "Meridian",
       "model": "F80",
       "year": 2005,
-      "type": "Audio Receiver"
+      "type": "Receiver"
     },
     {
       "id": "rd.1",
@@ -33,13 +52,38 @@
       "type": "Radio"
     },
     {
-      "id": "sp.3",
-      "image": "assets/speakers/img/KEF_IQ7_2005.webp",
-      "manufacturer": "KEF",
-      "model": "IQ7",
-      "year": 2005,
-      "type": "floor-standing standing speakers"
+      "id": "amp.1",
+      "image": "assets/speakers/img/Beatnik_Amp_Pro.webp",
+      "manufacturer": "Beatnik",
+      "model": "Amp Pro",
+      "year": 2026,
+      "type": "Amplifier"
+    },
+    {
+      "id": "gen.1",
+      "image": "assets/speakers/img/Beatnik_Generic_Alu.webp",
+      "manufacturer": "Beatnik",
+      "model": "Unibody Alu",
+      "year": 2026,
+      "type": "Generic"
+    },
+    {
+      "id": "gen.2",
+      "image": "assets/speakers/img/Beatnik_Generic_Black.webp",
+      "manufacturer": "Beatnik",
+      "model": "Unibody PLA-CF",
+      "year": 2026,
+      "type": "Generic"
+    },
+    {
+      "id": "gen.3",
+      "image": "assets/speakers/img/empty.webp",
+      "manufacturer": "No Image",
+      "model": "",
+      "year": 2026,
+      "type": "Generic"
     }
+
 
   ]
 }

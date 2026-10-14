@@ -86,10 +86,15 @@ export class DashboardPage implements OnInit {
   ) {
   }
 
+  async ionViewDidEnter() {
+    console.log('ionViewDidEnter called');
+    this.loadSpeakerData();
+  }
+
   async ngOnInit() {
     // this.snapcastService.connect();
     this.getScreenSize(null); // Initialize screen size
-    this.loadSpeakerData();
+    // this.loadSpeakerData();
 
     this.userPreferenceServerUrl = await this.getUserPreferenceServerUrl();
     this.userPreeferenceUsername = await this.getUserName();
@@ -170,7 +175,7 @@ export class DashboardPage implements OnInit {
         this.checkUserPreferencesForAutomaticScan();
 
       }
-    }, 10000);
+    }, 2000);
 
   }
 

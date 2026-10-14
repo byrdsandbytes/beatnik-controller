@@ -8,7 +8,7 @@ import { SnapcastService } from 'src/app/services/snapcast.service';
 @Component({
   selector: 'app-choose-speakers',
   templateUrl: './choose-speakers.component.html',
-  styleUrls: ['./choose-speakers.component.scss'],  
+  styleUrls: ['./choose-speakers.component.scss'],
   standalone: false
 })
 export class ChooseSpeakersComponent implements OnInit {
@@ -18,6 +18,8 @@ export class ChooseSpeakersComponent implements OnInit {
   selectedId: string | undefined;
   speakers: Speaker[] = [];
   filteredSpeakers: Speaker[] = [];
+  selectedSegment: string | undefined = 'All';
+  types: string[] = [];
 
   constructor(
     private modalController: ModalController,
@@ -52,6 +54,8 @@ export class ChooseSpeakersComponent implements OnInit {
       this.speakers = response.speakers;
       this.filteredSpeakers = [...this.speakers];
       console.log('Speakers loaded:', this.speakers);
+      this.types = this.getTypesFromJson();
+      this.selectedSegment = 'All';
       return this.speakers;
     } catch (error) {
       console.error('Error loading speakers:', error);
@@ -75,12 +79,12 @@ export class ChooseSpeakersComponent implements OnInit {
 
   filterSpeakers(event: any) {
     const searchTerm = event.target.value.toLowerCase();
-    
+
     if (!searchTerm) {
       this.filteredSpeakers = [...this.speakers];
       return;
     }
-    
+
     this.filteredSpeakers = this.speakers.filter(speaker => {
       const matchManufacturer = speaker.manufacturer?.toLowerCase().includes(searchTerm);
       const matchModel = speaker.model?.toLowerCase().includes(searchTerm);
@@ -88,4 +92,10 @@ export class ChooseSpeakersComponent implements OnInit {
     });
   }
 
+
+
+  getTypesFromJson(): string[] {
+    const typesSet = new Set(this.speakers.map(speaker => speaker.type));
+    return Array.from(typesSet);
+  }
 }

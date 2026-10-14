@@ -43,6 +43,35 @@
     padding-bottom: 32px;
   }
 
+  .onboarding-card {
+    max-width: 420px;
+    margin: 0 auto;
+    padding: 24px 16px;
+
+    .onboarding-fab-wrapper {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin: 24px 0 16px;
+    }
+
+    .onboarding-fab {
+      // width: 140px;
+      // height: 140px;
+      font-size: 16px;
+      font-weight: 600;
+      white-space: normal;
+      text-align: center;
+      --border-radius: 50%;
+    }
+
+    .secondary-actions {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+    }
+  }
+
   .fab-label{
     font-size: 8px;
     width: 80%;

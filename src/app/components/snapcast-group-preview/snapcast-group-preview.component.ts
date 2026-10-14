@@ -1,4 +1,4 @@
-import { Component, Input, OnChanges, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, Output, OnChanges, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { Group, Stream } from 'src/app/model/snapcast.model';
 import { Speaker } from 'src/app/model/speaker.model';
@@ -16,6 +16,11 @@ export class SnapcastGroupPreviewComponent implements OnInit, OnChanges {
   @Input() streams?: Stream[] | null;
   @Input() speakerData?: Speaker[] | null;
 
+  @Output() longPress = new EventEmitter<Group>();
+
+  private pressTimer?: ReturnType<typeof setTimeout>;
+  private longPressed = false;
+
   activeStream?: Stream;
   activeSpeaker?: Speaker;
 
@@ -31,6 +36,7 @@ export class SnapcastGroupPreviewComponent implements OnInit, OnChanges {
 
   ngOnChanges() {
     this.getActiveStream();
+    this.getActiveSpeaker();
   }
 
   getStreamById(streamId: string): Stream | undefined {
@@ -44,6 +50,33 @@ export class SnapcastGroupPreviewComponent implements OnInit, OnChanges {
     }
     this.activeStream = this.getStreamById(this.group.stream_id);
     return this.activeStream;
+  }
+
+  onPressStart(): void {
+    this.longPressed = false;
+    this.cancelPress();
+    this.pressTimer = setTimeout(() => {
+      this.longPressed = true;
+      if (this.group) {
+        this.longPress.emit(this.group);
+      }
+    }, 600);
+  }
+
+  cancelPress(): void {
+    if (this.pressTimer) {
+      clearTimeout(this.pressTimer);
+      this.pressTimer = undefined;
+    }
+  }
+
+  onCardClick(): void {
+    // a long press must not also trigger navigation
+    if (this.longPressed) {
+      this.longPressed = false;
+      return;
+    }
+    this.navToGroupDetails();
   }
 
   navToGroupDetails(): void {
@@ -81,7 +114,7 @@ export class SnapcastGroupPreviewComponent implements OnInit, OnChanges {
       return undefined;
     }
     // Hacky implementation of speaker selection
-    this.activeSpeaker = this.speakerData.find(speaker => speaker.id === this.group.clients[0].config.name);
+    this.activeSpeaker = this.speakerData.find(speaker => speaker.id === this.group.clients[0]?.config.name);
     if (!this.activeSpeaker) {
       console.warn('No active speaker found for the group:', this.group.id);
       return undefined;
