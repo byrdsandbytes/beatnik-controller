@@ -33,8 +33,12 @@ export class DeviceDetailsPage implements OnInit {
     private modalController: ModalController
   ) { }
 
-  async ngOnInit() {
+  async ionViewWillEnter() {
+    console.log('ionViewWillEnter called');
     this.loadSpeakerData();
+  }
+
+  async ngOnInit() {
     this.serverState = this.snapcastService.state$;
     this.id = this.avtivateRoute.snapshot.paramMap.get('id') || undefined;
     if (!this.id) {
@@ -73,7 +77,11 @@ export class DeviceDetailsPage implements OnInit {
       id: 'choose-speakers-modal',
       componentProps: { clientId: group.clients[0]?.id }
     });
+
     await modal.present();
+    await modal.onDidDismiss();
+    this.loadSpeakerData();
+    this.snapcastService.refreshState().subscribe();
   }
 
   changeGroupName(newName: string): void {

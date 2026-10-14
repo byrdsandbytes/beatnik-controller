@@ -36,6 +36,7 @@ export class SnapcastGroupPreviewComponent implements OnInit, OnChanges {
 
   ngOnChanges() {
     this.getActiveStream();
+    this.getActiveSpeaker();
   }
 
   getStreamById(streamId: string): Stream | undefined {
@@ -113,7 +114,7 @@ export class SnapcastGroupPreviewComponent implements OnInit, OnChanges {
       return undefined;
     }
     // Hacky implementation of speaker selection
-    this.activeSpeaker = this.speakerData.find(speaker => speaker.id === this.group.clients[0].config.name);
+    this.activeSpeaker = this.speakerData.find(speaker => speaker.id === this.group.clients[0]?.config.name);
     if (!this.activeSpeaker) {
       console.warn('No active speaker found for the group:', this.group.id);
       return undefined;

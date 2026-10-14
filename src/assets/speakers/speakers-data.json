@@ -50,7 +50,32 @@
       "model": "Super",
       "year": 1953,
       "type": "Radio"
+    },
+    {
+      "id": "amp.1",
+      "image": "assets/speakers/img/Beatnik_Amp_Pro.webp",
+      "manufacturer": "Beatnik",
+      "model": "Amp Pro",
+      "year": 2026,
+      "type": "Amplifier"
+    },
+    {
+      "id": "gen.1",
+      "image": "assets/speakers/img/Beatnik_Generic_Alu.webp",
+      "manufacturer": "Beatnik",
+      "model": "Unibody Alu",
+      "year": 2026,
+      "type": "Generic"
+    },
+    {
+      "id": "gen.2",
+      "image": "assets/speakers/img/Beatnik_Generic_Black.webp",
+      "manufacturer": "Beatnik",
+      "model": "Unibody PLA-CF",
+      "year": 2026,
+      "type": "Generic"
     }
+
 
   ]
 }
