@@ -1,4 +1,6 @@
 import { Component, OnInit } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Speaker } from 'src/app/model/speaker.model';
 import { ActivatedRoute } from '@angular/router';
 import { Observable } from 'rxjs';
 import { Client, Group, SnapCastServerStatusResponse, Stream } from 'src/app/model/snapcast.model';
@@ -18,15 +20,18 @@ export class DeviceDetailsPage implements OnInit {
 
   serverState?: Observable<SnapCastServerStatusResponse>;
   selectedClient: Client;
+  speakerData: Speaker[] = [];
 
 
   constructor(
     private avtivateRoute: ActivatedRoute,
     private snapcastService: SnapcastService,
-    private coverDateService: CoverDataService
+    private coverDateService: CoverDataService,
+    private http: HttpClient
   ) { }
 
   async ngOnInit() {
+    this.loadSpeakerData();
     this.serverState = this.snapcastService.state$;
     this.id = this.avtivateRoute.snapshot.paramMap.get('id') || undefined;
     if (!this.id) {
@@ -51,6 +56,13 @@ export class DeviceDetailsPage implements OnInit {
 
   }
 
+
+  loadSpeakerData(): void {
+    this.http.get<{ speakers: Speaker[] }>('assets/speakers/speakers-data.json').subscribe({
+      next: (response) => this.speakerData = response.speakers,
+      error: (error) => console.error('DeviceDetailsPage: Error loading speaker data', error)
+    });
+  }
 
   changeGroupName(newName: string): void {
     if (!this.id) {
