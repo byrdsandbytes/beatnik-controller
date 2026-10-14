@@ -106,6 +106,10 @@ const routes: Routes = [
     path: 'stream-preset-edit',
     loadChildren: () => import('./pages/streams/stream-preset-edit/stream-preset-edit.module').then( m => m.StreamPresetEditPageModule)
   },
+  {
+    path: 'beatnik-update',
+    loadChildren: () => import('./pages/beatnik-update/beatnik-update.module').then( m => m.BeatnikUpdatePageModule)
+  },
 
 
 ];

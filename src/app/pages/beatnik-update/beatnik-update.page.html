@@ -1,0 +1,42 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button></ion-back-button>
+    </ion-buttons>
+    <ion-title>Updates</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-list>
+    <ion-item>
+      <ion-input label="Host" labelPlacement="stacked" [(ngModel)]="host"></ion-input>
+    </ion-item>
+  </ion-list>
+
+  <div class="ion-padding">
+    <ion-button size="small" (click)="refresh()">Refresh status</ion-button>
+    <ion-button *ngFor="let t of targets" size="small" color="secondary"
+      [disabled]="overview.busy" (click)="start(t)">
+      Update {{ t }}
+    </ion-button>
+  </div>
+
+  <ion-text color="danger" *ngIf="error"><p class="ion-padding-horizontal">{{ error }}</p></ion-text>
+  <ion-text color="success" *ngIf="message"><p class="ion-padding-horizontal">{{ message }}</p></ion-text>
+
+  <ion-list *ngIf="overview">
+    <ion-list-header>
+      <ion-label>{{ overview.busy ? 'Update running…' : 'Idle' }}</ion-label>
+    </ion-list-header>
+    <ion-item *ngFor="let s of overview.targets">
+      <ion-label class="ion-text-wrap">
+        <h2>{{ s.target }} – {{ s.state }}</h2>
+        <p *ngIf="s.message">{{ s.message }}</p>
+        <p *ngIf="s.startedAt">Started: {{ s.startedAt }}</p>
+        <p *ngIf="s.finishedAt">Finished: {{ s.finishedAt }}</p>
+        <pre *ngIf="s.output" style="white-space: pre-wrap; font-size: 11px">{{ s.output }}</pre>
+      </ion-label>
+    </ion-item>
+  </ion-list>
+</ion-content>
