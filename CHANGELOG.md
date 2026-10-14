@@ -3,6 +3,51 @@
 ## [Unreleased]
 
 ### Added
+- Add long press on group preview to choose speaker image
+- Add "All" segment to speaker selection
+- Add JBL XTi 20 and Beatnik device images to speaker database
+- Add empty speaker option
+- Add big "Add Device" button on dashboard
+
+### Changed
+- Base player toolbar on groups instead of streams
+- Move demo mode to menu
+- Clean up speaker selection component
+- Load speaker data on device details page
+
+### Fixed
+- Fix speaker type segments in speaker selection
+- Fix speaker image not refreshing after selection
+
+### Removed
+- Remove EEPROM matching logic dev info
+
+## [0.7.1] - 2026-10-13
+
+### Added
+- Add wifi band readout
+
+## [0.7.0] - 2026-10-07
+
+### Added
+- Add system info routes
+- Add frequency and band info
+
+### Fixed
+- Fix deployment target on iOS
+
+## [0.6.1] - 2026-09-20
+
+### Added
+- Add changelog
+
+### Changed
+- Refactor CamillaDSP service
+- Update mdns dependency
+
+## [0.6.0] - 2026-07-28
+
+### Added
 - Add stream album art to toolbar
 - Add rebooting and restarting functions
 - Add loading spinners and wifi check in setup
