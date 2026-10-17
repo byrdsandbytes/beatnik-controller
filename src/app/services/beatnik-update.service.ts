@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, timer } from 'rxjs';
-import { switchMap, takeWhile } from 'rxjs/operators';
+import { Observable, of, timer } from 'rxjs';
+import { catchError, switchMap, takeWhile } from 'rxjs/operators';
 
-export type UpdateTarget = 'bleno' | 'controller' | 'camilladsp' | 'api';
+export type UpdateTarget = 'bleno' | 'controller' | 'api';
 export type UpdateState = 'idle' | 'running' | 'success' | 'failed';
 
 export interface UpdateStatus {
@@ -18,6 +18,11 @@ export interface UpdateStatus {
 export interface UpdateOverview {
   busy: boolean; // True while an update is running
   targets: UpdateStatus[];
+}
+
+// Emitted by pollUntilDone() while the API is unreachable (it restarts after an 'api' update)
+export interface UpdateOffline {
+  offline: true;
 }
 
 export interface StartUpdateResponse {
@@ -45,6 +50,9 @@ export class BeatnikUpdateService {
 
   /**
    * Start an update (returns immediately, the update runs in the background).
+   * - 'bleno' and 'api' install the latest .deb release with apt (404 if the package is not installed).
+   * - 'controller' pulls the latest Docker image.
+   * - 'all' runs bleno, controller and api in that order; it stops at the first failure.
    * Responds with 409 if another update is already running.
    */
   update(target: UpdateTarget | 'all', host: string): Observable<StartUpdateResponse> {
@@ -53,13 +61,16 @@ export class BeatnikUpdateService {
 
   /**
    * Poll the status until no update is running anymore.
-   * Note: updating 'api' restarts the Hardware API, so requests fail for a few
-   * seconds. Handle the error (e.g. with retry) until the API is reachable again.
+   * Updating 'api' restarts the Hardware API, so requests fail for a few seconds.
+   * Failed polls are emitted as { offline: true } and polling continues until the API
+   * is reachable again and reports busy = false.
    */
-  pollUntilDone(host: string, intervalMs = 3000): Observable<UpdateOverview> {
+  pollUntilDone(host: string, intervalMs = 3000): Observable<UpdateOverview | UpdateOffline> {
     return timer(0, intervalMs).pipe(
-      switchMap(() => this.getStatus(host)),
-      takeWhile(status => status.busy, true)
+      switchMap(() =>
+        this.getStatus(host).pipe(catchError(() => of<UpdateOffline>({ offline: true })))
+      ),
+      takeWhile(status => 'offline' in status || status.busy, true)
     );
   }
 }

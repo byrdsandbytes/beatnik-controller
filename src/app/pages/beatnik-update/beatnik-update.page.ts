@@ -1,6 +1,5 @@
 import { Component, OnDestroy } from '@angular/core';
 import { Subscription } from 'rxjs';
-import { retry } from 'rxjs/operators';
 import {
   BeatnikUpdateService,
   UpdateOverview,
@@ -15,8 +14,9 @@ import {
 })
 export class BeatnikUpdatePage implements OnDestroy {
   host = window.location.hostname || 'localhost';
-  targets: (UpdateTarget | 'all')[] = ['bleno', 'controller', 'camilladsp', 'api', 'all'];
+  targets: (UpdateTarget | 'all')[] = ['bleno', 'controller', 'api', 'all'];
   overview?: UpdateOverview;
+  offline = false;
   error?: string;
   message?: string;
   private pollSub?: Subscription;
@@ -50,12 +50,16 @@ export class BeatnikUpdatePage implements OnDestroy {
 
   private poll() {
     this.pollSub?.unsubscribe();
-    // The API restarts when updating 'api', so retry through transient failures
+    // The API restarts when updating 'api'; the service reports that as offline
     this.pollSub = this.updateService
       .pollUntilDone(this.host)
-      .pipe(retry({ delay: 3000 }))
       .subscribe({
-        next: (o) => (this.overview = o),
+        next: (o) => {
+          this.offline = 'offline' in o;
+          if (!('offline' in o)) {
+            this.overview = o;
+          }
+        },
         error: (e) => (this.error = this.describe(e)),
       });
   }

@@ -20,7 +20,8 @@ export interface HardwareStatus {
   detectedHardware: HatProfile | null;
   isMatch: boolean;
   eepromReadDisabled: boolean;
-  camillaConfigFile: string | null;
+  camillaConfigFile: string | null; // Active playback (default) config
+  preampConfigFile: string | null; // Active line-in (preamp) config, null if no preamp is set up
 }
 
 export interface ApplyResponse {
@@ -44,6 +45,7 @@ export interface SetCamillaDefaultConfigRequest {
 export interface SetCamillaDefaultConfigResponse {
   status: string;
   fileName: string;
+  camillaRestarted: boolean;
 }
 
 @Injectable({
@@ -95,9 +97,35 @@ export class BeatnikHardwareService {
     );
   }
 
+  // Line in (preamp CamillaDSP instance). These calls fail if no preamp is set up.
+
+  /**
+   * List the available line-in (preamp) configs
+   */
+  getLineInConfigs(host: string): Observable<CamillaConfigListResponse> {
+    return this.http.get<CamillaConfigListResponse>(`${this.getApiUrl(host)}/camilla/preamp/configs`);
+  }
+
+  /**
+   * Get the active line-in (preamp) config
+   */
+  getLineInDefaultConfig(host: string): Observable<CamillaDefaultConfigResponse> {
+    return this.http.get<CamillaDefaultConfigResponse>(`${this.getApiUrl(host)}/camilla/preamp/configs/default`);
+  }
+
+  /**
+   * Set the active line-in (preamp) config (restarts the preamp CamillaDSP service)
+   */
+  setLineInDefaultConfig(fileName: string, host: string): Observable<SetCamillaDefaultConfigResponse> {
+    return this.http.put<SetCamillaDefaultConfigResponse>(
+      `${this.getApiUrl(host)}/camilla/preamp/configs/default`,
+      { fileName } satisfies SetCamillaDefaultConfigRequest
+    );
+  }
+
   /**
    * Apply a new hardware configuration
-   * This will update config.txt and camilladsp.yml
+   * This will update config.txt and the playback CamillaDSP config
    */
   applyConfiguration(hatId: string, host: string): Observable<ApplyResponse> {
     return this.http.post<ApplyResponse>(`${this.getApiUrl(host)}/apply`, { hatId });

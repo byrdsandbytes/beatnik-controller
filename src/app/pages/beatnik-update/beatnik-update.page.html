@@ -16,14 +16,25 @@
 
   <div class="ion-padding">
     <ion-button size="small" (click)="refresh()">Refresh status</ion-button>
-    <ion-button *ngFor="let t of targets" size="small" color="secondary"
-      [disabled]="overview.busy" (click)="start(t)">
-      Update {{ t }}
-    </ion-button>
+
+    <ng-container *ngIf="overview">
+      <ion-button *ngFor="let t of targets" size="small" color="secondary" [disabled]="overview.busy"
+        (click)="start(t)">
+        Update {{ t }}
+      </ion-button>
+    </ng-container>
   </div>
 
-  <ion-text color="danger" *ngIf="error"><p class="ion-padding-horizontal">{{ error }}</p></ion-text>
-  <ion-text color="success" *ngIf="message"><p class="ion-padding-horizontal">{{ message }}</p></ion-text>
+  <ion-text color="danger" *ngIf="error">
+    <p class="ion-padding-horizontal">{{ error }}</p>
+  </ion-text>
+  <ion-text color="success" *ngIf="message">
+    <p class="ion-padding-horizontal">{{ message }}</p>
+  </ion-text>
+
+  <ion-text color="warning" *ngIf="offline">
+    <p class="ion-padding-horizontal">API is restarting, waiting for it to come back…</p>
+  </ion-text>
 
   <ion-list *ngIf="overview">
     <ion-list-header>
