@@ -106,7 +106,7 @@ export class BeatnikBlenoService {
     }
   }
 
-  private async handleFoundDevice(result: { device: any }): Promise<void> {
+private async handleFoundDevice(result: { device: any }): Promise<void> {
     if (!result.device) return;
 
     this.deviceId = result.device.deviceId;
@@ -120,39 +120,20 @@ export class BeatnikBlenoService {
       await BleClient.connect(this.deviceId, () => this.onDisconnect());
       console.log('Connection successful.');
 
-      // Get services and characteristics
+      // 1. Immediately request services without pausing
       console.log('Discovering services...');
       const services = await BleClient.getServices(this.deviceId);
-      console.log('Available services:', JSON.stringify(services, null, 2));
-
-      // Find our service
+      
       const provisioningService = services.find(s =>
         s.uuid.toLowerCase() === this.SERVICE.toLowerCase()
       );
 
       if (!provisioningService) {
-        console.error('Available services:', services.map(s => s.uuid));
         throw new Error(`Provisioning service ${this.SERVICE} not found`);
       }
 
-      console.log('Found provisioning service:', provisioningService);
-
-      // Log all characteristics for debugging
-      if (provisioningService.characteristics) {
-        console.log('Service characteristics:',
-          provisioningService.characteristics.map(c => ({
-            uuid: c.uuid,
-            properties: c.properties
-          }))
-        );
-      }
-
-      // Short delay to ensure characteristics are ready
-      await this.sleep(2000);
-
-      // Try to read the device information first 
+      // 2. Safely attempt to read device info (Optional, non-blocking)
       try {
-        console.log('Reading device information...');
         const deviceInfo = await BleClient.read(
           this.deviceId,
           '0000180a-0000-1000-8000-00805f9b34fb',
@@ -160,12 +141,15 @@ export class BeatnikBlenoService {
         );
         console.log('Device information:', new TextDecoder().decode(deviceInfo));
       } catch (error) {
-        console.warn('Could not read device information:', error);
+        console.warn('Could not read device info, continuing...', error);
       }
 
+      // 3. Setup notifications BEFORE any writes to keep connection active
+      await this.subscribeToStatusNotifications();
+      await this.subscribeToNetworkList();
+
+      // 4. Safely verify write access without triggering a global disconnect
       try {
-        console.log('Verifying provisioning service access...');
-        // First try to write to SSID characteristic (it should be writable)
         await BleClient.write(
           this.deviceId,
           this.SERVICE,
@@ -174,21 +158,17 @@ export class BeatnikBlenoService {
         );
         console.log('Successfully verified write access');
       } catch (error) {
-        console.error('Error verifying service access:', error);
-        throw new Error('Could not access service characteristics');
+        console.warn('Write verification failed, but keeping connection alive:', error);
       }
-
-      await this.subscribeToStatusNotifications();
 
       this.deviceConnectionStatus$.next('Connected');
       console.log('Device is ready.');
 
-      await this.subscribeToStatusNotifications();
-      await this.subscribeToNetworkList();
+      // 5. Trigger the scan last
       await this.scanForWifiNetworks();
 
     } catch (error) {
-      console.error('Error handling device:', error);
+      console.error('Fatal error handling device:', error);
       this.disconnect();
     }
   }
