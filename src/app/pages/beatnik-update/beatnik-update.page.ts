@@ -4,6 +4,7 @@ import {
   BeatnikUpdateService,
   UpdateOverview,
   UpdateTarget,
+  VersionInfo,
 } from 'src/app/services/beatnik-update.service';
 
 @Component({
@@ -16,6 +17,7 @@ export class BeatnikUpdatePage implements OnDestroy {
   host = window.location.hostname || 'localhost';
   targets: (UpdateTarget | 'all')[] = ['bleno', 'controller', 'api', 'all'];
   overview?: UpdateOverview;
+  versions: VersionInfo[] = [];
   offline = false;
   error?: string;
   message?: string;
@@ -31,6 +33,10 @@ export class BeatnikUpdatePage implements OnDestroy {
     this.error = undefined;
     this.updateService.getStatus(this.host).subscribe({
       next: (o) => (this.overview = o),
+      error: (e) => (this.error = this.describe(e)),
+    });
+    this.updateService.getVersions(this.host).subscribe({
+      next: (response) => (this.versions = response.versions),
       error: (e) => (this.error = this.describe(e)),
     });
   }
@@ -58,10 +64,20 @@ export class BeatnikUpdatePage implements OnDestroy {
           this.offline = 'offline' in o;
           if (!('offline' in o)) {
             this.overview = o;
+            if (!o.busy) {
+              this.loadVersions();
+            }
           }
         },
         error: (e) => (this.error = this.describe(e)),
       });
+  }
+
+  private loadVersions() {
+    this.updateService.getVersions(this.host).subscribe({
+      next: (response) => (this.versions = response.versions),
+      error: (e) => (this.error = this.describe(e)),
+    });
   }
 
   private describe(e: any): string {

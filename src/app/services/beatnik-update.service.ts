@@ -20,6 +20,18 @@ export interface UpdateOverview {
   targets: UpdateStatus[];
 }
 
+export interface VersionInfo {
+  target: UpdateTarget;
+  installed: boolean;
+  version: string | null;
+  image?: string;
+  imageId?: string;
+}
+
+export interface VersionsResponse {
+  versions: VersionInfo[];
+}
+
 // Emitted by pollUntilDone() while the API is unreachable (it restarts after an 'api' update)
 export interface UpdateOffline {
   offline: true;
@@ -46,6 +58,13 @@ export class BeatnikUpdateService {
    */
   getStatus(host: string): Observable<UpdateOverview> {
     return this.http.get<UpdateOverview>(`${this.getApiUrl(host)}/status`);
+  }
+
+  /**
+   * Get installed version information for every update target
+   */
+  getVersions(host: string): Observable<VersionsResponse> {
+    return this.http.get<VersionsResponse>(`${this.getApiUrl(host)}/versions`);
   }
 
   /**

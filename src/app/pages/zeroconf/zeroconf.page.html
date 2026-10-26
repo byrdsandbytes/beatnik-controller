@@ -1,7 +1,3 @@
-
-
-
-
 <ion-header>
   <ion-toolbar>
     <ion-buttons slot="start">
@@ -12,7 +8,9 @@
       <ion-button (click)="scanForServices()" *ngIf="!isScanning">
         <ion-icon slot="icon-only" name="scan-outline"></ion-icon>
       </ion-button>
-     
+      <ion-button (click)="stopScanning()" *ngIf="isScanning">
+        <ion-icon slot="icon-only" name="stop-circle-outline"></ion-icon>
+      </ion-button>
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
@@ -22,7 +20,7 @@
   <ion-list-header>
     Discovered Services
   </ion-list-header>
-  <ion-item *ngIf="!isScanning && snapcastmdnsResults && snapcastmdnsResults.services.length === 0 || !snapcastmdnsResults && !beatnikmdnsResults">
+  <ion-item *ngIf="!isScanning && ((snapcastmdnsResults?.services?.length ?? 0) === 0 && (beatnikmdnsResults?.services?.length ?? 0) === 0)">
     <ion-label class="ion-text-center">
       <p>No services found.</p>
     </ion-label>
@@ -38,8 +36,6 @@
 
   <div *ngIf="(snapcastmdnsResults) as snapcastResults">
     <ion-list>
-
-
       <ion-item *ngIf="snapcastResults.services.length === 0 && isScanning">
         <ion-label>Searching for services...</ion-label>
       </ion-item>
@@ -74,13 +70,13 @@
             <p>{{ service.name }}</p>
             <p>{{ service.type }}</p>
             <p>{{ service.hosts[0] }}:{{ service.port }}</p>
-            <p>Beatnik Device - MAC: {{ service.txt['mac'] }}</p>
-            <p>Beatnik Pi: {{ service.txt['model'] }}</p>
-            <p>Beatnik Version: {{ service.txt['version'] }}</p>
-            <p>RAM: {{ service.txt['ram'] }}</p>
+            <p>Beatnik Device - MAC: {{ service.txt?.['mac'] }}</p>
+            <p>Beatnik Pi: {{ service.txt?.['model'] }}</p>
+            <p>Beatnik Version: {{ service.txt?.['version'] }}</p>
+            <p>RAM: {{ service.txt?.['ram'] }}</p>
 
           </ion-label>
-          <ion-button fill="outline" slot="end" [routerLink]="['/clients', service.txt['mac']]">View
+          <ion-button fill="outline" slot="end" [routerLink]="['/clients', service.txt?.['mac']]">View
             Device</ion-button>
         </ion-item>
       </ng-container>
@@ -89,7 +85,8 @@
 
 
   </div>
-  <ion-button expand="full" (click)="scanForServices()">Scan for Services</ion-button>
+  <ion-button expand="full" *ngIf="!isScanning" (click)="scanForServices()">Scan for Services</ion-button>
+  <ion-button expand="full" color="danger" *ngIf="isScanning" (click)="stopScanning()">Stop Scanning</ion-button>
   <ion-item>
     <ion-label class="ion-text-center">
       <p>Note: ZeroConf Scan does not work in Web Browser. iOS and Android only.</p>

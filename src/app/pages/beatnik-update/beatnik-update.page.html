@@ -50,4 +50,18 @@
       </ion-label>
     </ion-item>
   </ion-list>
+
+  <ion-list *ngIf="versions.length">
+    <ion-list-header>
+      <ion-label>Installed versions</ion-label>
+    </ion-list-header>
+    <ion-item *ngFor="let version of versions">
+      <ion-label class="ion-text-wrap">
+        <h2>{{ version.target }}</h2>
+        <p>{{ version.installed ? (version.version || 'Version unknown') : 'Not installed' }}</p>
+        <p *ngIf="version.image">Image: {{ version.image }}</p>
+        <p *ngIf="version.imageId">Image ID: {{ version.imageId }}</p>
+      </ion-label>
+    </ion-item>
+  </ion-list>
 </ion-content>
