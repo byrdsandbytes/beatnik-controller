@@ -20,11 +20,7 @@
                 <div class="container-fluid py-2">
                     <div class="row g-3">
                         <div class="col-12 col-md-6">
-                            <h3 class="min-label">Capture (Snapcast)</h3>
-
-                            <!-- <ion-list-header>
-                                <ion-label>Capture (Snapcast)</ion-label>
-                            </ion-list-header> -->
+                            <h3 class="meter-title">Capture (Snapcast)</h3>
                             <div class="row g-2">
                                 <div class="col-6">
                                     <app-vu-meter label="Left" [rms]="levels.capture_rms[0]"
@@ -37,10 +33,7 @@
                             </div>
                         </div>
                         <div class="col-12 col-md-6">
-                            <!-- <ion-list-header>
-                                <ion-label>Playback</ion-label>
-                            </ion-list-header> -->
-                            <h3 class="min-label">Playback</h3>
+                            <h3 class="meter-title">Playback</h3>
 
                             <div class="row g-2">
                                 <div class="col-6">
@@ -60,7 +53,7 @@
             <ion-card *ngIf="meterStyle === 'bars'" class="meters-container ion-no-margin">
                 <!-- Capture Group -->
                 <div class="meter-group">
-                    <h3>Capture (Snapcast)</h3>
+                    <h3 class="meter-title">Capture (Snapcast)</h3>
                     <div class="channels">
                         <!-- Left Channel -->
                         <div class="channel">
@@ -119,7 +112,7 @@
 
                 <!-- Playback Group -->
                 <div class="meter-group">
-                    <h3>Playback</h3>
+                    <h3 class="meter-title">Playback</h3>
                     <div class="channels">
                         <!-- Left Channel -->
                         <div class="channel">
@@ -198,7 +191,7 @@
             <ion-card color="primary" class="ion-no-margin">
 
                 <ion-item lines="none" color="primary">
-                    <ion-label slot="start">Master Volume:</ion-label>
+                    <ion-label slot="start">Master Volume</ion-label>
                     <ion-input type="number" slot="end" [(ngModel)]="currentVolume"
                         (ionChange)="setVolume(currentVolume)"></ion-input>
                     <ion-label slot="end">dB</ion-label>
@@ -226,9 +219,12 @@
                         {{ filter.key }}
                     </ion-card-subtitle>
                 </ion-card-header>
-                <ion-item color="primary"> Type: {{ filter.value.type }} </ion-item>
                 <ion-item color="primary">
-                    <ion-label slot="start">Gain:</ion-label>
+                    <ion-label>Type</ion-label>
+                    <ion-note slot="end" color="light">{{ filter.value.type }}</ion-note>
+                </ion-item>
+                <ion-item color="primary">
+                    <ion-label slot="start">Gain</ion-label>
                     <ion-input type="number" slot="end" [(ngModel)]="filter.value.parameters.gain"
                         (ionChange)="updateFilterParameter(filter.key, 'gain', filter.value.parameters.gain)"></ion-input>
                     <ion-label slot="end">dB</ion-label>
@@ -260,7 +256,10 @@
                         {{ mixer.key }}
                     </ion-card-subtitle>
                 </ion-card-header>
-                <ion-item color="primary"> Channels: {{ mixer.value.channels.out }} </ion-item>
+                <ion-item color="primary">
+                    <ion-label>Channels</ion-label>
+                    <ion-note slot="end" color="light">{{ mixer.value.channels.out }}</ion-note>
+                </ion-item>
                 <div *ngFor="let mapping of mixer.value.mapping; let i = index">
                     <ion-item color="primary">
                         <ion-label>
@@ -271,7 +270,8 @@
                     </ion-item>
                     <ng-container *ngFor="let source of mapping.sources">
                         <ion-item color="primary">
-                            <ion-label>Source {{ source.channel }} - Gain: {{ source.gain }}</ion-label>
+                            <ion-label>Source {{ source.channel }} gain</ion-label>
+                            <ion-note slot="end" color="light">{{ source.gain }} dB</ion-note>
                             <ion-range *ngIf="controlStyle === 'lines'" [ticks]="true" [snaps]="true" color="medium"
                                 min="-12" max="12" step="1" [(ngModel)]="source.gain"
                                 (ionChange)="updateMixerMapping(source, mixer.key)"></ion-range>
@@ -281,13 +281,13 @@
                             [ngModel]="source.gain"
                             (ngModelChange)="source.gain = $event; updateMixerMapping(source, mixer.key)"></app-rotary-knob>
                         <ion-item color="primary">
-                            <p>Inverted: {{ source.inverted }}</p>
-                            <ion-toggle color="light" [(ngModel)]="source.inverted"
+                            <ion-label>Inverted</ion-label>
+                            <ion-toggle slot="end" [(ngModel)]="source.inverted"
                                 (ionChange)="updateMixerMapping(source, mixer.key)"></ion-toggle>
                         </ion-item>
                         <ion-item color="primary">
-                            <p>Muted: {{ source.mute }}</p>
-                            <ion-toggle [(ngModel)]="source.mute"
+                            <ion-label>Muted</ion-label>
+                            <ion-toggle slot="end" [(ngModel)]="source.mute"
                                 (ionChange)="updateMixerMapping(source, mixer.key)"></ion-toggle>
                         </ion-item>
                     </ng-container>
@@ -306,7 +306,7 @@
             <ng-template #processorControl let-ctrl="ctrl" let-processorKey="processorKey" let-processor="processor">
                 <ng-container *ngIf="controlStyle === 'lines'">
                     <ion-item color="primary">
-                        <ion-label slot="start">{{ ctrl.label }}:</ion-label>
+                        <ion-label slot="start">{{ ctrl.label }}</ion-label>
                         <ion-input type="number" slot="end" [step]="ctrl.step"
                             [value]="getProcessorParam(processor, ctrl.key)"
                             (ionChange)="onProcessorNumberChange(processorKey, ctrl.key, $event.detail.value)"></ion-input>
@@ -376,7 +376,7 @@
                 </div>
                 <ion-item color="primary">
                     <ion-label>Soft clip</ion-label>
-                    <ion-toggle slot="end" color="light" [checked]="!!processor.value.parameters.soft_clip"
+                    <ion-toggle slot="end" [checked]="!!processor.value.parameters.soft_clip"
                         (ionChange)="updateProcessorParameter(processor.key, 'soft_clip', $event.detail.checked)"></ion-toggle>
                 </ion-item>
                 <div *ngIf="processor.value.parameters.soft_clip" [class.row]="controlStyle === 'rotary'"

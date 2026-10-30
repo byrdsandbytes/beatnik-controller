@@ -50,15 +50,8 @@
   }
 }
 
-.unit {
-  fill: #2a2a2a;
-  font-size: 12px;
-  font-weight: 700;
-  text-anchor: middle;
-}
-
 .needle {
-  transform-origin: 100px 112px;
+  transform-origin: 100px 114px;
   transition: transform 0.12s ease-out;
 
   line {
@@ -72,11 +65,37 @@
   fill: #111;
 }
 
-.clip {
-  margin: 0;
-}
-
 .vu-label {
   font-size: 0.8rem;
   letter-spacing: 1px;
+}
+
+.readout {
+  fill: #2a2a2a;
+  font-size: 7px;
+  text-anchor: start;
+
+  &.clip {
+    fill: #c62828;
+    font-weight: 700;
+  }
+}
+
+.brand {
+  fill: #2a2a2a;
+  font-size: 4px;
+  font-weight: 400;
+  letter-spacing: 0.3em;
+  text-anchor: middle;
+}
+
+.unit {
+  fill: #2a2a2a;
+  font-size: 12px;
+  font-weight: 700;
+  text-anchor: middle;
+}
+
+.end-mark {
+  font-size: 10px;
 }

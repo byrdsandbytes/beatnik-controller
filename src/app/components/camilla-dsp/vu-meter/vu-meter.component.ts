@@ -16,8 +16,8 @@ const MAX_DB = 0;
 const MIN_ANGLE = -45;
 const MAX_ANGLE = 45;
 const PIVOT_X = 100;
-const PIVOT_Y = 112;
-const RADIUS = 90;
+const PIVOT_Y = 114;
+const RADIUS = 95;
 const RED_ZONE_DB = -6;
 const CLIP_DB = -1;
 
@@ -62,7 +62,7 @@ export class VuMeterComponent {
         const angle = dbToAngle(db);
         const outer = polar(angle, RADIUS + 5);
         const inner = polar(angle, RADIUS - 5);
-        const label = polar(angle, RADIUS - 16);
+        const label = polar(angle, RADIUS + 13);
         return {
             x1: inner.x,
             y1: inner.y,
@@ -73,6 +73,14 @@ export class VuMeterComponent {
             label: String(db),
             red: db >= RED_ZONE_DB
         };
+    });
+
+    readonly endMarks = [
+        { label: '-∞', angle: MIN_ANGLE - 8, red: false },
+        { label: '×', angle: MAX_ANGLE + 8, red: true }
+    ].map(m => {
+        const pos = polar(m.angle, RADIUS + 13);
+        return { label: m.label, x: pos.x, y: pos.y, red: m.red };
     });
 
     get needleAngle(): number {

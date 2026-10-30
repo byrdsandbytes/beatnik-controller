@@ -1,5 +1,4 @@
 .meters-section {
-  // padding: 10px;
 
   .meters-container {
     display: flex;
@@ -7,40 +6,14 @@
     gap: 2rem;
     justify-content: center;
     background-color: var(--ion-color-primary);
-    // background-image: linear-gradient(45deg, #2b2b2b 25%, #262626 25%, #262626 50%, #2b2b2b 50%, #2b2b2b 75%, #262626 75%, #262626 100%);
-    // background-size: 4px 4px; /* Subtle texture */
     padding: 2rem;
-    // border-radius: 8px;
-    // box-shadow:
-    //   inset 1px 1px 0 rgba(255,255,255,0.1),
-    //   inset -1px -1px 0 rgba(0,0,0,0.5),
-    //   0 10px 20px rgba(0,0,0,0.5);
-    // border: 1px solid #1a1a1a;
   }
 
   .meter-group {
     background: var(--ion-color-primary);
     padding: 1.5rem;
-    // border: 1px solid #000;
-    // border-radius: 4px;
-    // box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.8);
     position: relative;
 
-    h3 {
-      font-size: 0.8rem;
-      // text-transform: uppercase;
-      letter-spacing: 2px;
-      margin-bottom: 1.5rem;
-      // color: #ccc;
-      text-align: center;
-      // text-shadow: 0 2px 4px rgba(0, 0, 0, 1);
-      // background-color: #111;
-      display: inline-block;
-      padding: 4px 12px;
-      border-radius: 2px;
-      // border: 1px solid #333;
-      width: 100%;
-    }
   }
 
   .channels {
@@ -56,10 +29,7 @@
 
   .channel-name {
     margin-bottom: 0.8rem;
-    // font-weight: 700;
     font-size: 0.75rem;
-    // color: #888;
-    // text-transform: uppercase;
     letter-spacing: 1px;
   }
 
@@ -67,10 +37,7 @@
     display: flex;
     gap: 12px;
     padding: 12px;
-    // background: #0d0d0d;
     border-radius: 2px;
-    // box-shadow: inset 0 0 5px rgba(255, 255, 255, 0.05);
-    // border: 1px solid #333;
   }
 
   .meter-column {
@@ -157,8 +124,6 @@
 
 
 ion-card {
-  // border-radius: 0px;
-  // --ion-border-radius: 0px;
   box-shadow: none;
   border: 1px solid var(--ion-color-light);
   
@@ -170,24 +135,88 @@ ion-list-header {
   border: 1px solid var(--ion-color-light);
 }
 
-.meter-style-segment {
-  max-width: 10rem;
+
+
+
+/* Typography: one consistent scale for the CamillaDSP panels */
+ion-list-header ion-label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
 }
 
-.min-label{
-      font-size: 0.8rem;
-      // text-transform: uppercase;
-      letter-spacing: 2px;
-      margin-bottom: 1.5rem;
-      // color: #ccc;
-      text-align: center;
-      // text-shadow: 0 2px 4px rgba(0, 0, 0, 1);
-      // background-color: #111;
-      display: inline-block;
-      padding: 4px 12px;
-      // border-radius: 2px;
-      // border: 1px solid #333;
-      width: 100%;
-      color: var(--ion-color-medium);
+ion-card-title,
+ion-card-subtitle {
+  font-size: 0.9rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: none;
+}
 
-    }
+ion-card-subtitle {
+  font-weight: 400;
+  opacity: 0.8;
+}
+
+ion-item ion-label,
+ion-item ion-input,
+ion-item ion-note {
+  font-size: 0.85rem;
+}
+
+ion-item ion-note {
+  font-weight: 600;
+}
+
+.meter-title {
+  width: 100%;
+  margin: 0 0 1rem;
+  text-align: center;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ion-color-medium);
+}
+
+/* Segments (used on dark headers): clear active state */
+.meter-style-segment {
+  max-width: 11rem;
+  min-height: 32px;
+  --background: transparent;
+  border: 1px solid var(--ion-color-light);
+}
+
+.meter-style-segment ion-segment-button {
+  --color: var(--ion-color-light);
+  --color-checked: var(--ion-color-primary);
+  --indicator-color: var(--ion-color-light);
+  --background-checked: var(--ion-color-light);
+  --border-radius: 0;
+  min-height: 30px;
+  margin: 0;
+}
+
+.meter-style-segment ion-segment-button::part(indicator-background) {
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.meter-style-segment ion-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: none;
+  letter-spacing: 0.05em;
+}
+
+/* Toggles: visible track and knob on dark cards */
+ion-toggle {
+  --track-background: rgba(245, 243, 232, 0.25);
+  --track-background-checked: var(--ion-color-secondary);
+  --handle-background: var(--ion-color-light);
+  --handle-background-checked: var(--ion-color-light);
+  --handle-box-shadow: none;
+  --handle-border-radius: 50%;
+  border: 0;
+}
