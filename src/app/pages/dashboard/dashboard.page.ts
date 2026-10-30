@@ -1,5 +1,5 @@
 import { Component, HostListener, OnInit } from '@angular/core';
-import { AlertController, ModalController, RefresherCustomEvent } from '@ionic/angular';
+import { AlertController, ModalController, Platform, RefresherCustomEvent } from '@ionic/angular';
 import { first, firstValueFrom, interval, Observable } from 'rxjs';
 import { Client, Group, ServerDetail, SnapCastServerStatusResponse, Stream } from 'src/app/model/snapcast.model';
 import { SnapcastService } from 'src/app/services/snapcast.service';
@@ -81,7 +81,8 @@ export class DashboardPage implements OnInit {
     private snapcastService: SnapcastService,
     private http: HttpClient,
     private capMdnsService: CapMdnsService,
-    private alertController: AlertController
+    private alertController: AlertController,
+    private platform: Platform
 
   ) {
   }
@@ -89,6 +90,23 @@ export class DashboardPage implements OnInit {
   async ionViewDidEnter() {
     console.log('ionViewDidEnter called');
     this.loadSpeakerData();
+    console.log('Platform:', this.platform);
+   this.platform.ready().then(() => {
+     console.log('Platform is ready');
+     console.log('Platform name:', this.platform.platforms());
+     console.log('Platform is ready and fully initialized.');
+     console.log('Is desktop platform:', this.platform.is('desktop'));
+    //  check if platform is ios or android
+    console.log('Is iOS platform:', this.platform.is('ios'));
+    console.log('Is Android platform:', this.platform.is('android'));
+
+    if (this.platform.is('desktop')) {
+      console.log('Running on a desktop platform');
+      const windowHost = window.location.hostname;
+      console.log('Window host:', windowHost);
+    }
+   });
+   
   }
 
   async ngOnInit() {
@@ -317,7 +335,7 @@ export class DashboardPage implements OnInit {
                   });
                   console.log('Server URL set to:', serverIP);
                   this.ionViewWillEnter(); // Refresh the view to reflect the new server URL
-                  
+
                 }
               }
             ]
@@ -340,7 +358,9 @@ export class DashboardPage implements OnInit {
     this.scanForDevicesOnStartup = result.value === 'true' ? true : false;
     if (this.scanForDevicesOnStartup) {
       console.log('User preference indicates to scan for devices on startup. Starting scan...');
+
       await this.scanForZeroConfServices();
+
     } else {
       console.log('User preference indicates NOT to scan for devices on startup.');
     }

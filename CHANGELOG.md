@@ -1,6 +1,12 @@
 # Changelog
-
 ## [Unreleased]
+
+### Fixed
+- BLE Connection issues on iOS
+
+
+
+## [0.7.2] - 2026-10-14
 
 ### Added
 - Add long press on group preview to choose speaker image

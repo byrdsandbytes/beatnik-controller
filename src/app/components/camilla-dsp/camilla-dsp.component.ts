@@ -14,6 +14,9 @@ export class CamillaDspComponent implements OnInit, OnDestroy {
 
     @Input() url: string = 'ws://beatnik-server.local:1234';
 
+    // 'linein' manages the preamp CamillaDSP configs instead of the playback ones
+    @Input() mode: 'playback' | 'linein' = 'playback';
+
     connectionStatus: ConnectionStatus = 'Disconnected';
     lastMessage: any = { message: 'No messages received yet.' };
     private subscriptions = new Subscription();
@@ -110,7 +113,9 @@ export class CamillaDspComponent implements OnInit, OnDestroy {
         this.camillaConfigMessage = '';
 
         this.subscriptions.add(
-            this.beatnikHardwareService.getCamillaConfigs(host).subscribe({
+            (this.mode === 'linein'
+                ? this.beatnikHardwareService.getLineInConfigs(host)
+                : this.beatnikHardwareService.getCamillaConfigs(host)).subscribe({
                 next: (response) => {
                     this.availableCamillaConfigs = response.configs ?? [];
                     this.syncSelectedCamillaConfig();
@@ -125,7 +130,9 @@ export class CamillaDspComponent implements OnInit, OnDestroy {
         );
 
         this.subscriptions.add(
-            this.beatnikHardwareService.getDefaultCamillaConfig(host).subscribe({
+            (this.mode === 'linein'
+                ? this.beatnikHardwareService.getLineInDefaultConfig(host)
+                : this.beatnikHardwareService.getDefaultCamillaConfig(host)).subscribe({
                 next: (response) => {
                     this.currentCamillaConfigFile = response.fileName;
                     this.syncSelectedCamillaConfig();
@@ -162,11 +169,14 @@ export class CamillaDspComponent implements OnInit, OnDestroy {
         this.camillaConfigMessage = '';
 
         this.subscriptions.add(
-            this.beatnikHardwareService.setDefaultCamillaConfig(this.selectedCamillaConfig, host).subscribe({
+            (this.mode === 'linein'
+                ? this.beatnikHardwareService.setLineInDefaultConfig(this.selectedCamillaConfig, host)
+                : this.beatnikHardwareService.setDefaultCamillaConfig(this.selectedCamillaConfig, host)).subscribe({
                 next: (response) => {
                     this.currentCamillaConfigFile = response.fileName;
                     this.selectedCamillaConfig = response.fileName;
-                    this.camillaConfigMessage = `Default config set to ${response.fileName}.`;
+                    this.camillaConfigMessage = `Default config set to ${response.fileName}.` +
+                        (response.camillaRestarted ? ' CamillaDSP restarted.' : '');
                     this.isSavingCamillaConfig = false;
                 },
                 error: (error) => {
