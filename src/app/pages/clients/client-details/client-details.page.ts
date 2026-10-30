@@ -22,6 +22,8 @@ export class ClientDetailsPage implements OnInit {
 
 
   id?: string;
+  // Address from the network scanner; lets the page work without the device being known to Snapcast
+  host?: string;
 
   serverState?: Observable<SnapCastServerStatusResponse>;
   client?: Client;
@@ -48,6 +50,7 @@ export class ClientDetailsPage implements OnInit {
   async ngOnInit() {
     this.serverState = this.snapcastService.state$;
     this.id = this.avtivateRoute.snapshot.paramMap.get('id') || undefined;
+    this.host = this.avtivateRoute.snapshot.queryParamMap.get('host') || undefined;
     if (!this.id) {
       console.error('ClientDetailsPage: No ID found in route parameters');
       return;

@@ -93,7 +93,7 @@
       </ng-container>
 
     </div>
-    <ng-container *ngIf="serverState | async as state">
+    <ng-container *ngIf="client">
       <div class="row justify-content-center align-items-center ion-text-center">
         <div class="col-6 col-lg-3" *ngIf="client.host.arch">
           <h2>{{client.host.arch}}</h2>
@@ -257,7 +257,7 @@
       Restart Client
     </ion-button>
 
-    <ion-button expand="full" color="primary" (click)="chooseSpeakers()">
+    <ion-button *ngIf="client" expand="full" color="primary" (click)="chooseSpeakers()">
       Choose Speakers
     </ion-button>
 
@@ -284,7 +284,7 @@
       <ion-icon slot="start" name="information-circle-outline" color="medium"></ion-icon>
       <ion-label class="ion-text-wrap">
         <h3>No address for CamillaDSP</h3>
-        <p>This client reports no usable network address. Set the server address in the app settings and reopen this view.</p>
+        <p>No usable network address for this device. Open it from the device list or network scanner, or set the server address in the app settings.</p>
       </ion-label>
     </ion-item>
   </ng-template>
