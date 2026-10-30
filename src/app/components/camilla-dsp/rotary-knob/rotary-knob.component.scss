@@ -1,0 +1,58 @@
+:host {
+  display: block;
+}
+
+.knob {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+
+  &.disabled {
+    opacity: 0.5;
+  }
+}
+
+.knob-face {
+  width: 100%;
+  max-width: 120px;
+  cursor: ns-resize;
+  touch-action: none;
+  outline: none;
+
+  &:focus-visible .body {
+    stroke: var(--ion-color-light);
+    stroke-width: 3;
+  }
+}
+
+.tick {
+  stroke: var(--ion-color-light);
+  stroke-width: 1.5;
+}
+
+.body {
+  fill: #2a2a2a;
+  stroke: #111;
+  stroke-width: 2;
+}
+
+.pointer {
+  transform-origin: 50px 50px;
+
+  line {
+    stroke: #fff;
+    stroke-width: 3;
+    stroke-linecap: square;
+  }
+}
+
+.readout {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.knob-label {
+  font-size: 0.8rem;
+  letter-spacing: 1px;
+}

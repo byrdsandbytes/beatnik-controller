@@ -37,6 +37,7 @@ export class CamillaDspComponent implements OnInit, OnDestroy {
     isConfigPickerOpen = false;
     configSearchTerm = '';
     meterStyle: 'bars' | 'vu' = 'bars';
+    controlStyle: 'lines' | 'rotary' = 'lines';
 
     get filteredCamillaConfigs(): string[] {
         const searchTerm = this.configSearchTerm.trim().toLowerCase();
@@ -57,15 +58,29 @@ export class CamillaDspComponent implements OnInit, OnDestroy {
         await Preferences.set({ key: UserPreference.SIGNAL_METER_STYLE, value: style });
     }
 
-    private async loadMeterStylePreference() {
-        const { value } = await Preferences.get({ key: UserPreference.SIGNAL_METER_STYLE });
-        if (value === 'bars' || value === 'vu') {
-            this.meterStyle = value;
+    async onControlStyleChange(style: string | number | undefined) {
+        if (style !== 'lines' && style !== 'rotary') {
+            return;
+        }
+
+        this.controlStyle = style;
+        await Preferences.set({ key: UserPreference.CONTROL_STYLE, value: style });
+    }
+
+    private async loadStylePreferences() {
+        const meter = await Preferences.get({ key: UserPreference.SIGNAL_METER_STYLE });
+        if (meter.value === 'bars' || meter.value === 'vu') {
+            this.meterStyle = meter.value;
+        }
+
+        const control = await Preferences.get({ key: UserPreference.CONTROL_STYLE });
+        if (control.value === 'lines' || control.value === 'rotary') {
+            this.controlStyle = control.value;
         }
     }
 
     async ngOnInit() {
-        this.loadMeterStylePreference();
+        this.loadStylePreferences();
         this.loadCamillaConfigState();
         this.connect();
         // Subscribe to connection status changes

@@ -4,13 +4,15 @@ import { FormsModule } from '@angular/forms';
 import { IonicModule } from '@ionic/angular';
 import { CamillaDspComponent } from './camilla-dsp.component';
 import { VuMeterModule } from './vu-meter/vu-meter.module';
+import { RotaryKnobModule } from './rotary-knob/rotary-knob.module';
 
 @NgModule({
   imports: [
     CommonModule,
     FormsModule,
     IonicModule,
-    VuMeterModule
+    VuMeterModule,
+    RotaryKnobModule
   ],
   declarations: [CamillaDspComponent],
   exports: [CamillaDspComponent]

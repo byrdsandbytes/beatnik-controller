@@ -1,0 +1,17 @@
+<div class="knob" [class.disabled]="disabled">
+    <svg viewBox="0 0 100 100" class="knob-face" role="slider" tabindex="0" [attr.aria-label]="label"
+        [attr.aria-valuemin]="min" [attr.aria-valuemax]="max" [attr.aria-valuenow]="value"
+        [attr.aria-valuetext]="value + ' ' + unit" [attr.aria-disabled]="disabled"
+        (pointerdown)="onPointerDown($event)" (pointermove)="onPointerMove($event)"
+        (pointerup)="onPointerUp($event)" (pointercancel)="onPointerUp($event)"
+        (keydown)="onKeydown($event)">
+        <line *ngFor="let tick of ticks" [attr.x1]="tick.x1" [attr.y1]="tick.y1" [attr.x2]="tick.x2"
+            [attr.y2]="tick.y2" class="tick" />
+        <circle cx="50" cy="50" r="34" class="body" />
+        <g class="pointer" [style.transform]="'rotate(' + angle + 'deg)'">
+            <line x1="50" y1="50" x2="50" y2="22" />
+        </g>
+    </svg>
+    <span class="readout">{{ value | number:'1.0-1' }} {{ unit }}</span>
+    <span class="knob-label" *ngIf="label">{{ label }}</span>
+</div>
