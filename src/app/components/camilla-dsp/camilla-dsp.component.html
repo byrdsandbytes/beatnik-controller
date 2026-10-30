@@ -1,8 +1,5 @@
 <div class="row g-0">
     <div class="col col-12 col-lg-12">
-
-
-
         <div *ngIf="levels" class="meters-section">
             <ion-list-header color="primary">
                 <ion-label>
@@ -228,7 +225,7 @@
                     </ng-container>
                 </div>
             </ion-card>
-            
+
 
         </div>
         <!-- Add processors -->
@@ -240,7 +237,7 @@
             </ion-list-header>
             <ion-card class="ion-no-margin ion-padding" color="primary"
                 *ngFor="let processor of parsedConfig.processors | keyvalue">
-                
+
                 <ion-card-header>
                     <ion-card-subtitle>
                         {{ processor.key }}
@@ -255,24 +252,145 @@
                 <!-- <ion-item color="primary"> Type: {{ processor.value.type }} </ion-item> -->
                 <!-- Add more processor parameters here as needed -->
             </ion-card>
+
+        </div>
+        <div>
+            <ion-list-header color="primary">
+                <ion-label>
+                    Advanced Settings
+                </ion-label>
+            </ion-list-header>
+
+            <ion-card class="ion-no-margin ion-padding" color="dark">
+                <ion-card-header>
+                    <!-- <ion-icon name="options-outline" color="primary" aria-hidden="true"></ion-icon> -->
+                    <!-- <ion-card-title>Default config</ion-card-title> -->
+                    <ion-card-subtitle>
+                        Choose which CamillaDSP config this device loads by default. We recommend not changing this
+                        unless you know what you
+                        are doing. <ion-icon name="warning-outline" color="warning" aria-hidden="true"></ion-icon>
+
+                    </ion-card-subtitle>
+                </ion-card-header>
+
+                <ion-card-content>
+                    <!-- <ion-item color="dark" lines="none">
+                        <ion-label slot="start">
+                            <ion-text color="medium">Current default</ion-text>
+                        </ion-label>
+                        <ion-note color="light">{{ currentCamillaConfigFile || 'No default config selected'
+                            }}</ion-note>
+
+                        <ion-badge slot="end" [color]="currentCamillaConfigFile ? 'success' : 'medium'">
+                            {{ currentCamillaConfigFile ? 'Active' : 'Not set' }}
+                        </ion-badge>
+                    </ion-item> -->
+
+
+                    <ion-button color="light" expand="block" fill="outline" class="config-select-button"
+                        (click)="openConfigPicker()"
+                        [disabled]="isLoadingCamillaConfigs || isSavingCamillaConfig || availableCamillaConfigs.length === 0">
+                        <ion-icon slot="start" name="search-outline" aria-hidden="true"></ion-icon>
+                        {{ selectedCamillaConfig || 'Choose a config file' }}
+                        <ion-icon slot="end" name="chevron-down-outline" aria-hidden="true"></ion-icon>
+                    </ion-button>
+                    <ion-item lines="none" *ngIf="!isLoadingCamillaConfigs && availableCamillaConfigs.length === 0">
+                        <ion-label color="medium">No config files found on this device.</ion-label>
+                    </ion-item>
+                </ion-card-content>
+
+                <ion-modal class="config-picker-modal" [isOpen]="isConfigPickerOpen" (didDismiss)="closeConfigPicker()">
+                    <ng-template>
+                        <ion-header>
+                            <ion-toolbar>
+                                <ion-title>Select a config</ion-title>
+                                <ion-buttons slot="end">
+                                    <ion-button (click)="closeConfigPicker()">Done</ion-button>
+                                </ion-buttons>
+                            </ion-toolbar>
+                        </ion-header>
+                        <ion-content>
+                            <ion-searchbar [(ngModel)]="configSearchTerm" placeholder="Search config files"
+                                aria-label="Search config files"></ion-searchbar>
+                            <ion-list>
+                                <ion-item button detail="false" *ngFor="let config of filteredCamillaConfigs"
+                                    (click)="selectCamillaConfig(config)">
+                                    <ion-icon slot="start" name="document-text-outline" color="medium"
+                                        aria-hidden="true"></ion-icon>
+                                    <ion-label class="ion-text-wrap">{{ config }}</ion-label>
+                                    <ion-badge slot="end" color="success" *ngIf="currentCamillaConfigFile === config">
+                                        Current
+                                    </ion-badge>
+                                    <ion-icon slot="end" name="checkmark-circle" color="primary"
+                                        *ngIf="selectedCamillaConfig === config" aria-label="Selected"></ion-icon>
+                                </ion-item>
+                            </ion-list>
+                            <ion-item lines="none" *ngIf="filteredCamillaConfigs.length === 0">
+                                <ion-icon slot="start" name="search-outline" color="medium"
+                                    aria-hidden="true"></ion-icon>
+                                <ion-label color="medium">No config files match “{{ configSearchTerm }}”.</ion-label>
+                            </ion-item>
+                        </ion-content>
+                    </ng-template>
+                </ion-modal>
+
+                <ion-item class="config-feedback" lines="none" *ngIf="isLoadingCamillaConfigs">
+                    <ion-spinner slot="start" name="crescent" aria-hidden="true"></ion-spinner>
+                    <ion-label color="medium">Loading config files...</ion-label>
+                </ion-item>
+
+                <ion-item class="config-feedback config-feedback-error" lines="none" role="alert"
+                    *ngIf="camillaConfigError">
+                    <ion-icon slot="start" name="alert-circle-outline" aria-hidden="true"></ion-icon>
+                    <ion-label>{{ camillaConfigError }}</ion-label>
+                </ion-item>
+
+                <ion-item class="config-feedback config-feedback-success" lines="none" role="status"
+                    *ngIf="camillaConfigMessage">
+                    <ion-icon slot="start" name="checkmark-circle-outline" aria-hidden="true"></ion-icon>
+                    <ion-label>{{ camillaConfigMessage }}</ion-label>
+                </ion-item>
+
+                <ion-grid class="config-actions">
+                    <ion-row>
+                        <ion-col>
+                            <ion-button expand="block" color="light" fill="outline" (click)="loadCamillaConfigState()"
+                                [disabled]="isLoadingCamillaConfigs || isSavingCamillaConfig">
+                                <ion-icon slot="start" name="refresh-outline" aria-hidden="true"></ion-icon>
+                                Refresh
+                            </ion-button>
+                        </ion-col>
+                        <ion-col>
+                            <ion-button expand="block" color="light" (click)="saveDefaultCamillaConfig()"
+                                [disabled]="!selectedCamillaConfig || isLoadingCamillaConfigs || isSavingCamillaConfig">
+                                <ion-spinner slot="start" name="crescent" *ngIf="isSavingCamillaConfig"
+                                    aria-hidden="true"></ion-spinner>
+                                <ion-icon slot="start" name="checkmark-outline" *ngIf="!isSavingCamillaConfig"
+                                    aria-hidden="true"></ion-icon>
+                                {{ isSavingCamillaConfig ? 'Applying...' : 'Set as default' }}
+                            </ion-button>
+                        </ion-col>
+                    </ion-row>
+                </ion-grid>
+            </ion-card>
+        </div>
     </div>
-</div>
 
 
-<ion-accordion-group class="ion-margin-top">
-    <ion-accordion value="camilla-dsp-control">
-        <ion-item slot="header">
-            <ion-label>CamillaDSP Connection</ion-label>
-        </ion-item>
+    <ion-accordion-group class="ion-margin-top">
+        <ion-accordion value="camilla-dsp-control">
+            <ion-item slot="header">
+                <ion-label>CamillaDSP Connection</ion-label>
+            </ion-item>
 
-        <div class="ion-padding" slot="content">
-            <ion-card-title class="ion-padding-top">WebSocket Connection</ion-card-title>
+            <div class="ion-padding" slot="content">
+                <ion-card-title class="ion-padding-top">WebSocket Connection</ion-card-title>
 
-            <ion-input placeholder="WebSocket URL" [(ngModel)]="url"></ion-input>
-            <p class="mb-2">
-                Connection Status: <strong>{{ connectionStatus }}</strong>
-            </p>
-            <!-- <ion-button (click)="connect()">Connect</ion-button>
+                <ion-input placeholder="WebSocket URL" [(ngModel)]="url"></ion-input>
+                <p class="mb-2">
+                    Connection Status: <strong>{{ connectionStatus }}</strong>
+                </p>
+                <!-- <ion-button (click)="connect()">Connect</ion-button>
         <ion-button (click)="disconnect()">Disconnect</ion-button>
         <ion-button (click)="getState()">Get State</ion-button>
         <ion-button (click)="getConfigJson()">Get Config JSON</ion-button>
@@ -281,61 +399,132 @@
         <ion-button (click)="getCaptureSignalLevels()">Get Capture Signal Levels</ion-button>
         <ion-button (click)="setUpdateInterval(100)">Set update Interval</ion-button>
         <ion-button (click)="getVolume()">Get Volume</ion-button> -->
-            <pre class="bg-gray-100 p-4 rounded mt-4 overflow-auto">
+                <pre class="bg-gray-100 p-4 rounded mt-4 overflow-auto">
                 {{ lastMessage | json }}
                 </pre>
-            <pre class="bg-gray-100 p-4 rounded mt-4 overflow-auto">
+                <pre class="bg-gray-100 p-4 rounded mt-4 overflow-auto">
                 {{ parsedConfig | json }}
                 </pre>
-        </div>
-    </ion-accordion>
-</ion-accordion-group>
+            </div>
+        </ion-accordion>
+    </ion-accordion-group>
 
-<ion-accordion-group class="ion-margin-bottom">
-    <ion-accordion value="camilla-dsp-config">
-        <ion-item slot="header">
-            <ion-label>Advanced CamillaDSP Config</ion-label>
-        </ion-item>
-
-        <div class="ion-padding" slot="content">
-            <ion-card-title>Default Config</ion-card-title>
-            <p>Manage the default config file used on this device. Only use this if you know what you are doing.</p>
-            <ion-item>
-                <ion-label position="stacked">Current Default Config</ion-label>
-                <ion-note color="medium">{{ currentCamillaConfigFile || 'No default config selected' }}</ion-note>
+    <ion-accordion-group class="ion-margin-bottom">
+        <ion-accordion value="camilla-dsp-config">
+            <ion-item slot="header">
+                <ion-label>Advanced CamillaDSP Config</ion-label>
             </ion-item>
 
-            <ion-item>
-                <ion-label position="stacked">Available Config Files</ion-label>
-                <ion-select [(ngModel)]="selectedCamillaConfig" placeholder="Select CamillaDSP config"
-                    [disabled]="isLoadingCamillaConfigs || isSavingCamillaConfig || availableCamillaConfigs.length === 0">
-                    <ion-select-option *ngFor="let config of availableCamillaConfigs" [value]="config">
-                        {{ config }}
-                    </ion-select-option>
-                </ion-select>
-            </ion-item>
+            <ion-card color="dark" class="config-panel" slot="content">
+                <ion-card-header>
+                    <!-- <ion-icon name="options-outline" color="primary" aria-hidden="true"></ion-icon> -->
+                    <!-- <ion-card-title>Default config</ion-card-title> -->
+                    <ion-card-subtitle>
+                        Choose which CamillaDSP config this device loads by default. We recommend not changing this
+                        unless you know what you
+                        are doing.
+                    </ion-card-subtitle>
+                </ion-card-header>
 
-            <ion-text color="medium" *ngIf="isLoadingCamillaConfigs">
-                <p>Loading CamillaDSP configs...</p>
-            </ion-text>
+                <ion-card-content>
+                    <ion-item color="dark" lines="none">
+                        <ion-label slot="start">
+                            <ion-text color="medium">Current default</ion-text>
+                        </ion-label>
+                        <ion-note color="light">{{ currentCamillaConfigFile || 'No default config selected'
+                            }}</ion-note>
 
-            <ion-text color="danger" *ngIf="camillaConfigError">
-                <p>{{ camillaConfigError }}</p>
-            </ion-text>
+                        <ion-badge slot="end" [color]="currentCamillaConfigFile ? 'success' : 'medium'">
+                            {{ currentCamillaConfigFile ? 'Active' : 'Not set' }}
+                        </ion-badge>
+                    </ion-item>
 
-            <ion-text color="success" *ngIf="camillaConfigMessage">
-                <p>{{ camillaConfigMessage }}</p>
-            </ion-text>
 
-            <ion-button expand="block" color="medium" fill="outline" (click)="loadCamillaConfigState()"
-                [disabled]="isLoadingCamillaConfigs || isSavingCamillaConfig">
-                Refresh Config List
-            </ion-button>
+                    <ion-button color="light" expand="block" fill="outline" class="config-select-button"
+                        (click)="openConfigPicker()"
+                        [disabled]="isLoadingCamillaConfigs || isSavingCamillaConfig || availableCamillaConfigs.length === 0">
+                        <ion-icon slot="start" name="search-outline" aria-hidden="true"></ion-icon>
+                        {{ selectedCamillaConfig || 'Choose a config file' }}
+                        <ion-icon slot="end" name="chevron-down-outline" aria-hidden="true"></ion-icon>
+                    </ion-button>
+                    <ion-item lines="none" *ngIf="!isLoadingCamillaConfigs && availableCamillaConfigs.length === 0">
+                        <ion-label color="medium">No config files found on this device.</ion-label>
+                    </ion-item>
+                </ion-card-content>
 
-            <ion-button expand="block" color="primary" (click)="saveDefaultCamillaConfig()"
-                [disabled]="!selectedCamillaConfig || isLoadingCamillaConfigs || isSavingCamillaConfig">
-                Set Default Config
-            </ion-button>
-        </div>
-    </ion-accordion>
-</ion-accordion-group>
+                <ion-modal class="config-picker-modal" [isOpen]="isConfigPickerOpen" (didDismiss)="closeConfigPicker()">
+                    <ng-template>
+                        <ion-header>
+                            <ion-toolbar>
+                                <ion-title>Select a config</ion-title>
+                                <ion-buttons slot="end">
+                                    <ion-button (click)="closeConfigPicker()">Done</ion-button>
+                                </ion-buttons>
+                            </ion-toolbar>
+                        </ion-header>
+                        <ion-content>
+                            <ion-searchbar [(ngModel)]="configSearchTerm" placeholder="Search config files"
+                                aria-label="Search config files"></ion-searchbar>
+                            <ion-list>
+                                <ion-item button detail="false" *ngFor="let config of filteredCamillaConfigs"
+                                    (click)="selectCamillaConfig(config)">
+                                    <ion-icon slot="start" name="document-text-outline" color="medium"
+                                        aria-hidden="true"></ion-icon>
+                                    <ion-label class="ion-text-wrap">{{ config }}</ion-label>
+                                    <ion-badge slot="end" color="success" *ngIf="currentCamillaConfigFile === config">
+                                        Current
+                                    </ion-badge>
+                                    <ion-icon slot="end" name="checkmark-circle" color="primary"
+                                        *ngIf="selectedCamillaConfig === config" aria-label="Selected"></ion-icon>
+                                </ion-item>
+                            </ion-list>
+                            <ion-item lines="none" *ngIf="filteredCamillaConfigs.length === 0">
+                                <ion-icon slot="start" name="search-outline" color="medium"
+                                    aria-hidden="true"></ion-icon>
+                                <ion-label color="medium">No config files match “{{ configSearchTerm }}”.</ion-label>
+                            </ion-item>
+                        </ion-content>
+                    </ng-template>
+                </ion-modal>
+
+                <ion-item class="config-feedback" lines="none" *ngIf="isLoadingCamillaConfigs">
+                    <ion-spinner slot="start" name="crescent" aria-hidden="true"></ion-spinner>
+                    <ion-label color="medium">Loading config files...</ion-label>
+                </ion-item>
+
+                <ion-item class="config-feedback config-feedback-error" lines="none" role="alert"
+                    *ngIf="camillaConfigError">
+                    <ion-icon slot="start" name="alert-circle-outline" aria-hidden="true"></ion-icon>
+                    <ion-label>{{ camillaConfigError }}</ion-label>
+                </ion-item>
+
+                <ion-item class="config-feedback config-feedback-success" lines="none" role="status"
+                    *ngIf="camillaConfigMessage">
+                    <ion-icon slot="start" name="checkmark-circle-outline" aria-hidden="true"></ion-icon>
+                    <ion-label>{{ camillaConfigMessage }}</ion-label>
+                </ion-item>
+
+                <ion-grid class="config-actions">
+                    <ion-row>
+                        <ion-col>
+                            <ion-button expand="block" color="medium" fill="outline" (click)="loadCamillaConfigState()"
+                                [disabled]="isLoadingCamillaConfigs || isSavingCamillaConfig">
+                                <ion-icon slot="start" name="refresh-outline" aria-hidden="true"></ion-icon>
+                                Refresh
+                            </ion-button>
+                        </ion-col>
+                        <ion-col>
+                            <ion-button expand="block" color="primary" (click)="saveDefaultCamillaConfig()"
+                                [disabled]="!selectedCamillaConfig || isLoadingCamillaConfigs || isSavingCamillaConfig">
+                                <ion-spinner slot="start" name="crescent" *ngIf="isSavingCamillaConfig"
+                                    aria-hidden="true"></ion-spinner>
+                                <ion-icon slot="start" name="checkmark-outline" *ngIf="!isSavingCamillaConfig"
+                                    aria-hidden="true"></ion-icon>
+                                {{ isSavingCamillaConfig ? 'Applying...' : 'Set as default' }}
+                            </ion-button>
+                        </ion-col>
+                    </ion-row>
+                </ion-grid>
+            </ion-card>
+        </ion-accordion>
+    </ion-accordion-group>

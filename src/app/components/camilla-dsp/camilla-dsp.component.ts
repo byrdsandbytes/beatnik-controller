@@ -32,6 +32,13 @@ export class CamillaDspComponent implements OnInit, OnDestroy {
     isSavingCamillaConfig = false;
     camillaConfigMessage = '';
     camillaConfigError = '';
+    isConfigPickerOpen = false;
+    configSearchTerm = '';
+
+    get filteredCamillaConfigs(): string[] {
+        const searchTerm = this.configSearchTerm.trim().toLowerCase();
+        return this.availableCamillaConfigs.filter(config => config.toLowerCase().includes(searchTerm));
+    }
 
     constructor(
         private camillaService: CamillaDspService,
@@ -154,6 +161,24 @@ export class CamillaDspComponent implements OnInit, OnDestroy {
         if (!this.selectedCamillaConfig && this.availableCamillaConfigs.length > 0) {
             this.selectedCamillaConfig = this.availableCamillaConfigs[0];
         }
+    }
+
+    openConfigPicker() {
+        this.configSearchTerm = '';
+        this.isConfigPickerOpen = true;
+    }
+
+    closeConfigPicker() {
+        this.isConfigPickerOpen = false;
+    }
+
+    selectCamillaConfig(config: string) {
+        if (this.isLoadingCamillaConfigs || this.isSavingCamillaConfig) {
+            return;
+        }
+
+        this.selectedCamillaConfig = config;
+        this.closeConfigPicker();
     }
 
     saveDefaultCamillaConfig() {
