@@ -49,6 +49,9 @@ export class CamillaDspComponent implements OnInit, OnDestroy {
     meterStyle: 'bars' | 'vu' = 'bars';
     controlStyle: 'lines' | 'rotary' = 'lines';
     private processorSendTimer?: ReturnType<typeof setTimeout>;
+    private configTimer?: ReturnType<typeof setTimeout>;
+    configTimedOut = false;
+    private readonly CONFIG_TIMEOUT_MS = 8000;
 
     readonly dynamicsControls: ProcessorControl[] = [
         { key: 'threshold', label: 'Threshold', unit: 'dB', min: -60, max: 0, step: 0.5, digits: '1.0-1' },
@@ -104,6 +107,56 @@ export class CamillaDspComponent implements OnInit, OnDestroy {
         }
     }
 
+    get isWaitingForDevice(): boolean {
+        return this.connectionStatus === 'Connecting'
+            || (this.connectionStatus === 'Connected' && !this.parsedConfig && !this.configTimedOut);
+    }
+
+    get connectionProblem(): { title: string; message: string; hints: string[] } | null {
+        if (this.connectionStatus === 'Error') {
+            return {
+                title: 'CamillaDSP not reachable',
+                message: `No answer from ${this.url}. Trying again every few seconds.`,
+                hints: ['Check that the device is on and on the same network.']
+            };
+        }
+        if (this.connectionStatus === 'Disconnected') {
+            return {
+                title: 'Not connected',
+                message: 'Levels and controls are unavailable until CamillaDSP is connected again.',
+                hints: []
+            };
+        }
+        if (this.configTimedOut) {
+            return {
+                title: 'No configuration received',
+                message: 'Connected, but CamillaDSP has not sent a configuration. You can pick one under "Advanced CamillaDSP Config".',
+                hints: []
+            };
+        }
+        return null;
+    }
+
+    retryConnection() {
+        this.configTimedOut = false;
+        this.camillaService.reconnect(this.url);
+    }
+
+    private startConfigTimer() {
+        this.clearConfigTimer();
+        this.configTimedOut = false;
+        this.configTimer = setTimeout(() => {
+            if (!this.parsedConfig) {
+                this.configTimedOut = true;
+            }
+        }, this.CONFIG_TIMEOUT_MS);
+    }
+
+    private clearConfigTimer() {
+        clearTimeout(this.configTimer);
+        this.configTimer = undefined;
+    }
+
     async ngOnInit() {
         this.loadStylePreferences();
         this.loadCamillaConfigState();
@@ -114,9 +167,15 @@ export class CamillaDspComponent implements OnInit, OnDestroy {
                 this.connectionStatus = status;
                 if (status === 'Connected') {
                     // Fetch initial state and config upon connection
+                    this.startConfigTimer();
                     this.getConfigJson();
                     this.getCaptureSignalLevels();
-
+                } else {
+                    // Drop stale data so the UI never shows controls that cannot reach the device
+                    this.clearConfigTimer();
+                    this.configTimedOut = false;
+                    this.levels = null;
+                    this.parsedConfig = null;
                 }
 
             })
@@ -135,6 +194,8 @@ export class CamillaDspComponent implements OnInit, OnDestroy {
                         this.configJson = JSON.parse(this.configJson);
                         console.log('Parsed Config JSON:', this.configJson);
                         this.parsedConfig = this.configJson;
+                        this.clearConfigTimer();
+                        this.configTimedOut = false;
                     } catch (error) {
                         console.error('Error parsing Config JSON:', error);
                     }
@@ -354,6 +415,7 @@ export class CamillaDspComponent implements OnInit, OnDestroy {
 
     ngOnDestroy() {
         clearTimeout(this.processorSendTimer);
+        this.clearConfigTimer();
         // Disconnect before unsubscribing so no late message/status update fires after teardown
         this.camillaService.disconnect();
         this.subscriptions.unsubscribe();

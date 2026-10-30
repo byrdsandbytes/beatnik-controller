@@ -1,3 +1,20 @@
+<ion-item *ngIf="isWaitingForDevice" lines="none" color="light">
+    <ion-spinner slot="start" name="dots"></ion-spinner>
+    <ion-label color="medium">
+        {{ connectionStatus === 'Connecting' ? 'Connecting to CamillaDSP…' : 'Loading configuration…' }}
+    </ion-label>
+</ion-item>
+
+<ion-item *ngIf="connectionProblem as problem" lines="none" color="light">
+    <ion-icon slot="start" name="information-circle-outline" color="medium"></ion-icon>
+    <ion-label class="ion-text-wrap">
+        <h3>{{ problem.title }}</h3>
+        <p>{{ problem.message }}</p>
+        <p *ngFor="let hint of problem.hints">{{ hint }}</p>
+    </ion-label>
+    <ion-button slot="end" fill="clear" size="small" (click)="retryConnection()">Retry</ion-button>
+</ion-item>
+
 <div class="row g-0">
     <div class="col col-12 col-lg-12">
         <div *ngIf="levels" class="meters-section">

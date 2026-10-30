@@ -152,6 +152,15 @@ export class CamillaDspService implements OnDestroy {
     this.connectionStatusSubject.next('Disconnected');
   }
 
+  /**
+   * Drops the current connection (and any pending retry) and connects again.
+   * Used by the "Retry" action so an edited URL is picked up immediately.
+   */
+  public reconnect(url: string): void {
+    this.disconnect();
+    this.connect(url);
+  }
+
   ngOnDestroy(): void {
     this.disconnect();
     this.messagesSubject.complete();

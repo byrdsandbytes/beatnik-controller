@@ -75,7 +75,8 @@
         </div>
         <div class="col-6 col-lg-3" *ngIf="networkQuality.band">
           <h2>{{ networkQuality.band }}</h2>
-          <p class="small-note">Band{{ networkQuality.frequency !== null ? ' (' + networkQuality.frequency + ' MHz)' : '' }}</p>
+          <p class="small-note">Band{{ networkQuality.frequency !== null ? ' (' + networkQuality.frequency + ' MHz)' :
+            '' }}</p>
         </div>
         <div class="col-6 col-lg-3" *ngIf="networkQuality.linkQuality !== null">
           <h2>{{ networkQuality.linkQuality }}%</h2>
@@ -146,7 +147,21 @@
 
 <ng-container *ngIf="segment === 'soundcard'">
 
-  <ion-list *ngIf="hardwareStatus$ | async as hardwareStatus">
+  <ion-item *ngIf="hardwareLoading && !hardwareStatus" lines="none" color="light">
+    <ion-spinner slot="start" name="dots"></ion-spinner>
+    <ion-label color="medium">Reading soundcard info…</ion-label>
+  </ion-item>
+
+  <ion-item *ngIf="hardwareError" lines="none" color="light">
+    <ion-icon slot="start" name="information-circle-outline" color="medium"></ion-icon>
+    <ion-label class="ion-text-wrap">
+      <h3>Soundcard info unavailable</h3>
+      <p>{{ hardwareError }}</p>
+    </ion-label>
+    <ion-button slot="end" fill="clear" size="small" (click)="getHardwareInfo()">Retry</ion-button>
+  </ion-item>
+
+  <ion-list *ngIf="hardwareStatus as hardwareStatus">
     <ion-card>
       <ion-label>
         <h2>Soundcard Information</h2>
@@ -161,7 +176,7 @@
           <p>Id: {{ hardwareStatus.currentConfig.id}}</p>
           <p>isMatched: {{ hardwareStatus.isMatch}}</p>
         </ng-container>
-        <ion-button expand="full" color="primary" (click)="openSoundcardPicker()">
+        <ion-button expand="full" color="primary" [disabled]="!hardwareStatus" (click)="openSoundcardPicker()">
           <ion-icon name="create" slot="start"></ion-icon>
           Choose Soundcard
         </ion-button>
@@ -173,7 +188,8 @@
     </ion-card>
 
   </ion-list>
-  <ion-button fill="clear" expand="full" color="primary" (click)="getHardwareInfo()">
+  <ion-button *ngIf="!hardwareError" fill="clear" expand="full" color="primary" [disabled]="hardwareLoading"
+    (click)="getHardwareInfo()">
     <u>Refresh Soundcard Info</u>
   </ion-button>
 </ng-container>
@@ -235,7 +251,8 @@
     </ion-button>
 
     <!-- restart client -->
-    <ion-button expand="full" color="warning" (click)="restartSnapcastClient()" [disabled]="isLoading['restartSnapcastClient']">
+    <ion-button expand="full" color="warning" (click)="restartSnapcastClient()"
+      [disabled]="isLoading['restartSnapcastClient']">
       <ion-spinner *ngIf="isLoading['restartSnapcastClient']" name="crescent" class="ion-margin-end"></ion-spinner>
       Restart Client
     </ion-button>
@@ -261,7 +278,16 @@
   <app-beatnik-device-update *ngIf="deviceHost" [host]="deviceHost" [lockHost]="true"></app-beatnik-device-update>
 </ng-container>
 <ng-container *ngIf="segment === 'camilla-dsp'">
-  <app-camilla-dsp *ngIf="camillaDspUrl" [url]="camillaDspUrl"></app-camilla-dsp>
+  <app-camilla-dsp *ngIf="camillaDspUrl; else noCamillaUrl" [url]="camillaDspUrl"></app-camilla-dsp>
+  <ng-template #noCamillaUrl>
+    <ion-item lines="none" color="light">
+      <ion-icon slot="start" name="information-circle-outline" color="medium"></ion-icon>
+      <ion-label class="ion-text-wrap">
+        <h3>No address for CamillaDSP</h3>
+        <p>This client reports no usable network address. Set the server address in the app settings and reopen this view.</p>
+      </ion-label>
+    </ion-item>
+  </ng-template>
 </ng-container>
 
 

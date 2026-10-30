@@ -25,7 +25,9 @@ export class ClientInfoComponent implements OnInit {
   serverState?: Observable<SnapCastServerStatusResponse>;
   segment: 'details' | 'soundcard' | 'camilla-dsp' | 'settings' | 'update' = 'camilla-dsp';
   deviceHost = '';
-  hardwareStatus$: Observable<HardwareStatus>;
+  hardwareStatus?: HardwareStatus;
+  hardwareLoading = false;
+  hardwareError = '';
   systemInfo$?: Observable<SystemInfo>;
   hats = Object.values(SUPPORTED_HATS);
   camillaDspUrl: string = '';
@@ -70,6 +72,9 @@ export class ClientInfoComponent implements OnInit {
       });
       console.log('Client Info Component: Using server IP address for Camilla DSP URL:', ipAddress);
     }
+    if (!ipAddress) {
+      return '';
+    }
     return `ws://${ipAddress}:1234`;
   }
 
@@ -101,35 +106,49 @@ export class ClientInfoComponent implements OnInit {
     }
     const localHostName = await this.getUrl();
 
-    this.hardwareStatus$ = this.beatnikHardwareService.getStatus(localHostName);
-    this.hardwareStatus$.subscribe({
+    this.hardwareLoading = true;
+    this.hardwareError = '';
+    this.beatnikHardwareService.getStatus(localHostName).subscribe({
       next: (status) => {
         console.log(`Client Info Component: Hardware status for client ${this.client?.id}:`, status);
+        this.hardwareStatus = status;
+        this.hardwareLoading = false;
       },
       error: (err) => {
         console.error(`Client Info Component: Failed to get hardware status for client ${this.client?.id}`, err);
+        this.hardwareStatus = undefined;
+        this.hardwareLoading = false;
+        this.hardwareError = this.describeHttpError(err, localHostName);
       }
     });
+  }
+
+  private describeHttpError(err: any, host: string): string {
+    if (err?.status === 0 || err?.name === 'TimeoutError') {
+      return `Can't reach the Beatnik device at ${host}. Check that it is powered on, on the same network, and that the Beatnik API is running.`;
+    }
+    const detail = err?.error?.error ?? err?.error?.message;
+    return `The device answered with an error (${err?.status ?? 'unknown'})${detail ? `: ${detail}` : '.'}`;
   }
 
 
   async openSoundcardPicker() {
     console.log('Open Soundcard Picker for client:', this.client?.id);
     // Here you would typically open a modal to select soundcards
-    const hardwareStatus = await firstValueFrom(this.hardwareStatus$);
+    const currentId = this.hardwareStatus?.currentConfig?.id ?? '';
     const modal = await this.modalController.create({
       component: SoundcardPickerComponent,
       id: 'soundcard-picker-modal',
       componentProps: {
         clientId: this.client?.id,
-        selectedHatId: hardwareStatus.currentConfig.id || ''
+        selectedHatId: currentId
       }
     });
     await modal.present();
 
     const { data } = await modal.onDidDismiss();
     if (data && data.selectedHatId) {
-      if (hardwareStatus.currentConfig.id === data.selectedHatId) {
+      if (currentId === data.selectedHatId) {
         console.log('Client Info Component: Selected hat is the same as current configuration, no changes needed');
         return;
       } else {
@@ -187,12 +206,14 @@ export class ClientInfoComponent implements OnInit {
             },
             error: (err) => {
               console.error(`Client Info Component: Failed to trigger reboot for client ${this.client?.id}`, err);
+              this.presentToast('Configuration applied, but the reboot could not be triggered. Please reboot the device manually.', 'warning');
             }
           });
         }
       },
       error: (err) => {
         console.error(`Client Info Component: Failed to apply hardware configuration ${hatId} to client ${this.client?.id}`, err);
+        this.presentToast(`Could not apply the soundcard configuration. ${this.describeHttpError(err, localHostName)}`, 'danger');
       }
     });
   }
