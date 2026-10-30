@@ -5,10 +5,59 @@
                 <ion-label>
                     Signal Levels
                 </ion-label>
+                <ion-segment class="meter-style-segment" [value]="meterStyle"
+                    (ionChange)="onMeterStyleChange($event.detail.value)">
+                    <ion-segment-button value="bars">
+                        <ion-label>Bars</ion-label>
+                    </ion-segment-button>
+                    <ion-segment-button value="vu">
+                        <ion-label>VU</ion-label>
+                    </ion-segment-button>
+                </ion-segment>
             </ion-list-header>
 
-            <ion-card class="meters-container ion-no-margin">
+            <ion-card color="dark" *ngIf="meterStyle === 'vu'" class="ion-no-margin">
+                <div class="container-fluid py-2">
+                    <div class="row g-3">
+                        <div class="col-12 col-md-6">
+                            <h3 class="min-label">Capture (Snapcast)</h3>
 
+                            <!-- <ion-list-header>
+                                <ion-label>Capture (Snapcast)</ion-label>
+                            </ion-list-header> -->
+                            <div class="row g-2">
+                                <div class="col-6">
+                                    <app-vu-meter label="Left" [rms]="levels.capture_rms[0]"
+                                        [peak]="levels.capture_peak[0]"></app-vu-meter>
+                                </div>
+                                <div class="col-6">
+                                    <app-vu-meter label="Right" [rms]="levels.capture_rms[1]"
+                                        [peak]="levels.capture_peak[1]"></app-vu-meter>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <!-- <ion-list-header>
+                                <ion-label>Playback</ion-label>
+                            </ion-list-header> -->
+                            <h3 class="min-label">Playback</h3>
+
+                            <div class="row g-2">
+                                <div class="col-6">
+                                    <app-vu-meter label="Left" [rms]="levels.playback_rms[0]"
+                                        [peak]="levels.playback_peak[0]"></app-vu-meter>
+                                </div>
+                                <div class="col-6">
+                                    <app-vu-meter label="Right" [rms]="levels.playback_rms[1]"
+                                        [peak]="levels.playback_peak[1]"></app-vu-meter>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </ion-card>
+
+            <ion-card *ngIf="meterStyle === 'bars'" class="meters-container ion-no-margin">
                 <!-- Capture Group -->
                 <div class="meter-group">
                     <h3>Capture (Snapcast)</h3>
@@ -351,16 +400,16 @@
                     <ion-label>{{ camillaConfigMessage }}</ion-label>
                 </ion-item>
 
-                <ion-grid class="config-actions">
-                    <ion-row>
-                        <ion-col>
+                <div class="container-fluid pb-2">
+                    <div class="row g-2">
+                        <div class="col">
                             <ion-button expand="block" color="light" fill="outline" (click)="loadCamillaConfigState()"
                                 [disabled]="isLoadingCamillaConfigs || isSavingCamillaConfig">
                                 <ion-icon slot="start" name="refresh-outline" aria-hidden="true"></ion-icon>
                                 Refresh
                             </ion-button>
-                        </ion-col>
-                        <ion-col>
+                        </div>
+                        <div class="col">
                             <ion-button expand="block" color="light" (click)="saveDefaultCamillaConfig()"
                                 [disabled]="!selectedCamillaConfig || isLoadingCamillaConfigs || isSavingCamillaConfig">
                                 <ion-spinner slot="start" name="crescent" *ngIf="isSavingCamillaConfig"
@@ -369,9 +418,9 @@
                                     aria-hidden="true"></ion-icon>
                                 {{ isSavingCamillaConfig ? 'Applying...' : 'Set as default' }}
                             </ion-button>
-                        </ion-col>
-                    </ion-row>
-                </ion-grid>
+                        </div>
+                    </div>
+                </div>
             </ion-card>
         </div>
     </div>
@@ -504,16 +553,16 @@
                     <ion-label>{{ camillaConfigMessage }}</ion-label>
                 </ion-item>
 
-                <ion-grid class="config-actions">
-                    <ion-row>
-                        <ion-col>
+                <div class="container-fluid pb-2">
+                    <div class="row g-2">
+                        <div class="col">
                             <ion-button expand="block" color="medium" fill="outline" (click)="loadCamillaConfigState()"
                                 [disabled]="isLoadingCamillaConfigs || isSavingCamillaConfig">
                                 <ion-icon slot="start" name="refresh-outline" aria-hidden="true"></ion-icon>
                                 Refresh
                             </ion-button>
-                        </ion-col>
-                        <ion-col>
+                        </div>
+                        <div class="col">
                             <ion-button expand="block" color="primary" (click)="saveDefaultCamillaConfig()"
                                 [disabled]="!selectedCamillaConfig || isLoadingCamillaConfigs || isSavingCamillaConfig">
                                 <ion-spinner slot="start" name="crescent" *ngIf="isSavingCamillaConfig"
@@ -522,9 +571,9 @@
                                     aria-hidden="true"></ion-icon>
                                 {{ isSavingCamillaConfig ? 'Applying...' : 'Set as default' }}
                             </ion-button>
-                        </ion-col>
-                    </ion-row>
-                </ion-grid>
+                        </div>
+                    </div>
+                </div>
             </ion-card>
         </ion-accordion>
     </ion-accordion-group>

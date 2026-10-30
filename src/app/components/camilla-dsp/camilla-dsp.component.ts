@@ -1,5 +1,7 @@
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { Preferences } from '@capacitor/preferences';
 import { Subscription } from 'rxjs';
+import { UserPreference } from 'src/app/enum/user-preference.enum';
 import { CamillaDspConfig, MixerSource, SignalLevels } from 'src/app/model/camilla-dsp.model';
 import { BeatnikHardwareService } from 'src/app/services/beatnik-hardware.service';
 import { CamillaDspService, ConnectionStatus } from 'src/app/services/camilla-dsp.service';
@@ -34,6 +36,7 @@ export class CamillaDspComponent implements OnInit, OnDestroy {
     camillaConfigError = '';
     isConfigPickerOpen = false;
     configSearchTerm = '';
+    meterStyle: 'bars' | 'vu' = 'bars';
 
     get filteredCamillaConfigs(): string[] {
         const searchTerm = this.configSearchTerm.trim().toLowerCase();
@@ -45,7 +48,24 @@ export class CamillaDspComponent implements OnInit, OnDestroy {
         private beatnikHardwareService: BeatnikHardwareService
     ) { }
 
+    async onMeterStyleChange(style: string | number | undefined) {
+        if (style !== 'bars' && style !== 'vu') {
+            return;
+        }
+
+        this.meterStyle = style;
+        await Preferences.set({ key: UserPreference.SIGNAL_METER_STYLE, value: style });
+    }
+
+    private async loadMeterStylePreference() {
+        const { value } = await Preferences.get({ key: UserPreference.SIGNAL_METER_STYLE });
+        if (value === 'bars' || value === 'vu') {
+            this.meterStyle = value;
+        }
+    }
+
     async ngOnInit() {
+        this.loadMeterStylePreference();
         this.loadCamillaConfigState();
         this.connect();
         // Subscribe to connection status changes

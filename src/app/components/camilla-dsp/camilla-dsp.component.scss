@@ -169,3 +169,25 @@ ion-list-header {
 
   border: 1px solid var(--ion-color-light);
 }
+
+.meter-style-segment {
+  max-width: 10rem;
+}
+
+.min-label{
+      font-size: 0.8rem;
+      // text-transform: uppercase;
+      letter-spacing: 2px;
+      margin-bottom: 1.5rem;
+      // color: #ccc;
+      text-align: center;
+      // text-shadow: 0 2px 4px rgba(0, 0, 0, 1);
+      // background-color: #111;
+      display: inline-block;
+      padding: 4px 12px;
+      // border-radius: 2px;
+      // border: 1px solid #333;
+      width: 100%;
+      color: var(--ion-color-medium);
+
+    }

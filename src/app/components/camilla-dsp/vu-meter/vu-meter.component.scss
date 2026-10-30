@@ -1,0 +1,82 @@
+:host {
+  display: block;
+}
+
+.vu {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.vu-face {
+  width: 100%;
+  max-width: 260px;
+  border: 3px solid #2a2a2a;
+}
+
+.dial {
+  fill: var(--ion-color-light);
+}
+
+.scale {
+  fill: none;
+  stroke: #2a2a2a;
+  stroke-width: 2;
+
+  &.red {
+    stroke: #c62828;
+    stroke-width: 4;
+  }
+}
+
+.tick {
+  stroke: #2a2a2a;
+  stroke-width: 1.5;
+
+  &.red {
+    stroke: #c62828;
+  }
+}
+
+.tick-label {
+  fill: #2a2a2a;
+  font-size: 7px;
+  text-anchor: middle;
+  dominant-baseline: middle;
+
+  &.red {
+    fill: #c62828;
+  }
+}
+
+.unit {
+  fill: #2a2a2a;
+  font-size: 12px;
+  font-weight: 700;
+  text-anchor: middle;
+}
+
+.needle {
+  transform-origin: 100px 112px;
+  transition: transform 0.12s ease-out;
+
+  line {
+    stroke: #111;
+    stroke-width: 1.6;
+    stroke-linecap: round;
+  }
+}
+
+.hub {
+  fill: #111;
+}
+
+.clip {
+  margin: 0;
+}
+
+.vu-label {
+  font-size: 0.8rem;
+  letter-spacing: 1px;
+}
