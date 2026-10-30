@@ -12,7 +12,9 @@
 .vu-face {
   width: 100%;
   max-width: 260px;
-  // border: 3px solid #2a2a2a;
+  // border: 3px solid var(--ion-color-dark);
+  border-radius: 8px 8px 0 0;
+  overflow: hidden;
 }
 
 .dial {
@@ -21,32 +23,32 @@
 
 .scale {
   fill: none;
-  stroke: #2a2a2a;
+  stroke: var(--ion-color-dark);
   stroke-width: 2;
 
   &.red {
-    stroke: #c62828;
+    stroke: var(--ion-color-danger);
     stroke-width: 4;
   }
 }
 
 .tick {
-  stroke: #2a2a2a;
+  stroke: var(--ion-color-dark);
   stroke-width: 1.5;
 
   &.red {
-    stroke: #c62828;
+    stroke: var(--ion-color-danger);
   }
 }
 
 .tick-label {
-  fill: #2a2a2a;
+  fill: var(--ion-color-dark);
   font-size: 7px;
   text-anchor: middle;
   dominant-baseline: middle;
 
   &.red {
-    fill: #c62828;
+    fill: var(--ion-color-danger);
   }
 }
 
@@ -55,7 +57,7 @@
   transition: transform 0.12s ease-out;
 
   line {
-    stroke: #111;
+    stroke: var(--ion-color-dark);
     stroke-width: 1.6;
     stroke-linecap: round;
   }
@@ -73,18 +75,18 @@
 }
 
 .readout {
-  fill: #2a2a2a;
+  fill: var(--ion-color-dark);
   font-size: 7px;
   text-anchor: start;
 
   &.clip {
-    fill: #c62828;
+    fill: var(--ion-color-danger);
     font-weight: 700;
   }
 }
 
 .brand {
-  fill: #2a2a2a;
+  fill: var(--ion-color-dark);
   font-size: 4px;
   font-weight: 400;
   letter-spacing: 0.3em;
@@ -92,7 +94,7 @@
 }
 
 .unit {
-  fill: #2a2a2a;
+  fill: var(--ion-color-dark);
   font-size: 12px;
   font-weight: 700;
   text-anchor: middle;
