@@ -28,13 +28,40 @@ export class CamillaDspService implements OnDestroy {
   public messages$: Observable<any> = this.messagesSubject.asObservable();
   public connectionStatus$: Observable<ConnectionStatus> = this.connectionStatusSubject.asObservable();
   public signalLevels$: Observable<any>;
-  private levelUpdateIntervalId: any;
+  private levelTimer: ReturnType<typeof setTimeout> | null = null;
+  private levelWatchdog: ReturnType<typeof setTimeout> | null = null;
+  private levelPollingMs = 0;
+  private levelRequestInFlight = false;
+  // CamillaDSP < 3 has no *SinceLast command; fall back to plain GetSignalLevels if it errors
+  private levelCommand = 'GetSignalLevelsSinceLast';
+  private readonly LEVEL_REPLY_TIMEOUT_MS = 1000;
 
   constructor() {
     this.signalLevels$ = this.messages$.pipe(
-      filter(msg => (msg && msg.SignalLevels) || (msg && (msg.GetSignalLevels && msg.GetSignalLevels.value))),
-      map(msg => msg.SignalLevels ? msg.SignalLevels : msg.GetSignalLevels.value)
+      map(msg => this.extractLevels(msg)),
+      filter((levels): levels is any => !!levels)
     );
+    // Every reply (data, empty, or error) ends the in-flight request and schedules the next poll
+    this.messages$.subscribe(msg => this.onLevelReply(msg));
+  }
+
+  private extractLevels(msg: any): any | null {
+    const reply = msg?.GetSignalLevelsSinceLast ?? msg?.GetSignalLevels;
+    const value = reply?.value;
+    // SinceLast answers with an empty list when there is no new data yet
+    return value && !Array.isArray(value) && value.playback_rms ? value : null;
+  }
+
+  private onLevelReply(msg: any): void {
+    const isLevelReply = msg && (msg.GetSignalLevelsSinceLast || msg.GetSignalLevels);
+    if (!isLevelReply || !this.levelPollingMs) {
+      return;
+    }
+    if (msg.GetSignalLevelsSinceLast?.result === 'Error' && this.levelCommand === 'GetSignalLevelsSinceLast') {
+      this.levelCommand = 'GetSignalLevels';
+    }
+    this.levelRequestInFlight = false;
+    this.scheduleNextLevelPoll();
   }
 
   /**
@@ -94,7 +121,7 @@ export class CamillaDspService implements OnDestroy {
    * @param command The command name (e.g., 'GetState', 'SetConfigJson').
    * @param params Optional parameters for the command.
    */
-  public sendCommand(command: string, params: any = null): void {
+  public sendCommand(command: string, params: any = null, quiet = false): void {
     if (this.connectionStatusSubject.value !== 'Connected' || !this.socket$) {
       console.warn('Cannot send command while not connected.');
       return;
@@ -103,38 +130,63 @@ export class CamillaDspService implements OnDestroy {
     // CamillaDSP expects a JSON object where the key is the command name
     const commandToSend: CamillaDspCommand = { [command]: params };
     
-    console.log('Sending command:', commandToSend);
+    if (!quiet) {
+      console.log('Sending command:', commandToSend);
+    }
     this.socket$.next(commandToSend);
   }
 
   /**
-   * Tells CamillaDSP to start sending SignalLevels messages periodically.
-   * Uses polling via 'GetSignalLevels' as reliable fallback if push is not available.
-   * @param intervalMs The update interval in milliseconds.
+   * Starts reading signal levels. CamillaDSP's websocket is request/response only (it has no push),
+   * so this polls with one request at a time: the next one is only sent after the previous reply
+   * arrived, so slow links never build up a backlog. GetSignalLevelsSinceLast returns the peak/RMS
+   * since our previous request, so short peaks between polls are not missed.
+   * @param intervalMs Minimum pause between a reply and the next request.
    */
   public startLevelUpdates(intervalMs: number): void {
-    this.stopLevelUpdates(); // Clear any existing interval
-    
-    // Also set the calculation interval on the server just in case
-    if (intervalMs > 0) {
-      this.sendCommand('SetUpdateInterval', intervalMs);
-      
-      // Setup client-side polling
-      this.levelUpdateIntervalId = setInterval(() => {
-          this.sendCommand('GetSignalLevels');
-      }, intervalMs);
+    this.stopLevelUpdates();
+    if (intervalMs <= 0) {
+      return;
     }
+    this.levelPollingMs = intervalMs;
+    this.pollLevels();
   }
 
-  /**
-   * Tells CamillaDSP to stop sending SignalLevels messages.
-   */
   public stopLevelUpdates(): void {
-    if (this.levelUpdateIntervalId) {
-        clearInterval(this.levelUpdateIntervalId);
-        this.levelUpdateIntervalId = null;
+    this.levelPollingMs = 0;
+    this.levelRequestInFlight = false;
+    clearTimeout(this.levelTimer ?? undefined);
+    clearTimeout(this.levelWatchdog ?? undefined);
+    this.levelTimer = null;
+    this.levelWatchdog = null;
+  }
+
+  private pollLevels(): void {
+    this.levelTimer = null;
+    if (!this.levelPollingMs || this.connectionStatusSubject.value !== 'Connected') {
+      return;
     }
-    this.sendCommand('SetUpdateInterval', 0);
+    // Nothing to show while the app is in the background, check again shortly
+    if (typeof document !== 'undefined' && document.hidden) {
+      this.levelTimer = setTimeout(() => this.pollLevels(), 500);
+      return;
+    }
+    this.levelRequestInFlight = true;
+    this.sendCommand(this.levelCommand, null, true);
+    // If the reply never arrives (dropped message), keep polling instead of stalling forever
+    this.levelWatchdog = setTimeout(() => {
+      this.levelRequestInFlight = false;
+      this.scheduleNextLevelPoll();
+    }, this.LEVEL_REPLY_TIMEOUT_MS);
+  }
+
+  private scheduleNextLevelPoll(): void {
+    clearTimeout(this.levelWatchdog ?? undefined);
+    this.levelWatchdog = null;
+    if (!this.levelPollingMs || this.levelRequestInFlight || this.levelTimer) {
+      return;
+    }
+    this.levelTimer = setTimeout(() => this.pollLevels(), this.levelPollingMs);
   }
 
   /**

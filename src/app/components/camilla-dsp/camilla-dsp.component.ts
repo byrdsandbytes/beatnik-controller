@@ -199,9 +199,6 @@ export class CamillaDspComponent implements OnInit, OnDestroy {
                     } catch (error) {
                         console.error('Error parsing Config JSON:', error);
                     }
-                } else if (message.GetSignalLevels) {
-                    // this.levels = message.GetSignalLevels.value;
-                    // console.log('Signal Levels received:', this.levels);
                 } else if (message.GetVolume) {
                     this.currentVolume = message.GetVolume.value;
                 }
@@ -396,7 +393,7 @@ export class CamillaDspComponent implements OnInit, OnDestroy {
     }
 
     getCaptureSignalLevels() {
-        // Use the server-side push mechanism instead of polling
+        // CamillaDSP has no push; the service polls one request at a time
         this.camillaService.startLevelUpdates(50);
     }
 
