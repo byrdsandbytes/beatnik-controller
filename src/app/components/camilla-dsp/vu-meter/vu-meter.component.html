@@ -14,11 +14,11 @@
         <text x="100" y="92" class="unit">VU</text>
         <text *ngFor="let end of endMarks" [attr.x]="end.x" [attr.y]="end.y" class="tick-label end-mark"
             [class.red]="end.red">{{ end.label }}</text>
-        <text x="8" y="124" class="readout" [class.clip]="isClipping">Peak {{ peak | number:'1.0-1' }} dB</text>
+        <text x="8" y="124" class="readout" [class.clip]="isClipping">Peak {{ peakText }} dB</text>
         <g class="needle" [style.transform]="'rotate(' + needleAngle + 'deg)'">
             <line [attr.x1]="pivotX" [attr.y1]="pivotY" [attr.x2]="pivotX" [attr.y2]="pivotY - 89" />
         </g>
-        <circle [attr.cx]="pivotX" [attr.cy]="pivotY" r="7" class="hub" />
+        <path [attr.d]="coverPath" class="cover" />
     </svg>
-    <ion-text class="vu-label">{{ label }}</ion-text>
+    <ion-text class="ion-padding-top vu-label">{{ label }}</ion-text>
 </div>

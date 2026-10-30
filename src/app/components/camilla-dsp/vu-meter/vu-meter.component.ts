@@ -75,6 +75,8 @@ export class VuMeterComponent {
         };
     });
 
+    readonly coverPath = `M ${PIVOT_X - 18} 132 L ${PIVOT_X - 18} ${PIVOT_Y + 6} A 18 18 0 0 1 ${PIVOT_X + 18} ${PIVOT_Y + 6} L ${PIVOT_X + 18} 132 Z`;
+
     readonly endMarks = [
         { label: '-∞', angle: MIN_ANGLE - 8, red: false },
         { label: '×', angle: MAX_ANGLE + 8, red: true }
@@ -85,6 +87,13 @@ export class VuMeterComponent {
 
     get needleAngle(): number {
         return dbToAngle(this.rms);
+    }
+
+    // Fixed-width "-06.3" style text; silence/invalid clamps to the scale floor.
+    get peakText(): string {
+        const value = Number.isFinite(this.peak) ? Math.max(MIN_DB, this.peak) : MIN_DB;
+        const abs = Math.abs(value).toFixed(1).padStart(4, '0');
+        return `${value < 0 ? '-' : '+'}${abs}`;
     }
 
     get isClipping(): boolean {

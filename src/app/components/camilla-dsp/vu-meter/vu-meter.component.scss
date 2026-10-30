@@ -12,7 +12,7 @@
 .vu-face {
   width: 100%;
   max-width: 260px;
-  border: 3px solid #2a2a2a;
+  // border: 3px solid #2a2a2a;
 }
 
 .dial {
@@ -61,8 +61,10 @@
   }
 }
 
-.hub {
-  fill: #111;
+.cover {
+  fill: var(--ion-color-dark);
+  border-radius: 4px;
+  border: 1px solid var(--ion-color-dark);
 }
 
 .vu-label {
