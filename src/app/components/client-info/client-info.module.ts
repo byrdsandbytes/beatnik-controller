@@ -7,7 +7,7 @@ import { CamillaDspModule } from '../camilla-dsp/camilla-dsp.module';
 import { SoundcardPickerModule } from '../soundcard-picker/soundcard-picker.module';
 import { ChooseSpeakersModule } from '../choose-speakers/choose-speakers.module';
 
-
+import { BeatnikDeviceUpdateModule } from '../../beatnik-device-update/beatnik-device-update-module';
 
 @NgModule({
   declarations: [
@@ -19,7 +19,8 @@ import { ChooseSpeakersModule } from '../choose-speakers/choose-speakers.module'
     FormsModule,
     CamillaDspModule,
     SoundcardPickerModule,
-    ChooseSpeakersModule
+    ChooseSpeakersModule,
+    BeatnikDeviceUpdateModule
   ],
   exports: [
     ClientInfoComponent

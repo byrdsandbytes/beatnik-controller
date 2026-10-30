@@ -23,7 +23,8 @@ export class ClientInfoComponent implements OnInit {
   @Input() client?: Client;
 
   serverState?: Observable<SnapCastServerStatusResponse>;
-  segment: 'details' | 'soundcard' | 'camilla-dsp' | 'settings' = 'camilla-dsp';
+  segment: 'details' | 'soundcard' | 'camilla-dsp' | 'settings' | 'update' = 'camilla-dsp';
+  deviceHost = '';
   hardwareStatus$: Observable<HardwareStatus>;
   systemInfo$?: Observable<SystemInfo>;
   hats = Object.values(SUPPORTED_HATS);
@@ -47,6 +48,7 @@ export class ClientInfoComponent implements OnInit {
   async ngOnInit() {
     this.serverState = this.snapcastService.state$;
     this.camillaDspUrl = await this.getCamillaDspUrl();
+    this.deviceHost = await this.getUrl();
     this.getHardwareInfo();
     this.getSystemInfo();
     this.refreshSnapcastStatus();

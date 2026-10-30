@@ -17,6 +17,10 @@
   <ion-segment-button value="settings">
     <ion-label>Settings</ion-label>
   </ion-segment-button>
+
+  <ion-segment-button value="update">
+    <ion-label>Update</ion-label>
+  </ion-segment-button>
 </ion-segment>
 <!-- </ion-toolbar> -->
 
@@ -252,6 +256,9 @@
     </ion-button>
   </div>
 
+</ng-container>
+<ng-container *ngIf="segment === 'update'">
+  <app-beatnik-device-update *ngIf="deviceHost" [host]="deviceHost" [lockHost]="true"></app-beatnik-device-update>
 </ng-container>
 <ng-container *ngIf="segment === 'camilla-dsp'">
   <app-camilla-dsp *ngIf="camillaDspUrl" [url]="camillaDspUrl"></app-camilla-dsp>

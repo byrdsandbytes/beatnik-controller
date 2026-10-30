@@ -6,6 +6,7 @@ import { IonicModule } from '@ionic/angular';
 
 import { BeatnikUpdatePageRoutingModule } from './beatnik-update-routing.module';
 
+import { BeatnikDeviceUpdateModule } from '../../beatnik-device-update/beatnik-device-update-module';
 import { BeatnikUpdatePage } from './beatnik-update.page';
 
 @NgModule({
@@ -13,6 +14,7 @@ import { BeatnikUpdatePage } from './beatnik-update.page';
     CommonModule,
     FormsModule,
     IonicModule,
+    BeatnikDeviceUpdateModule,
     BeatnikUpdatePageRoutingModule
   ],
   declarations: [BeatnikUpdatePage]

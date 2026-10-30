@@ -1,0 +1,19 @@
+.simple {
+  max-width: 420px;
+  margin: 0 auto;
+  text-align: center;
+
+  .hero {
+    font-size: 88px;
+    margin-top: 32px;
+  }
+
+  .subtitle {
+    color: var(--ion-color-medium);
+    margin-bottom: 24px;
+  }
+
+  ion-progress-bar {
+    margin-bottom: 24px;
+  }
+}

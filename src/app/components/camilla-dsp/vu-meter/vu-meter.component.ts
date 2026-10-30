@@ -44,7 +44,7 @@ const TICK_VALUES = [-60, -40, -30, -20, -10, -6, -3, 0];
     selector: 'app-vu-meter',
     templateUrl: './vu-meter.component.html',
     styleUrls: ['./vu-meter.component.scss'],
-    changeDetection: ChangeDetectionStrategy.OnPush,
+    // changeDetection: ChangeDetectionStrategy.OnPush,
     standalone: false
 })
 export class VuMeterComponent {
