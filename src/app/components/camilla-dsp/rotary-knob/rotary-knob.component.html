@@ -12,6 +12,6 @@
             <line x1="50" y1="50" x2="50" y2="22" />
         </g>
     </svg>
-    <span class="readout">{{ value | number:'1.0-1' }} {{ unit }}</span>
+    <span class="readout">{{ value | number:digits }} {{ unit }}</span>
     <span class="knob-label" *ngIf="label">{{ label }}</span>
 </div>

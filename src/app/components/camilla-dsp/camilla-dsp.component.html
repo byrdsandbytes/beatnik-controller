@@ -208,8 +208,8 @@
                         [(ngModel)]="currentVolume" (ionChange)="setVolume(currentVolume)">
                     </ion-range>
                 </ion-item>
-                <app-rotary-knob *ngIf="controlStyle === 'rotary'" class="ion-padding" label="Master Volume"
-                    [min]="-12" [max]="12" [step]="1" [ngModel]="currentVolume"
+                <app-rotary-knob *ngIf="controlStyle === 'rotary'" class="ion-padding" label="Master Volume" [min]="-12"
+                    [max]="12" [step]="1" [ngModel]="currentVolume"
                     (ngModelChange)="currentVolume = $event; setVolume($event)"></app-rotary-knob>
             </ion-card>
 
@@ -238,8 +238,8 @@
                         [(ngModel)]="filter.value.parameters.gain"
                         (ionChange)="updateFilterParameter(filter.key, 'gain', filter.value.parameters.gain)"></ion-range>
                 </ion-item>
-                <app-rotary-knob *ngIf="controlStyle === 'rotary'" class="ion-padding" label="Gain"
-                    [min]="-12" [max]="12" [step]="1" [ngModel]="filter.value.parameters.gain"
+                <app-rotary-knob *ngIf="controlStyle === 'rotary'" class="ion-padding" label="Gain" [min]="-12"
+                    [max]="12" [step]="1" [ngModel]="filter.value.parameters.gain"
                     (ngModelChange)="filter.value.parameters.gain = $event; updateFilterParameter(filter.key, 'gain', $event)"></app-rotary-knob>
                 <ion-item color="primary"> Frequency: {{ filter.value.parameters.freq }} </ion-item>
                 <ion-item color="primary"> Q: {{ filter.value.parameters.q }} </ion-item>
@@ -303,22 +303,88 @@
                     Processors
                 </ion-label>
             </ion-list-header>
+            <ng-template #processorControl let-ctrl="ctrl" let-processorKey="processorKey" let-processor="processor">
+                <ng-container *ngIf="controlStyle === 'lines'">
+                    <ion-item color="primary">
+                        <ion-label slot="start">{{ ctrl.label }}:</ion-label>
+                        <ion-input type="number" slot="end" [step]="ctrl.step"
+                            [value]="getProcessorParam(processor, ctrl.key)"
+                            (ionChange)="onProcessorNumberChange(processorKey, ctrl.key, $event.detail.value)"></ion-input>
+                        <ion-label slot="end">{{ ctrl.unit }}</ion-label>
+                    </ion-item>
+                    <ion-item color="primary">
+                        <ion-range [ticks]="false" color="medium" [min]="ctrl.min" [max]="ctrl.max" [step]="ctrl.step"
+                            [value]="getProcessorParam(processor, ctrl.key) ?? ctrl.min"
+                            (ionChange)="onProcessorNumberChange(processorKey, ctrl.key, $event.detail.value)"></ion-range>
+                    </ion-item>
+                </ng-container>
+                <div *ngIf="controlStyle === 'rotary'" class="col-6">
+                    <app-rotary-knob [label]="ctrl.label" [unit]="ctrl.unit" [min]="ctrl.min" [max]="ctrl.max"
+                        [step]="ctrl.step" [digits]="ctrl.digits"
+                        [ngModel]="getProcessorParam(processor, ctrl.key) ?? ctrl.min"
+                        (ngModelChange)="onProcessorNumberChange(processorKey, ctrl.key, $event)"></app-rotary-knob>
+                </div>
+            </ng-template>
+
             <ion-card class="ion-no-margin ion-padding" color="primary"
                 *ngFor="let processor of parsedConfig.processors | keyvalue">
-
                 <ion-card-header>
+                    <ion-card-title>{{ processor.key }}</ion-card-title>
                     <ion-card-subtitle>
-                        {{ processor.key }}
+                        {{ processor.value.type }}
+                        <ng-container *ngIf="processor.value.description"> - {{ processor.value.description
+                            }}</ng-container>
                     </ion-card-subtitle>
                 </ion-card-header>
-                test
-                <ion-item color="primary" *ngFor="let param of processor.value.parameters | keyvalue">
-                    <ion-label slot="start">{{ param.key }}:</ion-label>
-                    <ion-input type="number" slot="end" [(ngModel)]="param.value"
-                        (ionChange)="updateProcessorParameter(processor.key, param.key, param.value)"></ion-input>
+
+                <ion-label>Channels</ion-label>
+                <ion-item color="primary" lines="none">
+                    <ion-label>Total</ion-label>
+                    <ion-note slot="end" color="light">{{ processor.value.parameters.channels }}</ion-note>
                 </ion-item>
-                <!-- <ion-item color="primary"> Type: {{ processor.value.type }} </ion-item> -->
-                <!-- Add more processor parameters here as needed -->
+                <ion-item color="primary" lines="none">
+                    <ion-label>Monitor</ion-label>
+                    <ion-note slot="end" color="light">
+                        {{ formatChannels(processor.value.parameters.monitor_channels) }}
+                    </ion-note>
+                </ion-item>
+                <ion-item color="primary" lines="none">
+                    <ion-label>Process</ion-label>
+                    <ion-note slot="end" color="light">
+                        {{ formatChannels(processor.value.parameters.process_channels) }}
+                    </ion-note>
+                </ion-item>
+
+                <ion-list-header color="primary">
+                    <ion-label>Dynamics</ion-label>
+                </ion-list-header>
+                <div [class.row]="controlStyle === 'rotary'" [class.g-2]="controlStyle === 'rotary'">
+                    <ng-container *ngFor="let ctrl of dynamicsControls">
+                        <ng-container *ngTemplateOutlet="processorControl; context: {
+                            ctrl: ctrl, processorKey: processor.key, processor: processor.value }"></ng-container>
+                    </ng-container>
+                </div>
+
+                <ion-list-header color="primary">
+                    <ion-label>Output</ion-label>
+                </ion-list-header>
+                <div [class.row]="controlStyle === 'rotary'" [class.g-2]="controlStyle === 'rotary'">
+                    <ng-container *ngFor="let ctrl of outputControls">
+                        <ng-container *ngTemplateOutlet="processorControl; context: {
+                            ctrl: ctrl, processorKey: processor.key, processor: processor.value }"></ng-container>
+                    </ng-container>
+                </div>
+                <ion-item color="primary">
+                    <ion-label>Soft clip</ion-label>
+                    <ion-toggle slot="end" color="light" [checked]="!!processor.value.parameters.soft_clip"
+                        (ionChange)="updateProcessorParameter(processor.key, 'soft_clip', $event.detail.checked)"></ion-toggle>
+                </ion-item>
+                <div *ngIf="processor.value.parameters.soft_clip" [class.row]="controlStyle === 'rotary'"
+                    [class.g-2]="controlStyle === 'rotary'">
+                    <ng-container
+                        *ngTemplateOutlet="processorControl; context: {
+                        ctrl: clipLimitControl, processorKey: processor.key, processor: processor.value }"></ng-container>
+                </div>
             </ion-card>
 
         </div>

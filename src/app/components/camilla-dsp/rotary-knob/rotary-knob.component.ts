@@ -38,6 +38,7 @@ export class RotaryKnobComponent implements ControlValueAccessor {
     @Input() min = -12;
     @Input() max = 12;
     @Input() step = 1;
+    @Input() digits = '1.0-1';
 
     value = 0;
     disabled = false;

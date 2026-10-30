@@ -2,9 +2,19 @@ import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { Preferences } from '@capacitor/preferences';
 import { Subscription } from 'rxjs';
 import { UserPreference } from 'src/app/enum/user-preference.enum';
-import { CamillaDspConfig, MixerSource, SignalLevels } from 'src/app/model/camilla-dsp.model';
+import { CamillaDspConfig, MixerSource, Processor, SignalLevels } from 'src/app/model/camilla-dsp.model';
 import { BeatnikHardwareService } from 'src/app/services/beatnik-hardware.service';
 import { CamillaDspService, ConnectionStatus } from 'src/app/services/camilla-dsp.service';
+
+interface ProcessorControl {
+    key: string;
+    label: string;
+    unit: string;
+    min: number;
+    max: number;
+    step: number;
+    digits: string;
+}
 
 @Component({
     selector: 'app-camilla-dsp',
@@ -38,6 +48,21 @@ export class CamillaDspComponent implements OnInit, OnDestroy {
     configSearchTerm = '';
     meterStyle: 'bars' | 'vu' = 'bars';
     controlStyle: 'lines' | 'rotary' = 'lines';
+    private processorSendTimer?: ReturnType<typeof setTimeout>;
+
+    readonly dynamicsControls: ProcessorControl[] = [
+        { key: 'threshold', label: 'Threshold', unit: 'dB', min: -60, max: 0, step: 0.5, digits: '1.0-1' },
+        { key: 'factor', label: 'Ratio', unit: ':1', min: 1, max: 20, step: 0.1, digits: '1.0-1' },
+        { key: 'attack', label: 'Attack', unit: 's', min: 0.001, max: 1, step: 0.001, digits: '1.0-3' },
+        { key: 'release', label: 'Release', unit: 's', min: 0.01, max: 2, step: 0.01, digits: '1.0-2' }
+    ];
+
+    readonly outputControls: ProcessorControl[] = [
+        { key: 'makeup_gain', label: 'Makeup gain', unit: 'dB', min: 0, max: 24, step: 0.5, digits: '1.0-1' }
+    ];
+
+    readonly clipLimitControl: ProcessorControl =
+        { key: 'clip_limit', label: 'Clip limit', unit: 'dB', min: -24, max: 0, step: 0.5, digits: '1.0-1' };
 
     get filteredCamillaConfigs(): string[] {
         const searchTerm = this.configSearchTerm.trim().toLowerCase();
@@ -328,9 +353,29 @@ export class CamillaDspComponent implements OnInit, OnDestroy {
     }
 
     ngOnDestroy() {
+        clearTimeout(this.processorSendTimer);
         // Disconnect before unsubscribing so no late message/status update fires after teardown
         this.camillaService.disconnect();
         this.subscriptions.unsubscribe();
+    }
+
+    getProcessorParam(processor: Processor, paramKey: string): any {
+        return (processor.parameters as any)[paramKey];
+    }
+
+    formatChannels(channels: number | number[] | null | undefined): string {
+        if (channels === null || channels === undefined) {
+            return 'All';
+        }
+
+        return Array.isArray(channels) ? channels.join(', ') : String(channels);
+    }
+
+    onProcessorNumberChange(processorKey: string, paramKey: string, rawValue: unknown) {
+        const value = typeof rawValue === 'number' ? rawValue : parseFloat(String(rawValue));
+        if (Number.isFinite(value)) {
+            this.updateProcessorParameter(processorKey, paramKey, value);
+        }
     }
 
     updateProcessorParameter(processorKey: string, paramKey: string, newValue: any) {
@@ -345,16 +390,18 @@ export class CamillaDspComponent implements OnInit, OnDestroy {
             return;
         }
 
-        // Update the parameter locally
+        if (this.getProcessorParam(processor, paramKey) === newValue) {
+            return;
+        }
+
         (processor.parameters as any)[paramKey] = newValue;
 
-        // format the conffigJson to send to CamillaDSP
-        console.log('Updated processor parameter:', processorKey, paramKey, newValue);
-        console.log('Updated configuration to send:', this.parsedConfig);
-
-        // send the full configJson back to CamillaDSP
-        this.camillaService.sendCommand('SetConfigJson', JSON.stringify(this.parsedConfig));
-    }   
+        // Applying a config restarts the pipeline, so wait until dragging settles
+        clearTimeout(this.processorSendTimer);
+        this.processorSendTimer = setTimeout(() => {
+            this.camillaService.sendCommand('SetConfigJson', JSON.stringify(this.parsedConfig));
+        }, 250);
+    }
 
    
 }
