@@ -2,3 +2,75 @@
   display: block;
   width: 100%;
 }
+
+.fader {
+  position: relative;
+  padding: 4px 14px 22px;
+  margin-bottom: 16px;
+}
+
+.fader-range {
+  --bar-height: 2px;
+  --bar-border-radius: 0;
+  --bar-background: var(--ion-color-medium);
+  --bar-background-active: var(--ion-color-medium);
+  --knob-size: 18px;
+  --knob-background: transparent;
+  --knob-box-shadow: none;
+  --pin-background: transparent;
+  --height: 36px;
+  padding: 0;
+  margin: 0;
+
+  &::part(bar-active) {
+    background: transparent;
+  }
+
+  &::part(knob) {
+    border-radius: 50%;
+    background: var(--ion-color-light);
+    border: 0;
+    box-shadow: none;
+  }
+}
+
+.scale {
+  position: absolute;
+  left: 14px;
+  right: 14px;
+  bottom: 0;
+  height: 22px;
+  pointer-events: none;
+}
+
+.mark {
+  position: absolute;
+  top: 0;
+  width: 1px;
+  height: 6px;
+  background: var(--ion-color-medium);
+  transform: translateX(-50%);
+
+  &.zero {
+    width: 2px;
+    height: 10px;
+    background: var(--ion-color-light);
+  }
+}
+
+.mark-label {
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.6rem;
+  color: var(--ion-color-medium);
+  white-space: nowrap;
+}
+
+.zero .mark-label {
+  top: 12px;
+  color: var(--ion-color-light);
+  font-weight: 600;
+}
