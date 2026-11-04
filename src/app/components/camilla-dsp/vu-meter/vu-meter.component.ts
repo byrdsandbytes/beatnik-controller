@@ -74,7 +74,7 @@ export class VuMeterComponent {
     readonly innerTicks: VuTick[] = buildTicks([-60, -48, -36, -24, -12, 0], INNER_RADIUS,
         db => String(Math.round(((db - MIN_DB) / (MAX_DB - MIN_DB)) * 100)), () => false, false);
 
-    readonly coverPath = `M ${PIVOT_X - 18} 132 L ${PIVOT_X - 18} ${PIVOT_Y + 6} A 18 18 0 0 1 ${PIVOT_X + 18} ${PIVOT_Y + 6} L ${PIVOT_X + 18} 132 Z`;
+    readonly coverRadius = 10;
 
     get needleAngle(): number {
         return dbToAngle(this.rms);

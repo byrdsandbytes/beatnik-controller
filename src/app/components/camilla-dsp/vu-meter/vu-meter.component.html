@@ -23,7 +23,7 @@
         <g class="needle" [style.transform]="'rotate(' + needleAngle + 'deg)'">
             <line [attr.x1]="pivotX" [attr.y1]="pivotY" [attr.x2]="pivotX" [attr.y2]="pivotY - 92" />
         </g>
-        <path [attr.d]="coverPath" class="cover" />
+        <circle [attr.cx]="pivotX" [attr.cy]="pivotY" [attr.r]="coverRadius" class="cover" />
     </svg>
     <ion-text class="ion-padding-top vu-label">{{ label }}</ion-text>
 </div>
