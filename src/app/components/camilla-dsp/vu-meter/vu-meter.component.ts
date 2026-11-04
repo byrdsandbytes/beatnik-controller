@@ -17,7 +17,7 @@ const RED_ZONE_DB = -6;
 const MIN_ANGLE = -50;
 const MAX_ANGLE = 50;
 const PIVOT_X = 100;
-const PIVOT_Y = 114;
+const PIVOT_Y = 132;
 const RADIUS = 92;
 const INNER_RADIUS = 76;
 const CLIP_DB = -1;
@@ -74,7 +74,7 @@ export class VuMeterComponent {
     readonly innerTicks: VuTick[] = buildTicks([-60, -48, -36, -24, -12, 0], INNER_RADIUS,
         db => String(Math.round(((db - MIN_DB) / (MAX_DB - MIN_DB)) * 100)), () => false, false);
 
-    readonly coverRadius = 10;
+    readonly coverPath = `M ${PIVOT_X - 16} ${PIVOT_Y} A 16 16 0 0 1 ${PIVOT_X + 16} ${PIVOT_Y} Z`;
 
     get needleAngle(): number {
         return dbToAngle(this.rms);
