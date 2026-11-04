@@ -95,9 +95,8 @@
                     <ion-label slot="end">dB</ion-label>
                 </ion-item>
                 <ion-item color="primary" *ngIf="controlStyle === 'lines'">
-                    <ion-range color="medium" [ticks]="true" [snaps]="true" min="-12" max="12" step="1"
-                        [(ngModel)]="currentVolume" (ionChange)="setVolume(currentVolume)">
-                    </ion-range>
+                    <app-camilla-range-slider [ngModel]="currentVolume"
+                        (ngModelChange)="currentVolume = $event; setVolume($event)"></app-camilla-range-slider>
                 </ion-item>
                 <app-rotary-knob *ngIf="controlStyle === 'rotary'" class="ion-padding" label="Master Volume" [min]="-12"
                     [max]="12" [step]="1" [ngModel]="currentVolume"
@@ -128,9 +127,8 @@
                     <ion-label slot="end">dB</ion-label>
                 </ion-item>
                 <ion-item color="primary" *ngIf="controlStyle === 'lines'">
-                    <ion-range [ticks]="true" [snaps]="true" color="medium" min="-12" max="12" step="1"
-                        [(ngModel)]="filter.value.parameters.gain"
-                        (ionChange)="updateFilterParameter(filter.key, 'gain', filter.value.parameters.gain)"></ion-range>
+                    <app-camilla-range-slider [ngModel]="filter.value.parameters.gain"
+                        (ngModelChange)="filter.value.parameters.gain = $event; updateFilterParameter(filter.key, 'gain', $event)"></app-camilla-range-slider>
                 </ion-item>
                 <app-rotary-knob *ngIf="controlStyle === 'rotary'" class="ion-padding" label="Gain" [min]="-12"
                     [max]="12" [step]="1" [ngModel]="filter.value.parameters.gain"
@@ -170,9 +168,8 @@
                         <ion-item color="primary">
                             <ion-label>Source {{ source.channel }} gain</ion-label>
                             <ion-note slot="end" color="light">{{ source.gain }} dB</ion-note>
-                            <ion-range *ngIf="controlStyle === 'lines'" [ticks]="true" [snaps]="true" color="medium"
-                                min="-12" max="12" step="1" [(ngModel)]="source.gain"
-                                (ionChange)="updateMixerMapping(source, mixer.key)"></ion-range>
+                            <app-camilla-range-slider *ngIf="controlStyle === 'lines'" [ngModel]="source.gain"
+                                (ngModelChange)="source.gain = $event; updateMixerMapping(source, mixer.key)"></app-camilla-range-slider>
                         </ion-item>
                         <app-rotary-knob *ngIf="controlStyle === 'rotary'" class="ion-padding"
                             [label]="'Source ' + source.channel + ' Gain'" [min]="-12" [max]="12" [step]="1"

@@ -5,6 +5,7 @@ import { IonicModule } from '@ionic/angular';
 import { CamillaDspComponent } from './camilla-dsp.component';
 import { VuMeterModule } from './vu-meter/vu-meter.module';
 import { SignalLevelBarsModule } from './signal-level-bars/signal-level-bars-module';
+import { CamillaRangeSliderModule } from './camilla-range-slider/camilla-range-slider-module';
 import { RotaryKnobModule } from './rotary-knob/rotary-knob.module';
 
 @NgModule({
@@ -14,7 +15,8 @@ import { RotaryKnobModule } from './rotary-knob/rotary-knob.module';
     IonicModule,
     VuMeterModule,
     SignalLevelBarsModule,
-    RotaryKnobModule
+    RotaryKnobModule,
+    CamillaRangeSliderModule
   ],
   declarations: [CamillaDspComponent],
   exports: [CamillaDspComponent]
