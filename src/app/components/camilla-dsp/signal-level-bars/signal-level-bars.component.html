@@ -1,0 +1,26 @@
+<ion-card class="meters-container ion-no-margin">
+  <div class="meter-group" *ngFor="let group of groups; trackBy: trackByTitle">
+    <h3 class="meter-title">{{ group.title }}</h3>
+    <div class="channels">
+      <div class="channel" *ngFor="let name of channels; let i = index">
+        <span class="channel-name">{{ name }}</span>
+        <div class="sub-channel">
+          <div class="meter-column">
+            <span class="type-label">RMS</span>
+            <div class="meter-track">
+              <div class="meter-bar" [style.height.px]="barHeight(group.rms[i])"></div>
+            </div>
+            <span class="db-label">{{ group.rms[i] | number:'2.2-2' }}</span>
+          </div>
+          <div class="meter-column">
+            <span class="type-label">Peak</span>
+            <div class="meter-track">
+              <div class="meter-bar peak" [style.height.px]="barHeight(group.peak[i])"></div>
+            </div>
+            <span class="db-label">{{ group.peak[i] | number:'2.2-2' }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</ion-card>

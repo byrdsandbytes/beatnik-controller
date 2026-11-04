@@ -54,7 +54,7 @@
 
 .needle {
   transform-origin: 100px 132px;
-  transition: transform 0.12s ease-out;
+  transition: transform 0.06s linear;
 
   line {
     stroke: var(--ion-color-dark);
