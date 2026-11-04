@@ -58,7 +58,7 @@
 
   line {
     stroke: var(--ion-color-dark);
-    stroke-width: 1.6;
+    stroke-width: 1.2;
     stroke-linecap: round;
   }
 }
@@ -102,4 +102,44 @@
 
 .end-mark {
   font-size: 10px;
+}
+
+.scale.inner {
+  stroke-width: 1;
+}
+
+.tick-label.small {
+  font-size: 5px;
+}
+
+.peak-text {
+  fill: var(--ion-color-dark);
+  font-size: 5px;
+  letter-spacing: 0.15em;
+  text-anchor: middle;
+}
+
+.lamp {
+  fill: #5a1212;
+  stroke: var(--ion-color-dark);
+  stroke-width: 0.6;
+
+  &.on {
+    fill: #ff2a2a;
+  }
+}
+
+.lamp-glow {
+  fill: #ff2a2a;
+  opacity: 0;
+  filter: blur(3px);
+  transition: opacity 0.1s;
+
+  &.on {
+    opacity: 0.8;
+  }
+}
+
+.readout.rms {
+  text-anchor: end;
 }

@@ -4,19 +4,24 @@
         <text x="100" y="-12" class="brand">BEATNIK</text>
         <path [attr.d]="scalePath" class="scale" />
         <path [attr.d]="redPath" class="scale red" />
+        <path [attr.d]="innerPath" class="scale inner" />
         <ng-container *ngFor="let tick of ticks">
             <line [attr.x1]="tick.x1" [attr.y1]="tick.y1" [attr.x2]="tick.x2" [attr.y2]="tick.y2"
                 class="tick" [class.red]="tick.red" />
-            <text [attr.x]="tick.labelX" [attr.y]="tick.labelY" class="tick-label" [class.red]="tick.red">
-                {{ tick.label }}
-            </text>
+            <text [attr.x]="tick.labelX" [attr.y]="tick.labelY" class="tick-label" [class.red]="tick.red">{{ tick.label }}</text>
         </ng-container>
-        <text x="100" y="92" class="unit">VU</text>
-        <text *ngFor="let end of endMarks" [attr.x]="end.x" [attr.y]="end.y" class="tick-label end-mark"
-            [class.red]="end.red">{{ end.label }}</text>
+        <ng-container *ngFor="let tick of innerTicks">
+            <line [attr.x1]="tick.x1" [attr.y1]="tick.y1" [attr.x2]="tick.x2" [attr.y2]="tick.y2" class="tick" />
+            <text [attr.x]="tick.labelX" [attr.y]="tick.labelY" class="tick-label small">{{ tick.label }}</text>
+        </ng-container>
+        <text x="100" y="84" class="unit">dBFS</text>
+        <text x="176" y="2" class="peak-text">PEAK</text>
+        <circle cx="176" cy="-8" r="9" class="lamp-glow" [class.on]="isClipping" />
+        <circle cx="176" cy="-8" r="4.5" class="lamp" [class.on]="isClipping" />
         <text x="8" y="124" class="readout" [class.clip]="isClipping">Peak {{ peakText }} dB</text>
+        <text x="192" y="124" class="readout rms">RMS {{ rmsText }} dB</text>
         <g class="needle" [style.transform]="'rotate(' + needleAngle + 'deg)'">
-            <line [attr.x1]="pivotX" [attr.y1]="pivotY" [attr.x2]="pivotX" [attr.y2]="pivotY - 89" />
+            <line [attr.x1]="pivotX" [attr.y1]="pivotY" [attr.x2]="pivotX" [attr.y2]="pivotY - 92" />
         </g>
         <path [attr.d]="coverPath" class="cover" />
     </svg>
