@@ -13,6 +13,8 @@ Beatnik Controller is a web-based remote control for your [Beatnik Pi](https://g
 -   View what's currently playing on each stream.
 -   Simple and intuitive user interface.
 
+See the [Usage Guide](./docs/USAGE_GUIDE.md) for a walkthrough of every feature.
+
 ## Prerequisites
 
 To run Beatnik Controller, you will need:

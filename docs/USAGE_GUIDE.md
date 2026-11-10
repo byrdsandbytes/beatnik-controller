@@ -14,8 +14,8 @@ This guide walks through every feature of Beatnik Controller, from first-time se
 8. [Stream presets](#8-stream-presets)
 9. [Adding a new Beatnik device](#9-adding-a-new-beatnik-device)
 10. [Device details and maintenance](#10-device-details-and-maintenance)
-11. [Camilla DSP (audio processing)](#11-camilla-dsp-audio-processing)
-12. [Updates](#12-updates)
+11. [Camilla DSP and equalising](#11-camilla-dsp-and-equalising)
+12. [Updating](#12-updating)
 13. [Server status and maintenance](#13-server-status-and-maintenance)
 14. [Network scanner](#14-network-scanner)
 15. [Settings](#15-settings)
@@ -124,7 +124,7 @@ The **Streams** tab lists all streams. Active (non-idle) streams appear first, f
 Tap a stream to see its details:
 
 - The raw stream configuration in a collapsible JSON section (useful for debugging).
-- For the **Line-In** stream, the [Camilla DSP](#11-camilla-dsp-audio-processing) controls are shown in `linein` mode.
+- For the **Line-In** stream, the [Camilla DSP](#11-camilla-dsp-and-equalising) controls are shown in `linein` mode.
 - For the **Hof-Bar-Radio** stream, a Mopidy player with stop / play / pause buttons and an **Initialize Hof-Bar Radio** button is shown.
 
 ---
@@ -224,34 +224,240 @@ The client information panel has five tabs:
 
 | Tab | Content |
 |-----|---------|
-| **Camilla DSP** | Live audio levels and DSP controls - see [Camilla DSP](#11-camilla-dsp-audio-processing). |
+| **Camilla DSP** | Live audio levels and DSP controls - see [Camilla DSP](#11-camilla-dsp-and-equalising). |
 | **Soundcard** | Current soundcard configuration and detected hardware. Tap **Choose Soundcard** to open the picker with images, search and "Tested by Beatnik / Community" badges. Use the refresh icon to re-read the hardware. |
 | **Info** | System information: temperature, RAM usage, hostname, IP addresses, OS, model, storage type, MAC address, architecture, Wi-Fi SSID, band and frequency, link quality, signal and noise level, plus Snapcast client info (volume, muted, latency, connection state, last seen). |
 | **Settings** | Snapcast server status (active/inactive), **Choose Speakers** and **Reboot Device** actions. |
-| **Update** | Software update for this device - see [Updates](#12-updates). |
+| **Update** | Software update for this device - see [Updates](#12-updating). |
 
 ---
 
-## 11. Camilla DSP (audio processing)
+## 11. Camilla DSP and equalising
 
-[CamillaDSP](https://github.com/HEnquist/camilladsp) runs on each Beatnik for equalising and processing audio. Controls are found under **Device > Camilla DSP** and in the **Line-In** stream details. The app connects to the device automatically; use the retry button if the connection drops. If no network address is available for a device, open it from the device list or the network scanner, or set the server address in [Settings](#15-settings).
+[CamillaDSP](https://github.com/HEnquist/camilladsp) is the audio processing engine on each Beatnik. It sits between Snapcast and the soundcard and is what makes equalising, volume trim, channel mixing and dynamics control possible. The app talks to it live, so you can hear every change while you make it.
 
-- **Level meters:** view signal levels for **Capture (Snapcast)** and **Playback**, left and right. Switch the display style between **Bars**, **Gauge**, **Lines** and **Rotary**.
-- **Master volume and gain:** adjust in dB using sliders or rotary knobs.
-- **Mixer:** channel source gains with *Inverted* and *Muted* toggles.
-- **Processors:** per-channel processing blocks (for example dynamics and soft clip).
-- **Default config:** pick a CamillaDSP configuration file stored on the device (with search) and save it as the default.
-- **Advanced:** connect/disconnect and inspect the DSP state, configuration (JSON/YAML), update interval and signal levels.
+### 11.1 How it works
+
+CamillaDSP processes audio as a pipeline defined in a **config file** stored on the device. A typical Beatnik pipeline looks like this (the exact order and content depend on the config):
+
+```
+Snapcast audio (capture) > Mixer > Filters (EQ) > Processors (compressor) > Soundcard (playback)
+```
+
+| Block | What it does | Controls in the app |
+|-------|--------------|---------------------|
+| **Master volume** | Overall level of the device in dB. | Adjustable |
+| **Filters** | The equaliser. Each filter is one EQ band, for example a bass boost or treble cut. | Gain adjustable. Type, frequency and Q are shown but read-only |
+| **Mixers** | Routes input channels to output channels. | Per-source gain, invert and mute |
+| **Processors** | Dynamics processing (compressor) and soft clipping. | Threshold, ratio, attack, release, makeup gain, soft clip |
+
+The filters, mixers and processors you see depend entirely on the active config file. If a block does not exist in the config, it is not shown in the app.
+
+### 11.2 Opening the controls
+
+| Where | What you control |
+|-------|------------------|
+| **Devices > Clients > (client) > Camilla DSP tab** | The playback DSP of that device. |
+| **Streams > Line-In** | The separate line-in (preamp) DSP, shown only for the Line-In stream. |
+
+The app connects automatically and shows *Connecting to CamillaDSP...* and *Loading configuration...* while it waits. If the device cannot be reached, a message with a **Retry** button appears and the app retries every few seconds. If no address is known for a device, open it from the device list or the network scanner, or set the server address in [Settings](#15-settings).
+
+### 11.3 Equalising
+
+The **Filters** section is your equaliser. Every filter in the config appears as a card with:
+
+- **Name** - the filter name from the config, for example `bass` or `treble`.
+- **Type** - the filter type (for example a shelf or peaking filter). Read-only.
+- **Gain** - the amount of boost or cut in dB. This is the control you adjust.
+- **Frequency** and **Q** - where the filter acts and how wide it is. Read-only.
+
+To equalise:
+
+1. Open the **Camilla DSP** tab of the device you want to adjust.
+2. Start music so you can hear the effect.
+3. Find the filter card for the band you want to change (for example the bass band).
+4. Drag the slider or knob, or type a value into the number field. The range is -12 dB to +12 dB in 1 dB steps on sliders and knobs.
+5. Repeat for the other bands. Use gentle changes: a few dB is usually enough, and large boosts can cause clipping.
+
+Tips:
+
+- **Cut rather than boost.** If something sounds too harsh, reduce that band instead of raising the others. Lowering the master volume slightly before boosting avoids distortion.
+- **Check the playback meters.** If the peak reaches 0 dB, reduce the gain or enable **Soft clip** (see below).
+- **Different bands or frequencies:** the app changes only the gain. To change frequencies, Q or filter types, pick a different config file under [Advanced settings](#119-advanced-settings-config-files).
+- **Per device:** every client has its own EQ, so you can tune each room separately.
+
+Note: gain changes are sent to the running CamillaDSP immediately but are not written to the config file by the app. If CamillaDSP restarts, or you apply a config with **Set as default**, the values from the config file are used again.
+
+### 11.4 Master volume
+
+**Master** controls the overall level of the DSP in dB. Type a value or use the slider or knob. This is separate from the Snapcast volume you set in the player toolbar and in volume presets. Use it to set a sensible overall level and leave the Snapcast volume for day-to-day changes.
+
+### 11.5 Mixers
+
+Each mixer card shows its output channel count and, for every destination channel (the first is Left, the second Right), its source channels with:
+
+- **Source gain** - level of that source in dB (-12 to +12).
+- **Inverted** - flips the polarity of the signal. Use it to fix speakers that are wired out of phase.
+- **Muted** - silences that source.
+
+Mixers are useful for channel balance, swapping left and right, or muting one side while testing.
+
+### 11.6 Processors (dynamics)
+
+If the config contains a compressor, each processor card shows its name and type, plus the channels it works on (**Total**, **Monitor** and **Process**). The following controls are available:
+
+| Control | Range | Effect |
+|---------|-------|--------|
+| **Threshold** | -60 to 0 dB | Level above which compression starts. |
+| **Ratio** | 1 to 20 : 1 | How strongly levels above the threshold are reduced. |
+| **Attack** | 0.001 to 1 s | How quickly compression engages. |
+| **Release** | 0.01 to 2 s | How quickly compression lets go. |
+| **Makeup gain** | 0 to 24 dB | Level added after compression to compensate for the reduction. |
+| **Soft clip** | On / Off | Gently rounds off peaks instead of hard clipping. |
+| **Clip limit** | -24 to 0 dB | Level at which soft clipping starts. Shown when Soft clip is on. |
+
+Applying processor changes restarts the audio pipeline, so the app waits until you stop dragging before it sends the change. Expect a brief interruption in the audio while the change is applied.
+
+### 11.7 Signal levels
+
+The **Signal Levels** section at the top shows what is flowing through the DSP, updated continuously for left and right channels:
+
+- **Capture (Snapcast)** - the audio arriving from the stream.
+- **Playback** - the audio leaving towards the soundcard, after your EQ and processing.
+
+Each meter shows the RMS (average) level and the peak level. Switch the display with **Bars** or **Gauge**. The gauge scale runs from -60 dB to 0 dB. Comparing capture and playback tells you how much gain your settings add.
+
+### 11.8 Control style
+
+The **Master** header has a **Lines** / **Rotary** switch. **Lines** shows sliders with number fields. **Rotary** shows knobs. The choice applies to all controls (master, filters, mixers and processors). The meter style and control style are remembered on your device.
+
+### 11.9 Advanced settings (config files)
+
+At the bottom, **Advanced Settings** lets you choose which CamillaDSP config file the device loads by default. Only change this if you know what you are doing, because the config defines the whole pipeline (EQ bands, mixers, processors and soundcard format).
+
+1. Tap the config button to open the **Select a config** list.
+2. Search by file name. The config that is currently active is marked **Current**.
+3. Tap a file. The picker closes and the file is selected (press **Done** to close the list without choosing).
+4. Tap **Set as default**. The device applies the config and CamillaDSP restarts. A confirmation shows the new default.
+5. **Refresh** reloads the list of config files and the current default.
+
+For the **Line-In** stream the same section manages the config of the line-in (preamp) DSP, which is a separate CamillaDSP instance from the playback DSP. This only works if a preamp is set up on the device.
+
+At the very bottom, the collapsible **CamillaDSP Connection** section shows the WebSocket address, the connection status and the raw messages and configuration. It is meant for debugging.
+
+### 11.10 Troubleshooting Camilla DSP
+
+| Problem | What to try |
+|---------|-------------|
+| *CamillaDSP not reachable* | Check the device is on and on the same network, then tap **Retry**. |
+| *No configuration received* | CamillaDSP is connected but has no config loaded. Pick one under Advanced settings. |
+| No filters or processors shown | The active config does not define any. Choose a different config file. |
+| Distortion after boosting | Lower the gain of the boosted band or the master volume, or enable **Soft clip**. |
+| "No config files found on this device" | The device returned no config files. Make sure the device is online and up to date (see [Updates](#12-updating)). |
+| Line-In config list fails to load | No line-in (preamp) is set up on this device. |
+| EQ changes disappeared | Gain changes are live only. They reset when CamillaDSP restarts or a config is applied. |
 
 ---
 
-## 12. Updates
+## 12. Updating
 
-Open **Menu > Beatnik Update**, or the **Update** tab in the client details.
+There are three things you can update, and each is updated differently:
 
-- The overview shows the installed versions and whether an update is currently running (*Update running...* / *Idle*).
-- Update everything with one button, or update a single component: **bleno** (Bluetooth setup service), **controller** or **api**.
-- **Refresh** reloads the current status. Failed updates are flagged so you can retry.
+| What | How |
+|------|-----|
+| **Beatnik devices** (Bluetooth setup service, controller, hardware API) | In the app, see [12.1](#121-updating-a-beatnik-device-from-the-app) |
+| **Beatnik Controller web app in Docker** (when you run it yourself) | With Docker Compose, see [12.5](#125-updating-the-controller-docker-container-manually) |
+| **iOS / Android app** | Through the App Store or Play Store |
+
+### 12.1 Updating a Beatnik device from the app
+
+Each Beatnik runs three components that can be updated from the app:
+
+| Component | What it is | How it is updated |
+|-----------|------------|-------------------|
+| **bleno** | Bluetooth service used for adding the device and Wi-Fi setup. | Latest release package installed with apt |
+| **controller** | The Beatnik Controller web interface running on the device. | Latest Docker image pulled |
+| **api** | The Hardware API used for soundcards, system info, Camilla DSP configs, reboot and updates. | Latest release package installed with apt |
+
+Update a device in either of two ways:
+
+- **From the client details:** open **Devices > Clients > (client)** and select the **Update** tab. The device address is filled in automatically and cannot be edited. This is the recommended way and the only reliable one in the mobile app.
+- **From the menu:** open **Menu > Beatnik Update**. The app updates the device that serves the page, so this works best when you open Beatnik Controller from the Beatnik itself in a web browser. In the iOS and Android apps there is no such host, so use the **Update** tab of the client, or Expert mode and enter the device address.
+
+Before you start:
+
+- Make sure the device is powered on, online and on the same network as your phone or computer.
+- Make sure the device has internet access, because updates are downloaded from the internet.
+- Keep the screen open until the update has finished.
+- Expect services to restart during the update, so audio can be interrupted. Update when nobody is listening.
+
+### 12.2 Simple mode
+
+Simple mode is the default and is what most people need.
+
+1. Open the **Update** tab. The app checks the device and shows **Ready to update**.
+2. Tap **Update now**. This installs the latest version of everything (bleno, controller and api, in that order).
+3. Keep the screen open. A progress bar shows **Updating...**.
+4. When the API restarts you will see **Restarting...** for a few seconds. This is normal. The app keeps waiting and continues automatically once the device is back.
+5. When it is finished the status returns to **Ready to update**, and the installed versions are refreshed.
+
+Status messages:
+
+| Message | Meaning |
+|---------|---------|
+| *Checking...* | The app is asking the device for its status. |
+| *Ready to update* | The device is reachable and idle. |
+| *Updating...* | An update is running. Keep the screen open. |
+| *Restarting...* | The Hardware API is restarting after its update. Wait a moment. |
+| *Update failed* | At least one component failed. Try again, or open Expert mode for details. |
+| *Can't reach your Beatnik* | The device is off, or not on the same network. |
+
+Tap **Check again** to reload the status. The button is disabled while an update is running.
+
+### 12.3 Expert mode
+
+Switch on the **Expert** toggle in the header of the Update section to see more detail. The choice is remembered on your device.
+
+- **Host** - address of the device to update. Editable when you opened the page from **Menu > Beatnik Update**, locked in the client's Update tab.
+- **Refresh** - reload status and versions.
+- **Update bleno / Update controller / Update api / Update all** - update a single component, or all of them in order. Updating all stops at the first failure.
+- **Status cards** - for every component the last state (`idle`, `running`, `success` or `failed`), a message, the start and finish time and the tail of the update log. Use the log when an update fails.
+- **Installed versions** - the installed version of each component, its Docker image and image ID where relevant, or *not installed* if the component is not present on the device.
+
+Use Expert mode to update only one component, to read logs after a failed update, or to enter the address of another device.
+
+### 12.4 Troubleshooting updates
+
+| Problem | What to try |
+|---------|-------------|
+| *Can't reach your Beatnik* | Check power and network. Open the device from the device list or the network scanner so the correct address is used. |
+| *Another update is already running* | Wait until the running update has finished, then try again. Only one update can run at a time. |
+| *Update failed* | Open Expert mode and read the log of the failed component. Check that the device has internet access and enough free storage, then try again. |
+| A component shows *not installed* | That component is not set up on this device. Updating it is not possible and will report an error. |
+| The app shows *Restarting...* for a long time | Wait a minute. If the device does not come back, check that it is powered on and reachable, then tap **Check again**. |
+| Nothing happens in the mobile app on **Menu > Beatnik Update** | That page updates the host that serves the app, which is not a Beatnik in the mobile app. Use the client's **Update** tab or Expert mode and enter the device address. |
+
+After a successful update, switch on Expert mode and check **Installed versions** to confirm the new versions. If something still behaves oddly, a [restart or reboot](#13-server-status-and-maintenance) often helps.
+
+### 12.5 Updating the controller Docker container manually
+
+If you run Beatnik Controller yourself with Docker Compose, update it from the folder containing your `docker-compose.yml`:
+
+```bash
+git pull
+docker compose pull
+docker compose up -d
+```
+
+To stay on a specific version, replace `latest` in the image name of `docker-compose.yml` with a version tag (for example `v0.5.6`) before pulling:
+
+```yaml
+services:
+  beatnik:
+    image: ghcr.io/byrdsandbytes/beatnik-controller:v0.5.6
+```
+
+For the underlying operating system packages of a Beatnik Pi, see the [Docker installation guide](./DOCKER_INSTALLATION.md). The list of changes in each release is in the [CHANGELOG](../CHANGELOG.md).
 
 ---
 

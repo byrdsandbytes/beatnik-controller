@@ -5,3 +5,66 @@
   background-color: var(--ion-color-medium);
   padding: 16px;
 }
+
+$line: 1px solid var(--ion-color-step-300, #c8c7cc);
+
+.tree-connector {
+  width: 1px;
+  height: 20px;
+  margin: 0 auto;
+  background: var(--ion-color-step-300, #c8c7cc);
+}
+
+.org-swiper {
+  margin-bottom: 16px;
+
+  .swiper-slide {
+    height: auto;
+  }
+}
+
+// horizontal bar joining the sibling groups to the server
+.org-branch {
+  position: relative;
+  padding-top: 20px;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    border-top: $line;
+  }
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    height: 20px;
+    border-left: $line;
+  }
+}
+
+.swiper-slide:first-child .org-branch::before { left: 50%; }
+.swiper-slide:last-child .org-branch::before { right: 50%; }
+.swiper-slide:only-child .org-branch::before { display: none; }
+
+.topology-card {
+  margin: 0 8px;
+  border-radius: 0;
+  box-shadow: none;
+  border-top: 2px solid var(--ion-color-medium);
+
+  &.server-card { margin: 0 auto; max-width: 320px; border-top-color: var(--ion-color-dark); }
+  &.group-card { border-top-color: var(--ion-color-primary); &.muted { opacity: 0.5; } }
+  &.client-card { border-top-color: var(--ion-color-success); p { margin: 2px 0; } ion-badge { margin-top: 6px; } }
+  &.client-card.offline { opacity: 0.5; border-top-color: var(--ion-color-danger); }
+  .card-list { background: transparent; padding: 0; }
+
+  ion-card-header { padding: 10px 12px 4px; }
+  ion-card-title { font-size: 0.9rem; font-weight: 600; word-break: break-word; }
+  ion-card-subtitle { font-size: 0.65rem; letter-spacing: 0.04em; }
+  ion-card-content { padding: 4px 12px 10px; font-size: 0.75rem; line-height: 1.3; }
+  ion-badge { font-size: 0.65rem; }
+}
