@@ -1,0 +1,9 @@
+<div class="fader">
+  <ion-range class="fader-range" [ticks]="false" [snaps]="snaps" [min]="min" [max]="max" [step]="step"
+    [value]="value" [disabled]="disabled" aria-label="Level" (ionChange)="onRangeChange($event)"></ion-range>
+  <div class="scale" aria-hidden="true">
+    <span class="mark" *ngFor="let mark of marks" [class.zero]="mark.zero" [style.left.%]="mark.percent">
+      <span class="mark-label" *ngIf="mark.label">{{ mark.label }}</span>
+    </span>
+  </div>
+</div>

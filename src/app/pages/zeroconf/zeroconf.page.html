@@ -76,7 +76,8 @@
             <p>RAM: {{ service.txt?.['ram'] }}</p>
 
           </ion-label>
-          <ion-button fill="outline" slot="end" [routerLink]="['/clients', service.txt?.['mac']]">View
+          <ion-button fill="outline" slot="end" [routerLink]="['/clients', service.txt?.['mac']]"
+            [queryParams]="{ host: service.hosts[0] }">View
             Device</ion-button>
         </ion-item>
       </ng-container>

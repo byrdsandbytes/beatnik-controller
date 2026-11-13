@@ -6,4 +6,6 @@ export enum UserPreference {
     VOLUME_PRESETS = 'volumePresets',
     STREAM_PRESETS = 'streamPresets',
     SCAN_FOR_DEVICES_ON_STARTUP = 'scanForDevicesOnStartup',
+    SIGNAL_METER_STYLE = 'signalMeterStyle',
+    CONTROL_STYLE = 'controlStyle',
 }

@@ -1,0 +1,145 @@
+:host {
+  display: block;
+}
+
+.vu {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.vu-face {
+  width: 100%;
+  max-width: 260px;
+  // border: 3px solid var(--ion-color-dark);
+  border-radius: 8px 8px 0 0;
+  overflow: hidden;
+}
+
+.dial {
+  fill: var(--ion-color-light);
+}
+
+.scale {
+  fill: none;
+  stroke: var(--ion-color-dark);
+  stroke-width: 2;
+
+  &.red {
+    stroke: var(--ion-color-danger);
+    stroke-width: 4;
+  }
+}
+
+.tick {
+  stroke: var(--ion-color-dark);
+  stroke-width: 1.5;
+
+  &.red {
+    stroke: var(--ion-color-danger);
+  }
+}
+
+.tick-label {
+  fill: var(--ion-color-dark);
+  font-size: 7px;
+  text-anchor: middle;
+  dominant-baseline: middle;
+
+  &.red {
+    fill: var(--ion-color-danger);
+  }
+}
+
+.needle {
+  transform-origin: 100px 132px;
+  transition: transform 0.06s linear;
+
+  line {
+    stroke: var(--ion-color-dark);
+    stroke-width: 1.2;
+    stroke-linecap: round;
+  }
+}
+
+.cover {
+  fill: var(--ion-color-dark);
+  border-radius: 4px;
+  border: 1px solid var(--ion-color-dark);
+}
+
+.vu-label {
+  font-size: 0.8rem;
+  letter-spacing: 1px;
+}
+
+.readout {
+  fill: var(--ion-color-dark);
+  font-size: 7px;
+  text-anchor: start;
+
+  &.clip {
+    fill: var(--ion-color-danger);
+    font-weight: 700;
+  }
+}
+
+.brand {
+  fill: var(--ion-color-dark);
+  font-size: 4px;
+  font-weight: 400;
+  letter-spacing: 0.3em;
+  text-anchor: middle;
+}
+
+.unit {
+  fill: var(--ion-color-dark);
+  font-size: 12px;
+  font-weight: 700;
+  text-anchor: middle;
+}
+
+.end-mark {
+  font-size: 10px;
+}
+
+.scale.inner {
+  stroke-width: 1;
+}
+
+.tick-label.small {
+  font-size: 5px;
+}
+
+.peak-text {
+  fill: var(--ion-color-dark);
+  font-size: 5px;
+  letter-spacing: 0.15em;
+  text-anchor: middle;
+}
+
+.lamp {
+  fill: #5a1212;
+  stroke: var(--ion-color-dark);
+  stroke-width: 0.6;
+
+  &.on {
+    fill: #ff2a2a;
+  }
+}
+
+.lamp-glow {
+  fill: #ff2a2a;
+  opacity: 0;
+  filter: blur(3px);
+  transition: opacity 0.1s;
+
+  &.on {
+    opacity: 0.8;
+  }
+}
+
+.readout.rms {
+  text-anchor: end;
+}

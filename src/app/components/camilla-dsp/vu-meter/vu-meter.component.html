@@ -1,0 +1,29 @@
+<div class="vu" role="img" [attr.aria-label]="label + ' level ' + (rms | number:'1.0-1') + ' dB RMS, peak ' + (peak | number:'1.0-1') + ' dB'">
+    <svg viewBox="0 6 200 126" class="vu-face">
+        <rect x="0" y="6" width="200" height="126" class="dial" />
+        <path [attr.d]="scalePath" class="scale" />
+        <path [attr.d]="redPath" class="scale red" />
+        <path [attr.d]="innerPath" class="scale inner" />
+        <ng-container *ngFor="let tick of ticks">
+            <line [attr.x1]="tick.x1" [attr.y1]="tick.y1" [attr.x2]="tick.x2" [attr.y2]="tick.y2"
+                class="tick" [class.red]="tick.red" />
+            <text [attr.x]="tick.labelX" [attr.y]="tick.labelY" class="tick-label" [class.red]="tick.red">{{ tick.label }}</text>
+        </ng-container>
+        <ng-container *ngFor="let tick of innerTicks">
+            <line [attr.x1]="tick.x1" [attr.y1]="tick.y1" [attr.x2]="tick.x2" [attr.y2]="tick.y2" class="tick" />
+            <text [attr.x]="tick.labelX" [attr.y]="tick.labelY" class="tick-label small">{{ tick.label }}</text>
+        </ng-container>
+        <text x="100" y="97" class="brand">BEATNIK</text>
+        <text x="100" y="108" class="unit">dBFS</text>
+        <text x="176" y="34" class="peak-text">PEAK</text>
+        <circle cx="176" cy="20" r="9" class="lamp-glow" [class.on]="isClipping" />
+        <circle cx="176" cy="20" r="4.5" class="lamp" [class.on]="isClipping" />
+        <text x="8" y="124" class="readout" [class.clip]="isClipping">Peak {{ peakText }} dB</text>
+        <text x="192" y="124" class="readout rms">RMS {{ rmsText }} dB</text>
+        <g class="needle" [style.transform]="'rotate(' + needleAngle + 'deg)'">
+            <line [attr.x1]="pivotX" [attr.y1]="pivotY" [attr.x2]="pivotX" [attr.y2]="pivotY - 92" />
+        </g>
+        <path [attr.d]="coverPath" class="cover" />
+    </svg>
+    <ion-text class="ion-padding-top vu-label">{{ label }}</ion-text>
+</div>

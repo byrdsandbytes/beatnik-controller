@@ -1,0 +1,89 @@
+<ion-list-header color="light">
+  <ion-label>Update</ion-label>
+  <ion-toggle class="expert-toggle" [checked]="expert" (ionChange)="toggleExpert()">Expert</ion-toggle>
+</ion-list-header>
+
+<ion-card *ngIf="!expert" color="primary" class="mx-3 my-3">
+  <ion-item color="primary" lines="none">
+    <ion-icon slot="start" [name]="simpleIcon" color="light"></ion-icon>
+    <ion-label class="ion-text-wrap">
+      <h2>{{ simpleTitle }}</h2>
+      <p>{{ simpleSubtitle }}</p>
+    </ion-label>
+  </ion-item>
+
+  <ion-progress-bar *ngIf="overview?.busy || offline" type="indeterminate" color="light"></ion-progress-bar>
+
+  <ion-item *ngIf="error" color="primary" lines="none">
+    <ion-note color="light" class="ion-text-wrap">{{ error }}</ion-note>
+  </ion-item>
+
+  <div class="ion-padding">
+    <ion-button expand="block" color="light" [disabled]="!overview || overview.busy || offline" (click)="start('all')">
+      {{ overview?.busy ? 'Updating…' : 'Update now' }}
+    </ion-button>
+    <ion-button expand="block" fill="clear" color="light" size="small" [disabled]="overview?.busy || offline"
+      (click)="refresh()">
+      Check again
+    </ion-button>
+  </div>
+</ion-card>
+
+<ng-container *ngIf="expert">
+  <ion-card color="primary" class="mx-3 my-3">
+    <ion-item color="primary">
+      <ion-input label="Host" labelPlacement="stacked" [(ngModel)]="host" [readonly]="lockHost"></ion-input>
+    </ion-item>
+
+    <ion-item *ngIf="error" color="primary" lines="none">
+      <ion-note color="light" class="ion-text-wrap">{{ error }}</ion-note>
+    </ion-item>
+    <ion-item *ngIf="message" color="primary" lines="none">
+      <ion-note color="light" class="ion-text-wrap">{{ message }}</ion-note>
+    </ion-item>
+    <ion-item *ngIf="offline" color="primary" lines="none">
+      <ion-note color="light" class="ion-text-wrap">API is restarting, waiting for it to come back…</ion-note>
+    </ion-item>
+
+    <div class="ion-padding">
+      <ion-button size="small" fill="outline" color="light" (click)="refresh()">Refresh</ion-button>
+      <ng-container *ngIf="overview">
+        <ion-button *ngFor="let t of targets" size="small" color="light" [disabled]="overview.busy" (click)="start(t)">
+          Update {{ t }}
+        </ion-button>
+      </ng-container>
+    </div>
+  </ion-card>
+
+  <ion-card *ngIf="overview" color="primary" class="mx-3 my-3">
+    <ion-card-header class="pb-1">
+      <ion-card-subtitle>{{ overview.busy ? 'Update running…' : 'Idle' }}</ion-card-subtitle>
+    </ion-card-header>
+    <ion-item *ngFor="let s of overview.targets" color="primary">
+      <ion-label class="ion-text-wrap">
+        <h3>{{ s.target }}</h3>
+        <p *ngIf="s.message">{{ s.message }}</p>
+        <p *ngIf="s.startedAt">Started {{ s.startedAt }}</p>
+        <p *ngIf="s.finishedAt">Finished {{ s.finishedAt }}</p>
+        <pre *ngIf="s.output" class="output">{{ s.output }}</pre>
+      </ion-label>
+      <ion-note slot="end" color="light">{{ s.state }}</ion-note>
+    </ion-item>
+  </ion-card>
+
+  <ion-card *ngIf="versions.length" color="primary" class="mx-3 my-3">
+    <ion-card-header class="pb-1">
+      <ion-card-subtitle>Installed versions</ion-card-subtitle>
+    </ion-card-header>
+    <ion-item *ngFor="let version of versions" color="primary">
+      <ion-label class="ion-text-wrap">
+        <h3>{{ version.target }}</h3>
+        <p *ngIf="version.image">{{ version.image }}</p>
+        <p *ngIf="version.imageId">{{ version.imageId }}</p>
+      </ion-label>
+      <ion-note slot="end" color="light">
+        {{ version.installed ? (version.version || 'unknown') : 'not installed' }}
+      </ion-note>
+    </ion-item>
+  </ion-card>
+</ng-container>

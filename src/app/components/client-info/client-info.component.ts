@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
 import { Preferences } from '@capacitor/preferences';
 import { firstValueFrom, Observable } from 'rxjs';
 import { SUPPORTED_HATS } from 'src/app/constant/hat.constant';
@@ -19,12 +19,18 @@ import { ChooseSpeakersComponent } from '../choose-speakers/choose-speakers.comp
   styleUrls: ['./client-info.component.scss'],
   standalone: false
 })
-export class ClientInfoComponent implements OnInit {
+export class ClientInfoComponent implements OnInit, OnChanges {
+  // Optional Snapcast view of the device (only available when it is known to the Snapcast server)
   @Input() client?: Client;
+  // IP or hostname of the device; enough on its own to use everything except the Snapcast-only parts
+  @Input() host?: string;
 
   serverState?: Observable<SnapCastServerStatusResponse>;
-  segment: 'details' | 'soundcard' | 'camilla-dsp' | 'settings' = 'camilla-dsp';
-  hardwareStatus$: Observable<HardwareStatus>;
+  segment: 'details' | 'soundcard' | 'camilla-dsp' | 'settings' | 'update' = 'camilla-dsp';
+  deviceHost = '';
+  hardwareStatus?: HardwareStatus;
+  hardwareLoading = false;
+  hardwareError = '';
   systemInfo$?: Observable<SystemInfo>;
   hats = Object.values(SUPPORTED_HATS);
   camillaDspUrl: string = '';
@@ -46,45 +52,42 @@ export class ClientInfoComponent implements OnInit {
 
   async ngOnInit() {
     this.serverState = this.snapcastService.state$;
-    this.camillaDspUrl = await this.getCamillaDspUrl();
+    await this.loadDevice();
+  }
+
+  async ngOnChanges(changes: SimpleChanges) {
+    if (changes['host'] || changes['client']) {
+      await this.loadDevice();
+    }
+  }
+
+  // Reloads everything that depends on the device address, but only when that address actually changed
+  private async loadDevice() {
+    const host = await this.getUrl();
+    if (!host) {
+      this.deviceHost = '';
+      this.camillaDspUrl = '';
+      return;
+    }
+    if (host === this.deviceHost) {
+      return;
+    }
+    this.deviceHost = host;
+    this.camillaDspUrl = `ws://${host}:1234`;
     this.getHardwareInfo();
     this.getSystemInfo();
     this.refreshSnapcastStatus();
   }
 
-
-
-
-  async getCamillaDspUrl(): Promise<string> {
-    if (!this.client) {
-      console.error('Client Info Component: No client available to get Camilla DSP URL');
-      return '';
-    }
-    var ipAddress = this.cleanIpAddress(this.client.host.ip);
-    // if ip adress is 127.0.0.1 or localhost, it's the client running on the server so we get the server ip from user preferences
-    if (ipAddress === '127.0.0.1' || ipAddress === '172.18.0.1' || ipAddress === 'localhost') {
-      await Preferences.get({ key: UserPreference.SERVER_URL }).then((result) => {
-        ipAddress = result.value;
-      });
-      console.log('Client Info Component: Using server IP address for Camilla DSP URL:', ipAddress);
-    }
-    return `ws://${ipAddress}:1234`;
-  }
-
+  // Resolves the address of the device: explicit host first, otherwise the Snapcast client's IP
   async getUrl(): Promise<string> {
-    if (!this.client) {
-      console.error('Client Info Component: No client available to get Camilla DSP URL');
-      return '';
+    let address = this.host?.trim() || (this.client ? this.cleanIpAddress(this.client.host.ip) : '');
+    // The client running on the server itself reports a local address, so use the configured server instead
+    if (address === '127.0.0.1' || address === '172.18.0.1' || address === 'localhost') {
+      const result = await Preferences.get({ key: UserPreference.SERVER_URL });
+      address = result.value ?? '';
     }
-    var ipAddress = this.cleanIpAddress(this.client.host.ip);
-    // if ip adress is 127.0.0.1 or localhost, it's the client running on the server so we get the server ip from user preferences
-    if (ipAddress === '127.0.0.1' || ipAddress === 'localhost') {
-      await Preferences.get({ key: UserPreference.SERVER_URL }).then((result) => {
-        ipAddress = result.value;
-      });
-      console.log('Client Info Component: Using server IP address for Camilla DSP URL:', ipAddress);
-    }
-    return ipAddress;
+    return address;
   }
 
 
@@ -93,41 +96,54 @@ export class ClientInfoComponent implements OnInit {
   }
 
   async getHardwareInfo() {
-    if (!this.client) {
-      console.error('Client Info Component: No client available to get hardware info');
+    const localHostName = await this.getUrl();
+    if (!localHostName) {
       return;
     }
-    const localHostName = await this.getUrl();
 
-    this.hardwareStatus$ = this.beatnikHardwareService.getStatus(localHostName);
-    this.hardwareStatus$.subscribe({
+    this.hardwareLoading = true;
+    this.hardwareError = '';
+    this.beatnikHardwareService.getStatus(localHostName).subscribe({
       next: (status) => {
-        console.log(`Client Info Component: Hardware status for client ${this.client?.id}:`, status);
+        console.log(`Client Info Component: Hardware status for ${localHostName}:`, status);
+        this.hardwareStatus = status;
+        this.hardwareLoading = false;
       },
       error: (err) => {
-        console.error(`Client Info Component: Failed to get hardware status for client ${this.client?.id}`, err);
+        console.error(`Client Info Component: Failed to get hardware status for ${localHostName}`, err);
+        this.hardwareStatus = undefined;
+        this.hardwareLoading = false;
+        this.hardwareError = this.describeHttpError(err, localHostName);
       }
     });
+  }
+
+  private describeHttpError(err: any, host: string): string {
+    if (err?.status === 0 || err?.name === 'TimeoutError') {
+      return `Can't reach the Beatnik device at ${host}. Check that it is powered on, on the same network, and that the Beatnik API is running.`;
+    }
+    const detail = err?.error?.error ?? err?.error?.message;
+    return `The device answered with an error (${err?.status ?? 'unknown'})${detail ? `: ${detail}` : '.'}`;
   }
 
 
   async openSoundcardPicker() {
     console.log('Open Soundcard Picker for client:', this.client?.id);
     // Here you would typically open a modal to select soundcards
-    const hardwareStatus = await firstValueFrom(this.hardwareStatus$);
+    const currentId = this.hardwareStatus?.currentConfig?.id ?? '';
     const modal = await this.modalController.create({
       component: SoundcardPickerComponent,
       id: 'soundcard-picker-modal',
       componentProps: {
         clientId: this.client?.id,
-        selectedHatId: hardwareStatus.currentConfig.id || ''
+        selectedHatId: currentId
       }
     });
     await modal.present();
 
     const { data } = await modal.onDidDismiss();
     if (data && data.selectedHatId) {
-      if (hardwareStatus.currentConfig.id === data.selectedHatId) {
+      if (currentId === data.selectedHatId) {
         console.log('Client Info Component: Selected hat is the same as current configuration, no changes needed');
         return;
       } else {
@@ -167,12 +183,11 @@ export class ClientInfoComponent implements OnInit {
 
 
   async applySoundcardConfig(hatId: string) {
-    if (!this.client) {
-      console.error('Client Info Component: No client available to apply hardware configuration');
+    const localHostName = await this.getUrl();
+    if (!localHostName) {
       return;
     }
-    console.log(`Client Info Component: Applying hardware configuration ${hatId} to client ${this.client.id}`);
-    const localHostName = await this.getUrl();
+    console.log(`Client Info Component: Applying hardware configuration ${hatId} to ${localHostName}`);
     this.beatnikHardwareService.applyConfiguration(hatId, localHostName).subscribe({
       next: (response) => {
         console.log(`Client Info Component: Successfully applied hardware configuration ${hatId} to client ${this.client?.id}`, response);
@@ -181,16 +196,18 @@ export class ClientInfoComponent implements OnInit {
           console.log('Client Info Component: Reboot required. Triggering reboot...');
           this.beatnikHardwareService.reboot(localHostName).subscribe({
             next: () => {
-              console.log(`Client Info Component: Successfully triggered reboot for client ${this.client?.id}`);
+              console.log(`Client Info Component: Successfully triggered reboot for ${localHostName}`);
             },
             error: (err) => {
-              console.error(`Client Info Component: Failed to trigger reboot for client ${this.client?.id}`, err);
+              console.error(`Client Info Component: Failed to trigger reboot for ${localHostName}`, err);
+              this.presentToast('Configuration applied, but the reboot could not be triggered. Please reboot the device manually.', 'warning');
             }
           });
         }
       },
       error: (err) => {
         console.error(`Client Info Component: Failed to apply hardware configuration ${hatId} to client ${this.client?.id}`, err);
+        this.presentToast(`Could not apply the soundcard configuration. ${this.describeHttpError(err, localHostName)}`, 'danger');
       }
     });
   }
@@ -223,19 +240,18 @@ export class ClientInfoComponent implements OnInit {
   }
 
   async disableSnapcastServer() {
-    if (!this.client) {
-      console.error('Client Info Component: No client available to disable Snapcast server');
+    const localHostName = await this.getUrl();
+    if (!localHostName) {
       return;
     }
     this.isLoading['disableSnapcast'] = true;
-    const localHostName = this.client.host.name + '.local';
     try {
       const response = await firstValueFrom(this.beatnikSnapcastService.disable(localHostName));
-      console.log(`Client Info Component: Disabled Snapcast server for client ${this.client.id}:`, response);
+      console.log(`Client Info Component: Disabled Snapcast server for ${localHostName}:`, response);
       this.snapcastServerStatus = response;
       this.presentToast('Snapcast Server Disabled', 'success');
     } catch (error) {
-      console.error(`Client Info Component: Failed to disable Snapcast server for client ${this.client.id}`, error);
+      console.error(`Client Info Component: Failed to disable Snapcast server for ${localHostName}`, error);
       this.presentToast('Failed to Disable Snapcast', 'danger');
     } finally {
       this.isLoading['disableSnapcast'] = false;
@@ -243,19 +259,18 @@ export class ClientInfoComponent implements OnInit {
   }
 
   async enableSnapcastServer() {
-    if (!this.client) {
-      console.error('Client Info Component: No client available to enable Snapcast server');
+    const localHostName = await this.getUrl();
+    if (!localHostName) {
       return;
     }
     this.isLoading['enableSnapcast'] = true;
-    const localHostName = this.client.host.name + '.local';
     try {
       const response = await firstValueFrom(this.beatnikSnapcastService.enable(localHostName));
-      console.log(`Client Info Component: Enabled Snapcast server for client ${this.client.id}:`, response);
+      console.log(`Client Info Component: Enabled Snapcast server for ${localHostName}:`, response);
       this.snapcastServerStatus = response;
       this.presentToast('Snapcast Server Enabled', 'success');
     } catch (error) {
-      console.error(`Client Info Component: Failed to enable Snapcast server for client ${this.client.id}`, error);
+      console.error(`Client Info Component: Failed to enable Snapcast server for ${localHostName}`, error);
       this.presentToast('Failed to Enable Snapcast', 'danger');
     } finally {
       this.isLoading['enableSnapcast'] = false;
@@ -263,40 +278,38 @@ export class ClientInfoComponent implements OnInit {
   }
 
   async refreshSnapcastStatus() {
-    if (!this.client) {
-      console.error('Client Info Component: No client available to refresh Snapcast status');
+    const localHostName = await this.getUrl();
+    if (!localHostName) {
       return;
     }
     this.isLoading['refreshSnapcast'] = true;
-    const localHostName = this.client.host.name + '.local';
     try {
       const status = await firstValueFrom(this.beatnikSnapcastService.getStatus(localHostName));
-      console.log(`Client Info Component: Snapcast status for client ${this.client.id}:`, status);
+      console.log(`Client Info Component: Snapcast status for ${localHostName}:`, status);
       this.snapcastServerStatus = { ...status, success: true, message: 'Status retrieved successfully' };
       // this.presentToast('Snapcast Status Refreshed', 'success');
     } catch (error) {
-      console.error(`Client Info Component: Failed to get Snapcast status for client ${this.client.id}`, error);
+      console.error(`Client Info Component: Failed to get Snapcast status for ${localHostName}`, error);
       this.presentToast('Failed to Refresh Snapcast Status', 'danger');
     } finally {
       this.isLoading['refreshSnapcast'] = false;
     }
   }
 
-  rebootDevice() {
-    if (!this.client) {
-      console.error('Client Info Component: No client available to reboot');
+  async rebootDevice() {
+    const localHostName = await this.getUrl();
+    if (!localHostName) {
       return;
     }
     this.isLoading['reboot'] = true;
-    const localHostName = this.client.host.name + '.local';
     this.beatnikHardwareService.reboot(localHostName).subscribe({
       next: () => {
-        console.log(`Client Info Component: Successfully triggered reboot for client ${this.client?.id}`);
+        console.log(`Client Info Component: Successfully triggered reboot for ${localHostName}`);
         this.isLoading['reboot'] = false;
         this.presentToast('Device Reboot Initiated', 'success');
       },
       error: (err) => {
-        console.error(`Client Info Component: Failed to trigger reboot for client ${this.client?.id}`, err);
+        console.error(`Client Info Component: Failed to trigger reboot for ${localHostName}`, err);
         this.isLoading['reboot'] = false;
         this.presentToast('Failed to Reboot Device', 'danger');
       }
@@ -324,9 +337,9 @@ export class ClientInfoComponent implements OnInit {
   }
 
   async getSystemInfo() {
-    if (!this.client) return;
-    this.isLoading['systemInfo'] = true;
     const localHostName = await this.getUrl();
+    if (!localHostName) return;
+    this.isLoading['systemInfo'] = true;
     this.systemInfo$ = this.beatnikSystemService.getInfo(localHostName);
     this.systemInfo$.subscribe({
       next: (info) => {
@@ -342,9 +355,9 @@ export class ClientInfoComponent implements OnInit {
   }
 
   async restartSnapcastServer() {
-    if (!this.client) return;
-    this.isLoading['restartSnapcast'] = true;
     const localHostName = await this.getUrl();
+    if (!localHostName) return;
+    this.isLoading['restartSnapcast'] = true;
     this.beatnikSnapcastService.restartServer(localHostName).subscribe({
       next: (response) => {
         console.log('Successfully restarted Snapcast server:', response);
@@ -361,9 +374,9 @@ export class ClientInfoComponent implements OnInit {
   }
 
   async restartSnapcastClient() {
-    if (!this.client) return;
-    this.isLoading['restartSnapcastClient'] = true;
     const localHostName = await this.getUrl();
+    if (!localHostName) return;
+    this.isLoading['restartSnapcastClient'] = true;
     this.beatnikSnapcastService.restartClient(localHostName).subscribe({
       next: (response) => {
         console.log('Successfully restarted Snapcast client:', response);

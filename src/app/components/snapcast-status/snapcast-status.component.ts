@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, ChangeDetectionStrategy } from '@angular/core';
+import { Component, HostListener, OnInit, OnDestroy, ChangeDetectionStrategy } from '@angular/core';
 import { Observable, Subscription, EMPTY, firstValueFrom } from 'rxjs';
 import { catchError, first, tap } from 'rxjs/operators';
 import { SnapcastService } from 'src/app/services/snapcast.service'; // Adjust path
@@ -7,6 +7,7 @@ import { BeatnikHardwareService } from 'src/app/services/beatnik-hardware.servic
 import { UserPreference } from 'src/app/enum/user-preference.enum';
 import { Preferences } from '@capacitor/preferences';
 import { AlertController, ToastController } from '@ionic/angular';
+import { SwiperOptions } from 'swiper';
 import { BeatnikSnapcastService } from 'src/app/services/beatnik-snapcast.service';
 
 @Component({
@@ -21,6 +22,24 @@ export class SnapcastStatusComponent implements OnInit, OnDestroy {
   displayState?: Observable<SnapCastServerStatusResponse | null>;
   isLoading: { [key: string]: boolean } = {};
   serverUrl: string = '';
+  treeSwiperConfig: SwiperOptions = {
+    slidesPerView: 6,
+    spaceBetween: 0,
+  };
+  readonly maxTreeSlides = 6;
+  readonly maxTreeSlidesMobile = 1.8;
+  screenWidth = window.innerWidth;
+
+  @HostListener('window:resize')
+  onResize(): void {
+    this.screenWidth = window.innerWidth;
+  }
+
+  swiperConfig: SwiperOptions = {
+    slidesPerView: 3,
+    spaceBetween: 10,
+    breakpoints: { 768: { slidesPerView: 2.2 }, 1024: { slidesPerView: 3.2 } },
+  };
 
   private subscriptions = new Subscription();
 
@@ -34,8 +53,8 @@ export class SnapcastStatusComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    this.displayState = this.snapcastService.state$
-
+    this.displayState = this.snapcastService.state$;
+    Preferences.get({ key: UserPreference.SERVER_URL }).then(r => this.serverUrl = r.value ?? '');
   }
 
   getClientStats(state: SnapCastServerStatusResponse): { total: number, online: number, offline: number } {
@@ -103,13 +122,27 @@ export class SnapcastStatusComponent implements OnInit, OnDestroy {
     await this.rebootClients();
   }
 
-  // async formatIpAddress(ip: string): Promise<string> {
-  //   // Rebooted client ::ffff:192.168.1.114
-  //   if (ip.startsWith("::ffff:")) {
-  //     return ip.substring(7);
-  //   }
-  //   return ip;
-  // }
+  // Up to 6 columns (1.8 on small screens); fewer groups share the full width
+  getTreeSlidesPerView(groupCount: number): number {
+    const max = this.screenWidth < 768 ? this.maxTreeSlidesMobile : this.maxTreeSlides;
+    return Math.max(1, Math.min(groupCount, max));
+  }
+
+  formatLastSeen(client: Client): string {
+    if (client.connected) return 'Now';
+    const ms = client.lastSeen?.sec ? client.lastSeen.sec * 1000 : 0;
+    if (!ms) return 'Unknown';
+    const diffMin = Math.floor((Date.now() - ms) / 60000);
+    if (diffMin < 1) return 'Just now';
+    if (diffMin < 60) return `${diffMin} min ago`;
+    if (diffMin < 1440) return `${Math.floor(diffMin / 60)} h ago`;
+    return new Date(ms).toLocaleString();
+  }
+
+  // Snapcast reports IPv4-mapped IPv6 addresses, e.g. ::ffff:192.168.1.114
+  formatIpAddress(ip: string): string {
+    return ip?.replace(/^::ffff:/i, '') ?? '';
+  }
 
   async rebootDevice(ip: string): Promise<void> {
 

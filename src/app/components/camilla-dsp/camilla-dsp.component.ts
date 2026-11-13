@@ -1,8 +1,20 @@
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { Preferences } from '@capacitor/preferences';
 import { Subscription } from 'rxjs';
-import { CamillaDspConfig, MixerSource, SignalLevels } from 'src/app/model/camilla-dsp.model';
+import { UserPreference } from 'src/app/enum/user-preference.enum';
+import { CamillaDspConfig, MixerSource, Processor, SignalLevels } from 'src/app/model/camilla-dsp.model';
 import { BeatnikHardwareService } from 'src/app/services/beatnik-hardware.service';
 import { CamillaDspService, ConnectionStatus } from 'src/app/services/camilla-dsp.service';
+
+interface ProcessorControl {
+    key: string;
+    label: string;
+    unit: string;
+    min: number;
+    max: number;
+    step: number;
+    digits: string;
+}
 
 @Component({
     selector: 'app-camilla-dsp',
@@ -32,13 +44,121 @@ export class CamillaDspComponent implements OnInit, OnDestroy {
     isSavingCamillaConfig = false;
     camillaConfigMessage = '';
     camillaConfigError = '';
+    isConfigPickerOpen = false;
+    configSearchTerm = '';
+    meterStyle: 'bars' | 'vu' = 'bars';
+    controlStyle: 'lines' | 'rotary' = 'lines';
+    private processorSendTimer?: ReturnType<typeof setTimeout>;
+    private configTimer?: ReturnType<typeof setTimeout>;
+    configTimedOut = false;
+    private readonly CONFIG_TIMEOUT_MS = 8000;
+
+    readonly dynamicsControls: ProcessorControl[] = [
+        { key: 'threshold', label: 'Threshold', unit: 'dB', min: -60, max: 0, step: 0.5, digits: '1.0-1' },
+        { key: 'factor', label: 'Ratio', unit: ':1', min: 1, max: 20, step: 0.1, digits: '1.0-1' },
+        { key: 'attack', label: 'Attack', unit: 's', min: 0.001, max: 1, step: 0.001, digits: '1.0-3' },
+        { key: 'release', label: 'Release', unit: 's', min: 0.01, max: 2, step: 0.01, digits: '1.0-2' }
+    ];
+
+    readonly outputControls: ProcessorControl[] = [
+        { key: 'makeup_gain', label: 'Makeup gain', unit: 'dB', min: 0, max: 24, step: 0.5, digits: '1.0-1' }
+    ];
+
+    readonly clipLimitControl: ProcessorControl =
+        { key: 'clip_limit', label: 'Clip limit', unit: 'dB', min: -24, max: 0, step: 0.5, digits: '1.0-1' };
+
+    get filteredCamillaConfigs(): string[] {
+        const searchTerm = this.configSearchTerm.trim().toLowerCase();
+        return this.availableCamillaConfigs.filter(config => config.toLowerCase().includes(searchTerm));
+    }
 
     constructor(
         private camillaService: CamillaDspService,
         private beatnikHardwareService: BeatnikHardwareService
     ) { }
 
+    async onMeterStyleChange(style: string | number | undefined) {
+        if (style !== 'bars' && style !== 'vu') {
+            return;
+        }
+
+        this.meterStyle = style;
+        await Preferences.set({ key: UserPreference.SIGNAL_METER_STYLE, value: style });
+    }
+
+    async onControlStyleChange(style: string | number | undefined) {
+        if (style !== 'lines' && style !== 'rotary') {
+            return;
+        }
+
+        this.controlStyle = style;
+        await Preferences.set({ key: UserPreference.CONTROL_STYLE, value: style });
+    }
+
+    private async loadStylePreferences() {
+        const meter = await Preferences.get({ key: UserPreference.SIGNAL_METER_STYLE });
+        if (meter.value === 'bars' || meter.value === 'vu') {
+            this.meterStyle = meter.value;
+        }
+
+        const control = await Preferences.get({ key: UserPreference.CONTROL_STYLE });
+        if (control.value === 'lines' || control.value === 'rotary') {
+            this.controlStyle = control.value;
+        }
+    }
+
+    get isWaitingForDevice(): boolean {
+        return this.connectionStatus === 'Connecting'
+            || (this.connectionStatus === 'Connected' && !this.parsedConfig && !this.configTimedOut);
+    }
+
+    get connectionProblem(): { title: string; message: string; hints: string[] } | null {
+        if (this.connectionStatus === 'Error') {
+            return {
+                title: 'CamillaDSP not reachable',
+                message: `No answer from ${this.url}. Trying again every few seconds.`,
+                hints: ['Check that the device is on and on the same network.']
+            };
+        }
+        if (this.connectionStatus === 'Disconnected') {
+            return {
+                title: 'Not connected',
+                message: 'Levels and controls are unavailable until CamillaDSP is connected again.',
+                hints: []
+            };
+        }
+        if (this.configTimedOut) {
+            return {
+                title: 'No configuration received',
+                message: 'Connected, but CamillaDSP has not sent a configuration. You can pick one under "Advanced CamillaDSP Config".',
+                hints: []
+            };
+        }
+        return null;
+    }
+
+    retryConnection() {
+        this.configTimedOut = false;
+        this.camillaService.reconnect(this.url);
+    }
+
+    private startConfigTimer() {
+        this.clearConfigTimer();
+        this.configTimedOut = false;
+        this.configTimer = setTimeout(() => {
+            if (!this.parsedConfig) {
+                this.configTimedOut = true;
+            }
+        }, this.CONFIG_TIMEOUT_MS);
+    }
+
+    private clearConfigTimer() {
+        clearTimeout(this.configTimer);
+        this.configTimer = undefined;
+    }
+
     async ngOnInit() {
+        this.loadStylePreferences();
         this.loadCamillaConfigState();
         this.connect();
         // Subscribe to connection status changes
@@ -47,9 +167,15 @@ export class CamillaDspComponent implements OnInit, OnDestroy {
                 this.connectionStatus = status;
                 if (status === 'Connected') {
                     // Fetch initial state and config upon connection
+                    this.startConfigTimer();
                     this.getConfigJson();
                     this.getCaptureSignalLevels();
-
+                } else {
+                    // Drop stale data so the UI never shows controls that cannot reach the device
+                    this.clearConfigTimer();
+                    this.configTimedOut = false;
+                    this.levels = null;
+                    this.parsedConfig = null;
                 }
 
             })
@@ -68,12 +194,11 @@ export class CamillaDspComponent implements OnInit, OnDestroy {
                         this.configJson = JSON.parse(this.configJson);
                         console.log('Parsed Config JSON:', this.configJson);
                         this.parsedConfig = this.configJson;
+                        this.clearConfigTimer();
+                        this.configTimedOut = false;
                     } catch (error) {
                         console.error('Error parsing Config JSON:', error);
                     }
-                } else if (message.GetSignalLevels) {
-                    // this.levels = message.GetSignalLevels.value;
-                    // console.log('Signal Levels received:', this.levels);
                 } else if (message.GetVolume) {
                     this.currentVolume = message.GetVolume.value;
                 }
@@ -154,6 +279,24 @@ export class CamillaDspComponent implements OnInit, OnDestroy {
         if (!this.selectedCamillaConfig && this.availableCamillaConfigs.length > 0) {
             this.selectedCamillaConfig = this.availableCamillaConfigs[0];
         }
+    }
+
+    openConfigPicker() {
+        this.configSearchTerm = '';
+        this.isConfigPickerOpen = true;
+    }
+
+    closeConfigPicker() {
+        this.isConfigPickerOpen = false;
+    }
+
+    selectCamillaConfig(config: string) {
+        if (this.isLoadingCamillaConfigs || this.isSavingCamillaConfig) {
+            return;
+        }
+
+        this.selectedCamillaConfig = config;
+        this.closeConfigPicker();
     }
 
     saveDefaultCamillaConfig() {
@@ -250,7 +393,7 @@ export class CamillaDspComponent implements OnInit, OnDestroy {
     }
 
     getCaptureSignalLevels() {
-        // Use the server-side push mechanism instead of polling
+        // CamillaDSP has no push; the service polls one request at a time
         this.camillaService.startLevelUpdates(50);
     }
 
@@ -268,9 +411,30 @@ export class CamillaDspComponent implements OnInit, OnDestroy {
     }
 
     ngOnDestroy() {
+        clearTimeout(this.processorSendTimer);
+        this.clearConfigTimer();
         // Disconnect before unsubscribing so no late message/status update fires after teardown
         this.camillaService.disconnect();
         this.subscriptions.unsubscribe();
+    }
+
+    getProcessorParam(processor: Processor, paramKey: string): any {
+        return (processor.parameters as any)[paramKey];
+    }
+
+    formatChannels(channels: number | number[] | null | undefined): string {
+        if (channels === null || channels === undefined) {
+            return 'All';
+        }
+
+        return Array.isArray(channels) ? channels.join(', ') : String(channels);
+    }
+
+    onProcessorNumberChange(processorKey: string, paramKey: string, rawValue: unknown) {
+        const value = typeof rawValue === 'number' ? rawValue : parseFloat(String(rawValue));
+        if (Number.isFinite(value)) {
+            this.updateProcessorParameter(processorKey, paramKey, value);
+        }
     }
 
     updateProcessorParameter(processorKey: string, paramKey: string, newValue: any) {
@@ -285,16 +449,18 @@ export class CamillaDspComponent implements OnInit, OnDestroy {
             return;
         }
 
-        // Update the parameter locally
+        if (this.getProcessorParam(processor, paramKey) === newValue) {
+            return;
+        }
+
         (processor.parameters as any)[paramKey] = newValue;
 
-        // format the conffigJson to send to CamillaDSP
-        console.log('Updated processor parameter:', processorKey, paramKey, newValue);
-        console.log('Updated configuration to send:', this.parsedConfig);
-
-        // send the full configJson back to CamillaDSP
-        this.camillaService.sendCommand('SetConfigJson', JSON.stringify(this.parsedConfig));
-    }   
+        // Applying a config restarts the pipeline, so wait until dragging settles
+        clearTimeout(this.processorSendTimer);
+        this.processorSendTimer = setTimeout(() => {
+            this.camillaService.sendCommand('SetConfigJson', JSON.stringify(this.parsedConfig));
+        }, 250);
+    }
 
    
 }
