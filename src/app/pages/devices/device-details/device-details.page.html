@@ -27,24 +27,31 @@
           </div>
         </div>
         <ion-card color="primary">
-          <ng-container *ngFor="let stream of state.server.streams" class="ion-padding-top" lines="none" color="dark">
-            <ion-item *ngIf="stream.id === group.stream_id && stream.properties.metadata" color="primary">
+          <ng-container *ngFor="let stream of state.server.streams">
+            <ion-item *ngIf="group && stream.id === group.stream_id" color="primary" lines="none">
               <ion-thumbnail slot="start">
-                <img *ngIf="stream.properties.metadata.artData as artData"
-                  [src]="convertCoverDataBase64(artData.data, artData.extension)" alt="cover image">
+                <img *ngIf="stream.properties?.metadata?.artData as artData; else noBase64"
+                  [src]="convertCoverDataBase64(artData.data, artData.extension)"
+                  (error)="onCoverImageError($event)" alt="cover image">
+                <ng-template #noBase64>
+                  <img *ngIf="stream.properties?.metadata?.artUrl as artUrl; else noArtUrl" [src]="artUrl"
+                    (error)="onCoverImageError($event)" alt="cover image">
+                  <ng-template #noArtUrl>
+                    <img [src]="'assets/placeholder/cover_art_placeholder.svg'" alt="Placeholder Image">
+                  </ng-template>
+                </ng-template>
               </ion-thumbnail>
-              <ion-label *ngIf="stream.properties.metadata">
-                <p>{{stream.id}}</p>
-                <h2> {{ stream.properties.metadata.title }}</h2>
-                <p>{{ stream.properties.metadata.artist }}</p>
-
+              <ion-label>
+                <p>{{ stream.id }}</p>
+                <h2>{{ stream.properties?.metadata?.title || 'Unknown Title' }}</h2>
+                <p>{{ stream.properties?.metadata?.artist || 'Unknown Artist' }}</p>
               </ion-label>
             </ion-item>
           </ng-container>
           <ion-item color="primary">
             <ion-label>Stream</ion-label>
-            <ion-select (ionChange)="changeStream(group.stream_id)" slot="end" interface="action-sheet"
-              [(ngModel)]="group.stream_id" placeholder="Select Stream">
+            <ion-select (ionChange)="changeStream($event.detail.value)" slot="end" interface="action-sheet"
+              [value]="group.stream_id" placeholder="Select Stream">
               <ion-select-option *ngFor="let stream of state.server.streams" [value]="stream.id">
                 {{ stream.id }}
               </ion-select-option>

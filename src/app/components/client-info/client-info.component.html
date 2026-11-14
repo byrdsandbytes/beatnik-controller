@@ -86,10 +86,10 @@
           <h2>{{ networkQuality.signalLevel }} dBm</h2>
           <p class="small-note">Signal Level</p>
         </div>
-        <div class="col-6 col-lg-3" *ngIf="networkQuality.noiseLevel !== null">
+        <!-- <div class="col-6 col-lg-3" *ngIf="networkQuality.noiseLevel !== null">
           <h2>{{ networkQuality.noiseLevel }} dBm</h2>
           <p class="small-note">Noise Level</p>
-        </div>
+        </div> -->
       </ng-container>
 
     </div>
@@ -169,12 +169,12 @@
 
         <ng-container *ngIf="hardwareStatus.currentConfig; else noConfig">
           <hr />
-          <h3>Config Status </h3>
-          <img [src]="'assets/soundcards/' + hardwareStatus.currentConfig.id + '.webp'" #myImage
+          <!-- <h3>Config Status </h3> -->
+          <img class="soundcard-img" [src]="'assets/soundcards/' + hardwareStatus.currentConfig.id + '.webp'" #myImage
             (error)="myImage.src = 'assets/placeholder/audio_board_placeholder.webp'" />
           <p>Name: {{ hardwareStatus.currentConfig.name}}</p>
           <p>Id: {{ hardwareStatus.currentConfig.id}}</p>
-          <p>isMatched: {{ hardwareStatus.isMatch}}</p>
+          <!-- <p>isMatched: {{ hardwareStatus.isMatch}}</p> -->
         </ng-container>
         <ion-button expand="full" color="primary" [disabled]="!hardwareStatus" (click)="openSoundcardPicker()">
           <ion-icon name="create" slot="start"></ion-icon>

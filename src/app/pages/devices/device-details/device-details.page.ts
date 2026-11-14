@@ -100,6 +100,10 @@ export class DeviceDetailsPage implements OnInit {
   }
 
   changeStream(streamId: string): void {
+    // ionChange also fires when the value is updated from server state
+    if (!streamId || streamId === this.group?.stream_id) {
+      return;
+    }
     if (!this.id) {
       console.error('DeviceDetailsPage: No ID available to change stream');
       return;

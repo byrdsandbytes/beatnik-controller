@@ -1,3 +1,14 @@
+<ng-container *ngIf="minimal; else fullPreview">
+  <ion-card class="mini-card" color="light" (click)="onCardClick()" (pointerdown)="onPressStart()"
+    (pointerup)="cancelPress()" (pointerleave)="cancelPress()" (pointercancel)="cancelPress()"
+    (contextmenu)="$event.preventDefault()">
+    <img [src]="coverSrc" class="mini-cover" alt="Album Art">
+    <!-- <img [src]="activeSpeaker?.image || 'assets/speakers/img/Beatnik_Generic_Black.webp'" class="mini-speaker"
+      alt="Speaker"> -->
+  </ion-card>
+</ng-container>
+
+<ng-template #fullPreview>
 <ion-card class="card ion-text-center" color="light" (click)="onCardClick()" (pointerdown)="onPressStart()" (pointerup)="cancelPress()"
   (pointerleave)="cancelPress()" (pointercancel)="cancelPress()" (contextmenu)="$event.preventDefault()">
   <div class="img-container">
@@ -94,3 +105,4 @@
     </ion-card-content>
   </ng-template>
 </ion-card>
+</ng-template>

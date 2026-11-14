@@ -15,6 +15,8 @@ export class SnapcastGroupPreviewComponent implements OnInit, OnChanges {
   @Input() group?: Group;
   @Input() streams?: Stream[] | null;
   @Input() speakerData?: Speaker[] | null;
+  /** Thumbnail mode: only album art and speaker picture */
+  @Input() minimal = false;
 
   @Output() longPress = new EventEmitter<Group>();
 
@@ -50,6 +52,14 @@ export class SnapcastGroupPreviewComponent implements OnInit, OnChanges {
     }
     this.activeStream = this.getStreamById(this.group.stream_id);
     return this.activeStream;
+  }
+
+  get coverSrc(): string {
+    const metadata = this.activeStream?.properties?.metadata;
+    if (metadata?.artData) {
+      return this.convertCoverDataBase64(metadata.artData.data, metadata.artData.extension);
+    }
+    return metadata?.artUrl || 'assets/placeholder/cover_art_placeholder.svg';
   }
 
   onPressStart(): void {
