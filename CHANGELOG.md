@@ -1,8 +1,27 @@
 # Changelog
 ## [Unreleased]
 
+## [0.8.0] - 2026-11-13
+
+### Added
+- Add server status screen with usage info
+- Add signal level visuals (VU meter, gauge) with user-selectable style
+- Add rotary and key logic demo
+- Add per-client device updating
+- Make client info accessible from zeroconf page
+
+### Changed
+- Move signal level to its own component
+- Outsource and restyle range slider
+- Adapt to Apple's new BLE permission system
+- Adapt to new mdns plugin version
+- Refactor update logic
+- Use color variables and reduce console logging
+
 ### Fixed
-- BLE Connection issues on iOS
+- Fix BLE connection issues on iOS
+- Fix iOS build issues
+- Add error handling on server status screen
 
 
 
