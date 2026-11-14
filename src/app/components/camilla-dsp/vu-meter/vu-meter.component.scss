@@ -18,12 +18,12 @@
 }
 
 .dial {
-  fill: var(--ion-color-light);
+  fill: var(--ion-color-primary-contrast);
 }
 
 .scale {
   fill: none;
-  stroke: var(--ion-color-dark);
+  stroke: var(--ion-color-primary);
   stroke-width: 2;
 
   &.red {
@@ -33,7 +33,7 @@
 }
 
 .tick {
-  stroke: var(--ion-color-dark);
+  stroke: var(--ion-color-primary);
   stroke-width: 1.5;
 
   &.red {
@@ -42,7 +42,7 @@
 }
 
 .tick-label {
-  fill: var(--ion-color-dark);
+  fill: var(--ion-color-primary);
   font-size: 7px;
   text-anchor: middle;
   dominant-baseline: middle;
@@ -57,16 +57,16 @@
   transition: transform 0.06s linear;
 
   line {
-    stroke: var(--ion-color-dark);
+    stroke: var(--ion-color-primary);
     stroke-width: 1.2;
     stroke-linecap: round;
   }
 }
 
 .cover {
-  fill: var(--ion-color-dark);
+  fill: var(--ion-color-primary);
   border-radius: 4px;
-  border: 1px solid var(--ion-color-dark);
+  border: 1px solid var(--ion-color-primary);
 }
 
 .vu-label {
@@ -75,7 +75,7 @@
 }
 
 .readout {
-  fill: var(--ion-color-dark);
+  fill: var(--ion-color-primary);
   font-size: 7px;
   text-anchor: start;
 
@@ -86,7 +86,7 @@
 }
 
 .brand {
-  fill: var(--ion-color-dark);
+  fill: var(--ion-color-primary);
   font-size: 4px;
   font-weight: 400;
   letter-spacing: 0.3em;
@@ -94,7 +94,7 @@
 }
 
 .unit {
-  fill: var(--ion-color-dark);
+  fill: var(--ion-color-primary);
   font-size: 12px;
   font-weight: 700;
   text-anchor: middle;
@@ -113,7 +113,7 @@
 }
 
 .peak-text {
-  fill: var(--ion-color-dark);
+  fill: var(--ion-color-primary);
   font-size: 5px;
   letter-spacing: 0.15em;
   text-anchor: middle;
@@ -121,7 +121,7 @@
 
 .lamp {
   fill: #5a1212;
-  stroke: var(--ion-color-dark);
+  stroke: var(--ion-color-primary);
   stroke-width: 0.6;
 
   &.on {

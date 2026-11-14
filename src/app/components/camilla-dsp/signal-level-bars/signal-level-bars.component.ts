@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, HostBinding, Input } from '@angular/core';
 import { SignalLevels } from '../../../model/camilla-dsp.model';
+import { levelColor } from '../visuals/level-utils';
 
 interface MeterGroup {
   title: string;
@@ -28,6 +29,9 @@ export class SignalLevelBarsComponent {
       { title: 'Playback', rms: levels.playback_rms, peak: levels.playback_peak }
     ] : [];
   }
+
+  // same zones as the bars: green below -18 dB, yellow from -18 dB, red from -6 dB
+  color = levelColor;
 
   trackByTitle(_: number, group: MeterGroup): string {
     return group.title;

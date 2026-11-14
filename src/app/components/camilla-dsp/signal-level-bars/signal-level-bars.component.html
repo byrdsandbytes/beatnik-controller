@@ -10,14 +10,14 @@
             <div class="meter-track">
               <div class="meter-bar" [style.height.%]="barHeight(group.rms[i])"></div>
             </div>
-            <span class="db-label">{{ group.rms[i] | number:'2.2-2' }}</span>
+            <span class="db-label" [style.color]="color(group.rms[i])">{{ group.rms[i] | number:'2.2-2' }}</span>
           </div>
           <div class="meter-column">
             <span class="type-label">Peak</span>
             <div class="meter-track">
               <div class="meter-bar peak" [style.height.%]="barHeight(group.peak[i])"></div>
             </div>
-            <span class="db-label">{{ group.peak[i] | number:'2.2-2' }}</span>
+            <span class="db-label" [style.color]="color(group.peak[i])">{{ group.peak[i] | number:'2.2-2' }}</span>
           </div>
         </div>
       </div>

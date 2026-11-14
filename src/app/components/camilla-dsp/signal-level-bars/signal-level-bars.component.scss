@@ -1,8 +1,11 @@
 :host {
   display: block;
+  --track-height: 220px;
 }
 
 :host(.kiosk) {
+  --track-height: 55vh;
+
   .meters-container {
     min-height: 100%;
     align-items: center;
@@ -10,7 +13,7 @@
   }
 
   .meter-track {
-    height: 55vh;
+    height: var(--track-height);
     width: 36px;
   }
 
@@ -73,7 +76,7 @@
 .meter-track {
   position: relative;
   width: 20px;
-  height: 220px;
+  height: var(--track-height);
   background-color: #1a1a1a;
   border: 1px solid #333;
   border-radius: 2px;
@@ -104,19 +107,18 @@
 
 .meter-bar {
   width: 100%;
-  /* Retro LED Colors: Green -> Yellow -> Red */
+  // Gradient is sized to the full track, so only segments above -18 dB (yellow) and -6 dB (red) change colour
   background: linear-gradient(
     to top,
-    #35ff35 0%,
-    #35ff35 60%,
-    #ffcc00 60%,
-    #ffcc00 85%,
-    #ff3333 85%,
-    #ff3333 100%
-  );
+    var(--ion-color-success) 0,
+    var(--ion-color-success) 74.5%,
+    var(--ion-color-warning) 74.5%,
+    var(--ion-color-warning) 85.5%,
+    var(--ion-color-danger) 85.5%,
+    var(--ion-color-danger) 100%
+  ) bottom / 100% var(--track-height) no-repeat;
   transition: height 0.05s linear;
   min-height: 0px;
-  box-shadow: 0 0 8px rgba(53, 255, 53, 0.4); /* Subtle ambient glow */
   border-radius: 1px 1px 0 0;
 }
 
@@ -127,8 +129,6 @@
 
 .db-label {
   font-size: 0.7rem;
-  color: #35ff35; /* Digital green text */
-  text-shadow: 0 0 3px rgba(53, 255, 53, 0.6);
   margin-top: 4px;
   font-weight: bold;
   min-width: 7ch;
