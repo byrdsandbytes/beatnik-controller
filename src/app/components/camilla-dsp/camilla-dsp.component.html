@@ -17,7 +17,8 @@
 
 <div class="row g-0">
     <div class="col col-12 col-lg-12">
-        <div *ngIf="levels" class="meters-section">
+        <div *ngIf="levels" class="meters-section" [class.kiosk]="kiosk"
+            (dblclick)="onMetersDoubleClick($event)">
             <ion-list-header color="primary">
                 <ion-label>
                     Signal Levels
@@ -67,7 +68,7 @@
                 </div>
             </ion-card>
 
-            <app-signal-level-bars *ngIf="meterStyle === 'bars'" [levels]="levels"></app-signal-level-bars>
+            <app-signal-level-bars *ngIf="meterStyle === 'bars'" [levels]="levels" [kiosk]="kiosk"></app-signal-level-bars>
         </div>
     </div>
     <div class="col col-12 col-lg-6">

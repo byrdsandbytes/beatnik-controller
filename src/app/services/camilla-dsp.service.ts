@@ -23,6 +23,8 @@ export class CamillaDspService implements OnDestroy {
   private messagesSubject = new Subject<any>();
   private connectionStatusSubject = new BehaviorSubject<ConnectionStatus>('Disconnected');
   private readonly RECONNECT_INTERVAL_MS = 5000;
+  // Ionic keeps previous pages alive, so several components can share this one connection
+  private consumers = 0;
 
   // Public observables for components to subscribe to
   public messages$: Observable<any> = this.messagesSubject.asObservable();
@@ -187,6 +189,20 @@ export class CamillaDspService implements OnDestroy {
       return;
     }
     this.levelTimer = setTimeout(() => this.pollLevels(), this.levelPollingMs);
+  }
+
+  /** Connects (if needed) on behalf of a component; pair every call with release(). */
+  public acquire(url: string): void {
+    this.consumers++;
+    this.connect(url);
+  }
+
+  /** Drops one consumer and closes the connection once nobody uses it anymore. */
+  public release(): void {
+    this.consumers = Math.max(0, this.consumers - 1);
+    if (this.consumers === 0) {
+      this.disconnect();
+    }
   }
 
   /**

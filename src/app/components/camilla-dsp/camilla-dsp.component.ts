@@ -1,5 +1,6 @@
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { Preferences } from '@capacitor/preferences';
+import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { UserPreference } from 'src/app/enum/user-preference.enum';
 import { CamillaDspConfig, MixerSource, Processor, SignalLevels } from 'src/app/model/camilla-dsp.model';
@@ -28,6 +29,9 @@ export class CamillaDspComponent implements OnInit, OnDestroy {
 
     // 'linein' manages the preamp CamillaDSP configs instead of the playback ones
     @Input() mode: 'playback' | 'linein' = 'playback';
+
+    // fullscreen page: same panels, larger meters
+    @Input() kiosk = false;
 
     connectionStatus: ConnectionStatus = 'Disconnected';
     lastMessage: any = { message: 'No messages received yet.' };
@@ -67,6 +71,14 @@ export class CamillaDspComponent implements OnInit, OnDestroy {
     readonly clipLimitControl: ProcessorControl =
         { key: 'clip_limit', label: 'Clip limit', unit: 'dB', min: -24, max: 0, step: 0.5, digits: '1.0-1' };
 
+    onMetersDoubleClick(event: MouseEvent): void {
+        // the style segment is clickable, so a double tap there must not open kiosk mode
+        if (this.kiosk || (event.target as HTMLElement).closest('ion-segment')) {
+            return;
+        }
+        this.router.navigate(['/full-scrren-dsp'], { queryParams: { url: this.url } });
+    }
+
     get filteredCamillaConfigs(): string[] {
         const searchTerm = this.configSearchTerm.trim().toLowerCase();
         return this.availableCamillaConfigs.filter(config => config.toLowerCase().includes(searchTerm));
@@ -74,7 +86,8 @@ export class CamillaDspComponent implements OnInit, OnDestroy {
 
     constructor(
         private camillaService: CamillaDspService,
-        private beatnikHardwareService: BeatnikHardwareService
+        private beatnikHardwareService: BeatnikHardwareService,
+        private router: Router
     ) { }
 
     async onMeterStyleChange(style: string | number | undefined) {
@@ -160,7 +173,7 @@ export class CamillaDspComponent implements OnInit, OnDestroy {
     async ngOnInit() {
         this.loadStylePreferences();
         this.loadCamillaConfigState();
-        this.connect();
+        this.camillaService.acquire(this.url);
         // Subscribe to connection status changes
         this.subscriptions.add(
             this.camillaService.connectionStatus$.subscribe(status => {
@@ -413,8 +426,8 @@ export class CamillaDspComponent implements OnInit, OnDestroy {
     ngOnDestroy() {
         clearTimeout(this.processorSendTimer);
         this.clearConfigTimer();
-        // Disconnect before unsubscribing so no late message/status update fires after teardown
-        this.camillaService.disconnect();
+        // Release before unsubscribing so no late message/status update fires after teardown
+        this.camillaService.release();
         this.subscriptions.unsubscribe();
     }
 

@@ -1,11 +1,32 @@
 <ion-header [translucent]="true">
 
-  <ion-toolbar>
+  <ion-toolbar color="light">
     <ion-buttons slot="start">
       <ion-back-button defaultHref="/tabs/devices" text="Back"></ion-back-button>
     </ion-buttons>
     <ion-title>Device Details
     </ion-title>
+    <ion-buttons slot="end">
+      <ion-button id="device-menu-trigger">
+        <ion-icon name="ellipsis-vertical"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-popover trigger="device-menu-trigger" triggerAction="click" dismissOnSelect="true">
+      <ng-template>
+        <ion-content>
+          <ion-list lines="none">
+            <ion-item button detail="false" (click)="openCamillaDspFullscreen()">
+              <ion-icon name="pulse-outline" slot="start"></ion-icon>
+              <ion-label>CamillaDSP Fullscreen</ion-label>
+            </ion-item>
+            <ion-item button detail="false" (click)="chooseSpeakers(group)">
+              <ion-icon name="musical-notes-outline" slot="start"></ion-icon>
+              <ion-label>Choose Speakers</ion-label>
+            </ion-item>
+          </ion-list>
+        </ion-content>
+      </ng-template>
+    </ion-popover>
   </ion-toolbar>
 </ion-header>
 <ion-content [fullscreen]="true">

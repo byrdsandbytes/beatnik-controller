@@ -2,6 +2,27 @@
   display: block;
 }
 
+:host(.kiosk) {
+  .meters-container {
+    min-height: 100%;
+    align-items: center;
+    margin: 0;
+  }
+
+  .meter-track {
+    height: 55vh;
+    width: 36px;
+  }
+
+  .meter-column {
+    width: 72px;
+  }
+
+  .db-label {
+    font-size: 1.1rem;
+  }
+}
+
 .meters-container {
   display: flex;
   flex-wrap: wrap;

@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Speaker } from 'src/app/model/speaker.model';
 import { ModalController } from '@ionic/angular';
 import { ChooseSpeakersComponent } from 'src/app/components/choose-speakers/choose-speakers.component';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Observable } from 'rxjs';
 import { Client, Group, SnapCastServerStatusResponse, Stream } from 'src/app/model/snapcast.model';
 import { CoverDataService } from 'src/app/services/cover-data.service';
@@ -30,7 +30,8 @@ export class DeviceDetailsPage implements OnInit {
     private snapcastService: SnapcastService,
     private coverDateService: CoverDataService,
     private http: HttpClient,
-    private modalController: ModalController
+    private modalController: ModalController,
+    private router: Router
   ) { }
 
   async ionViewWillEnter() {
@@ -69,6 +70,15 @@ export class DeviceDetailsPage implements OnInit {
       next: (response) => this.speakerData = response.speakers,
       error: (error) => console.error('DeviceDetailsPage: Error loading speaker data', error)
     });
+  }
+
+  openCamillaDspFullscreen(): void {
+    const ip = this.group?.clients[0]?.host.ip?.replace(/^::ffff:/i, '');
+    if (!ip) {
+      console.error('DeviceDetailsPage: No client address available for CamillaDSP');
+      return;
+    }
+    this.router.navigate(['/full-scrren-dsp'], { queryParams: { url: `ws://${ip}:1234` } });
   }
 
   async chooseSpeakers(group: Group) {
