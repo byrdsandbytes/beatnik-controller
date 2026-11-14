@@ -2,14 +2,14 @@
 
 ion-card {
   box-shadow: none;
-  border: 1px solid var(--ion-color-light);
+  border: 1px solid var(--ion-background-color);
   
 }
 
 ion-list-header {
   border-radius: 8px 8px 0 0;
 
-  border: 1px solid var(--ion-color-light);
+  border: 1px solid var(--ion-background-color);
 }
 
 
@@ -58,27 +58,42 @@ ion-item ion-note {
   padding-bottom: 4px;
 }
 
+/* Headers with a segment: title on its own row, segment full width below */
+ion-list-header:has(.meter-style-segment) {
+  flex-wrap: wrap;
+  row-gap: 8px;
+  padding-top: 12px;
+  padding-bottom: 12px;
+  min-height: 0;
+}
+
 /* Segments (used on dark headers): clear active state */
 .meter-style-segment {
+  // flex: 1 0 100%;
   max-width: 100%;
   min-height: 32px;
   --background: transparent;
+
+  // border: 1px solid var(--ion-color-light);
+}
+
+.meter-toolbar {
   border: 1px solid var(--ion-color-light);
 }
 
 .meter-style-segment ion-segment-button {
-  --color: var(--ion-color-light);
-  --color-checked: var(--ion-color-primary);
-  --indicator-color: var(--ion-color-light);
-  --background-checked: var(--ion-color-light);
-  --border-radius: 0;
-  min-height: 30px;
-  margin: 0;
+  // --color: var(--ion-color-light);
+  // --color-checked: var(--ion-color-primary);
+  // --indicator-color: var(--ion-color-light);
+  // --background-checked: var(--ion-color-light);
+  // --border-radius: 0;
+  // min-height: 30px;
+  // margin: 0;
 }
 
 .meter-style-segment ion-segment-button::part(indicator-background) {
-  border-radius: 0;
-  box-shadow: none;
+  // border-radius: 0;
+  // box-shadow: none;
 }
 
 .meter-style-segment ion-label {

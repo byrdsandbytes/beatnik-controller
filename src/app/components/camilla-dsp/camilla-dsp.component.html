@@ -23,7 +23,9 @@
                 <ion-label>
                     Signal Levels
                 </ion-label>
-                <ion-segment class="meter-style-segment" [scrollable]="true" [value]="meterStyle"
+            </ion-list-header>
+            <ion-toolbar class="meter-toolbar" color="primary">
+                <ion-segment  class="meter-style-segment" [scrollable]="true" [value]="meterStyle"
                     (ionChange)="onMeterStyleChange($event.detail.value)">
                     <ion-segment-button value="bars">
                         <ion-label>Bars</ion-label>
@@ -47,7 +49,7 @@
                         <ion-label>Drivers</ion-label>
                     </ion-segment-button>
                 </ion-segment>
-            </ion-list-header>
+            </ion-toolbar>
 
             <ion-card color="dark" *ngIf="meterStyle === 'vu'" class="ion-no-margin">
                 <div class="container-fluid py-2">
@@ -99,6 +101,8 @@
                 <ion-label>
                     Master
                 </ion-label>
+            </ion-list-header>
+            <ion-toolbar class="meter-toolbar" color="primary">
                 <ion-segment class="meter-style-segment" [value]="controlStyle"
                     (ionChange)="onControlStyleChange($event.detail.value)">
                     <ion-segment-button value="lines">
@@ -108,7 +112,7 @@
                         <ion-label>Rotary</ion-label>
                     </ion-segment-button>
                 </ion-segment>
-            </ion-list-header>
+            </ion-toolbar>
             <ion-card color="primary" class="ion-no-margin">
 
                 <ion-item lines="none" color="primary">

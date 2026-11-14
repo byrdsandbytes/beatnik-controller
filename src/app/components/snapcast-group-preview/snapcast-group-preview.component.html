@@ -1,5 +1,5 @@
 <ng-container *ngIf="minimal; else fullPreview">
-  <ion-card class="mini-card" color="light" (click)="onCardClick()" (pointerdown)="onPressStart()"
+  <ion-card class="mini-card"  (click)="onCardClick()" (pointerdown)="onPressStart()"
     (pointerup)="cancelPress()" (pointerleave)="cancelPress()" (pointercancel)="cancelPress()"
     (contextmenu)="$event.preventDefault()">
     <img [src]="coverSrc" class="mini-cover" alt="Album Art">
@@ -9,7 +9,7 @@
 </ng-container>
 
 <ng-template #fullPreview>
-<ion-card class="card ion-text-center" color="light" (click)="onCardClick()" (pointerdown)="onPressStart()" (pointerup)="cancelPress()"
+<ion-card class="card ion-text-center"  (click)="onCardClick()" (pointerdown)="onPressStart()" (pointerup)="cancelPress()"
   (pointerleave)="cancelPress()" (pointercancel)="cancelPress()" (contextmenu)="$event.preventDefault()">
   <div class="img-container">
     <ng-container *ngIf="activeSpeaker else defaultImage">
