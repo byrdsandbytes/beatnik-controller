@@ -23,13 +23,28 @@
                 <ion-label>
                     Signal Levels
                 </ion-label>
-                <ion-segment class="meter-style-segment" [value]="meterStyle"
+                <ion-segment class="meter-style-segment" [scrollable]="true" [value]="meterStyle"
                     (ionChange)="onMeterStyleChange($event.detail.value)">
                     <ion-segment-button value="bars">
                         <ion-label>Bars</ion-label>
                     </ion-segment-button>
                     <ion-segment-button value="vu">
                         <ion-label>Gauge</ion-label>
+                    </ion-segment-button>
+                    <ion-segment-button value="headroom">
+                        <ion-label>Headroom</ion-label>
+                    </ion-segment-button>
+                    <ion-segment-button value="balance">
+                        <ion-label>Balance</ion-label>
+                    </ion-segment-button>
+                    <ion-segment-button value="timeline">
+                        <ion-label>Timeline</ion-label>
+                    </ion-segment-button>
+                    <ion-segment-button value="rings">
+                        <ion-label>Rings</ion-label>
+                    </ion-segment-button>
+                    <ion-segment-button value="drivers">
+                        <ion-label>Drivers</ion-label>
                     </ion-segment-button>
                 </ion-segment>
             </ion-list-header>
@@ -69,6 +84,13 @@
             </ion-card>
 
             <app-signal-level-bars *ngIf="meterStyle === 'bars'" [levels]="levels" [kiosk]="kiosk"></app-signal-level-bars>
+            <app-headroom-meter *ngIf="meterStyle === 'headroom'" [levels]="levels" [volume]="currentVolume"></app-headroom-meter>
+            <app-stereo-balance *ngIf="meterStyle === 'balance'" [levels]="levels"></app-stereo-balance>
+            <app-loudness-timeline *ngIf="meterStyle === 'timeline'" [levels]="levels"></app-loudness-timeline>
+            <app-radial-gauges *ngIf="meterStyle === 'rings'" [levels]="levels" [volume]="currentVolume"
+                [sampleRate]="health.sampleRate"></app-radial-gauges>
+            <app-driver-map *ngIf="meterStyle === 'drivers'" [levels]="levels"></app-driver-map>
+            <app-dsp-health-strip [health]="health"></app-dsp-health-strip>
         </div>
     </div>
     <div class="col col-12 col-lg-6">

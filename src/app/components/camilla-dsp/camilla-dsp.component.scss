@@ -60,7 +60,7 @@ ion-item ion-note {
 
 /* Segments (used on dark headers): clear active state */
 .meter-style-segment {
-  max-width: 11rem;
+  max-width: 100%;
   min-height: 32px;
   --background: transparent;
   border: 1px solid var(--ion-color-light);

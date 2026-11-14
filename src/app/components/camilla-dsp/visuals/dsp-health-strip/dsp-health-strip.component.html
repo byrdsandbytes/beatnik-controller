@@ -1,0 +1,20 @@
+<div class="strip" *ngIf="health as h">
+  <span class="item" [class.bad]="(h.clippedSamples ?? 0) > 0">
+    <i class="lamp" [class.on]="(h.clippedSamples ?? 0) > 0"></i>
+    <span class="label">Clip</span><span class="value">{{ h.clippedSamples ?? '–' }}</span>
+  </span>
+  <span class="item" [class.warn]="(h.processingLoad ?? 0) > 80" [class.bad]="(h.processingLoad ?? 0) > 95">
+    <i class="lamp" [class.on]="(h.processingLoad ?? 0) > 95" [class.amber]="(h.processingLoad ?? 0) > 80 && (h.processingLoad ?? 0) <= 95"></i>
+    <span class="label">CPU</span>
+    <span class="value">{{ h.processingLoad !== null ? (h.processingLoad | number:'1.0-0') + '%' : '–' }}</span>
+  </span>
+  <span class="item">
+    <i class="lamp ok"></i>
+    <span class="label">Buffer</span><span class="value">{{ h.bufferLevel ?? '–' }}</span>
+  </span>
+  <span class="item">
+    <i class="lamp ok"></i>
+    <span class="label">Rate</span>
+    <span class="value">{{ h.sampleRate ? (h.sampleRate / 1000 | number:'1.0-1') + ' kHz' : '–' }}</span>
+  </span>
+</div>

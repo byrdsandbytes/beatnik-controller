@@ -1,0 +1,25 @@
+<div class="panel">
+  <header class="head">
+    <span class="brand">Beatnik · Loudness</span>
+    <span class="unit">dBFS</span>
+  </header>
+
+  <div class="chart">
+    <div class="axis">
+      <span *ngFor="let t of axis" [style.bottom.%]="t.pos" [class.red]="t.red">{{ t.db }}</span>
+    </div>
+    <svg [attr.viewBox]="'0 0 ' + width + ' ' + height" preserveAspectRatio="none" role="img"
+      aria-label="Loudness over the last minute">
+      <rect x="0" y="0" [attr.width]="width" [attr.height]="redHeight" class="red-zone" />
+      <line *ngFor="let y of gridLines" x1="0" [attr.y1]="y" [attr.x2]="width" [attr.y2]="y" class="grid" />
+      <path [attr.d]="rmsArea" class="rms" />
+      <path [attr.d]="peakLine" class="peak" />
+    </svg>
+  </div>
+
+  <footer class="foot">
+    <span class="caption">−{{ windowSeconds }} s → now</span>
+    <span class="caption">Crest</span>
+    <span class="readout">{{ fmt(crest).replace('+', '') }} dB</span>
+  </footer>
+</div>

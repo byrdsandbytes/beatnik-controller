@@ -1,0 +1,141 @@
+@use '../instrument' as *;
+
+:host {
+  display: block;
+}
+
+.panel {
+  @include face;
+}
+
+.face {
+  display: block;
+  width: 100%;
+  max-width: 460px;
+  margin: 0 auto;
+}
+
+.scale {
+  fill: none;
+  stroke: $ink;
+  stroke-width: 2;
+
+  &.red {
+    stroke: $red;
+    stroke-width: 4;
+  }
+
+  &.inner {
+    stroke-width: 1;
+  }
+}
+
+.spread {
+  fill: none;
+  stroke: $ink;
+  stroke-width: 5;
+  stroke-linecap: butt;
+  transition: d 0.1s linear;
+}
+
+.tick {
+  stroke: $ink;
+  stroke-width: 1.5;
+
+  &.red {
+    stroke: $red;
+  }
+}
+
+.tick-label {
+  fill: $ink;
+  font-size: 7px;
+  text-anchor: middle;
+  dominant-baseline: middle;
+
+  &.red {
+    fill: $red;
+  }
+}
+
+.side {
+  fill: $ink;
+  font-size: 9px;
+  font-weight: 700;
+  text-anchor: middle;
+}
+
+.brand {
+  fill: $ink;
+  font-size: 4px;
+  letter-spacing: 0.3em;
+  text-anchor: middle;
+}
+
+.unit {
+  fill: $ink;
+  font-size: 11px;
+  font-weight: 700;
+  text-anchor: middle;
+}
+
+.sub {
+  fill: $ink;
+  font-size: 4px;
+  letter-spacing: 0.2em;
+  text-anchor: middle;
+}
+
+.readout {
+  fill: $ink;
+  font-family: $mono;
+  font-size: 6px;
+  font-weight: 700;
+
+  &.end {
+    text-anchor: end;
+  }
+}
+
+.needle {
+  transform-origin: 100px 70px;
+  transition: transform 0.1s linear;
+
+  line {
+    stroke: $ink;
+    stroke-width: 1.2;
+    stroke-linecap: round;
+  }
+}
+
+.cover {
+  fill: $ink;
+}
+
+.lamp {
+  fill: #5a1212;
+  stroke: $ink;
+  stroke-width: 0.6;
+
+  &.on {
+    fill: #ff2a2a;
+  }
+}
+
+.lamp-glow {
+  fill: #ff2a2a;
+  opacity: 0;
+  filter: blur(3px);
+  transition: opacity 0.1s;
+
+  &.on {
+    opacity: 0.8;
+  }
+}
+
+.lamp-text {
+  fill: $ink;
+  font-size: 4px;
+  letter-spacing: 0.15em;
+  text-anchor: middle;
+}

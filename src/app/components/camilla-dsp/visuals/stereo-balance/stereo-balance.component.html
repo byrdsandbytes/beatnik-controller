@@ -1,0 +1,29 @@
+<div class="panel">
+  <svg viewBox="0 -30 200 112" class="face" role="img"
+    [attr.aria-label]="'Stereo balance ' + fmt(diff) + ' dB'">
+    <path [attr.d]="scalePath" class="scale" />
+    <path [attr.d]="redLeftPath" class="scale red" />
+    <path [attr.d]="redRightPath" class="scale red" />
+    <path [attr.d]="innerPath" class="scale inner" />
+    <path [attr.d]="spreadPath" class="spread" />
+    <ng-container *ngFor="let tick of ticks">
+      <line [attr.x1]="tick.x1" [attr.y1]="tick.y1" [attr.x2]="tick.x2" [attr.y2]="tick.y2" class="tick"
+        [class.red]="tick.red" />
+      <text [attr.x]="tick.labelX" [attr.y]="tick.labelY" class="tick-label" [class.red]="tick.red">{{ tick.label }}</text>
+    </ng-container>
+    <text x="26" y="44" class="side">L</text>
+    <text x="174" y="44" class="side">R</text>
+    <text x="100" y="30" class="brand">BEATNIK</text>
+    <text x="100" y="45" class="unit">BALANCE</text>
+    <text x="100" y="53" class="sub">L / R  dB</text>
+    <circle cx="176" cy="-16" r="8" class="lamp-glow" [class.on]="imbalanced" />
+    <circle cx="176" cy="-16" r="4" class="lamp" [class.on]="imbalanced" />
+    <text x="176" y="-4" class="lamp-text">IMB</text>
+    <text x="8" y="78" class="readout">BAL {{ fmt(diff) }} dB</text>
+    <text x="192" y="78" class="readout end">SPR {{ fmt(spread) }} dB</text>
+    <g class="needle" [style.transform]="'rotate(' + needleAngle + 'deg)'">
+      <line [attr.x1]="pivotX" [attr.y1]="pivotY" [attr.x2]="pivotX" [attr.y2]="pivotY - needleLength" />
+    </g>
+    <path [attr.d]="coverPath" class="cover" />
+  </svg>
+</div>

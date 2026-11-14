@@ -1,0 +1,88 @@
+@use '../instrument' as *;
+
+:host {
+  display: block;
+}
+
+.panel {
+  @include face;
+}
+
+.head {
+  @include head;
+}
+
+.caption {
+  @include caption;
+}
+
+.readout {
+  @include readout;
+}
+
+.chart {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.axis {
+  position: relative;
+  width: 2rem;
+  font-size: 0.55rem;
+  text-align: right;
+
+  span {
+    position: absolute;
+    right: 0;
+    transform: translateY(50%);
+
+    &.red {
+      color: $red;
+    }
+  }
+}
+
+svg {
+  flex: 1;
+  height: 220px;
+  display: block;
+  border: 1px solid $ink;
+}
+
+.red-zone {
+  fill: $red;
+  fill-opacity: 0.12;
+}
+
+.grid {
+  stroke: $ink;
+  stroke-opacity: 0.3;
+  stroke-width: 1;
+  stroke-dasharray: 2 3;
+  vector-effect: non-scaling-stroke;
+}
+
+.rms {
+  fill: $ink;
+  fill-opacity: 0.35;
+  stroke: none;
+}
+
+.peak {
+  fill: none;
+  stroke: $ink;
+  stroke-width: 1.2;
+  vector-effect: non-scaling-stroke;
+}
+
+.foot {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  align-items: baseline;
+  margin-top: 0.6rem;
+
+  .caption:first-child {
+    flex: 1;
+  }
+}
