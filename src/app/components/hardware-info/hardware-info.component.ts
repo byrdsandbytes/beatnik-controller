@@ -1,6 +1,9 @@
 import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { BeatnikSystemService, SystemInfo } from 'src/app/services/beatnik-system.service';
 
+// Last known info per host, shown immediately on re-open while a fresh copy is fetched
+const systemInfoCache = new Map<string, SystemInfo>();
+
 @Component({
   selector: 'app-hardware-info',
   templateUrl: './hardware-info.component.html',
@@ -19,7 +22,7 @@ export class HardwareInfoComponent implements OnChanges {
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes['host']) {
-      this.systemInfo = undefined;
+      this.systemInfo = systemInfoCache.get(this.host);
       this.load();
     }
   }
@@ -33,6 +36,7 @@ export class HardwareInfoComponent implements OnChanges {
     this.error = '';
     this.beatnikSystemService.getInfo(host).subscribe({
       next: (info) => {
+        systemInfoCache.set(host, info);
         if (host === this.host) {
           this.systemInfo = info;
         }

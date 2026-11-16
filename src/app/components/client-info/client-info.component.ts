@@ -46,6 +46,7 @@ export class ClientInfoComponent implements OnChanges {
 
   hardware: LoadState<HardwareStatus> = { loading: false, error: '' };
   snapcast: LoadState<SnapcastActionResponse> = { loading: false, error: '' };
+  soundcardImageLoaded = false;
   isLoading: Partial<Record<Action, boolean>> = {};
 
   private destroyed = false;
@@ -84,6 +85,7 @@ export class ClientInfoComponent implements OnChanges {
     this.deviceHost = host;
     this.camillaDspUrl = host ? `ws://${host}:${CAMILLA_DSP_PORT}` : '';
     this.hardware = { loading: false, error: '' };
+    this.soundcardImageLoaded = false;
     this.snapcast = { loading: false, error: '' };
     this.loadSegmentData();
   }
@@ -136,6 +138,7 @@ export class ClientInfoComponent implements OnChanges {
     if (!host) {
       return;
     }
+    this.soundcardImageLoaded = false;
     this.hardware = { ...this.hardware, loading: true, error: '' };
     try {
       const data = await this.request(this.beatnikHardwareService.getStatus(host));

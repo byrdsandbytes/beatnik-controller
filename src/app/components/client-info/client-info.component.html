@@ -24,6 +24,8 @@
 </ion-segment>
 <!-- </ion-toolbar> -->
 
+<div class="segment-content">
+
 <ng-container *ngIf="segment === 'details'">
 
   <div class=container>
@@ -109,7 +111,10 @@
 
         <ng-container *ngIf="hardwareStatus.currentConfig as config; else noConfig">
           <hr />
-          <img class="soundcard-img" [src]="'assets/soundcards/' + config.id + '.webp'" #myImage
+          <ion-skeleton-text *ngIf="!soundcardImageLoaded" [animated]="true" class="soundcard-img"
+            style="width: 100%; height: 200px;"></ion-skeleton-text>
+          <img class="soundcard-img" [hidden]="!soundcardImageLoaded" [src]="'assets/soundcards/' + config.id + '.webp'"
+            #myImage (load)="soundcardImageLoaded = true"
             (error)="myImage.src = 'assets/placeholder/audio_board_placeholder.webp'" />
           <p>Name: {{ config.name }}</p>
           <p>Id: {{ config.id }}</p>
@@ -233,9 +238,7 @@
     </ion-item>
   </ng-template>
 </ng-container>
-
-
-
+</div>
 
 <!-- <ion-button expand="full" color="primary" (click)="chooseSpeakers()">
       Choose Speakers

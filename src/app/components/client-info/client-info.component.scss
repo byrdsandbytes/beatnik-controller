@@ -11,3 +11,14 @@ ion-card {
     max-width: 400px;
     height: auto;
 }
+
+// Reserves space so the page doesn't collapse and jump while a tab is swapped
+.segment-content {
+    min-height: 70vh;
+    animation: segment-fade-in 0.2s ease-in;
+}
+
+@keyframes segment-fade-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
