@@ -1,4 +1,4 @@
-import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { Component, Input, OnChanges, OnDestroy, OnInit, SimpleChanges } from '@angular/core';
 import { Preferences } from '@capacitor/preferences';
 import { Router } from '@angular/router';
 import { DspHealth } from './visuals/dsp-health-strip/dsp-health-strip.component';
@@ -26,9 +26,10 @@ const HEALTH_POLL_MS = 1000;
     selector: 'app-camilla-dsp',
     templateUrl: './camilla-dsp.component.html',
     styleUrls: ['./camilla-dsp.component.scss'],
+    providers: [CamillaDspService],
     standalone: false
 })
-export class CamillaDspComponent implements OnInit, OnDestroy {
+export class CamillaDspComponent implements OnInit, OnChanges, OnDestroy {
 
     @Input() url: string = 'ws://beatnik-server.local:1234';
 
@@ -44,6 +45,7 @@ export class CamillaDspComponent implements OnInit, OnDestroy {
     connectionStatus: ConnectionStatus = 'Disconnected';
     lastMessage: any = { message: 'No messages received yet.' };
     private subscriptions = new Subscription();
+    private initialized = false;
     private configJson: any = null;
     parsedConfig: CamillaDspConfig | null = null;
 
@@ -182,6 +184,7 @@ export class CamillaDspComponent implements OnInit, OnDestroy {
         this.loadStylePreferences();
         this.loadCamillaConfigState();
         this.camillaService.acquire(this.url);
+        this.initialized = true;
         // Subscribe to connection status changes
         this.subscriptions.add(
             this.camillaService.connectionStatus$.subscribe(status => {
@@ -236,6 +239,13 @@ export class CamillaDspComponent implements OnInit, OnDestroy {
                 this.levels = levels;
             })
         );
+    }
+
+    ngOnChanges(changes: SimpleChanges): void {
+        if (this.initialized && changes['url'] && !changes['url'].firstChange) {
+            this.camillaService.reconnect(this.url);
+            this.loadCamillaConfigState();
+        }
     }
 
     private getHardwareHost(): string | null {

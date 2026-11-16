@@ -1,7 +1,9 @@
-import { Injectable, OnDestroy } from '@angular/core';
+import { Injectable, NgZone, OnDestroy } from '@angular/core';
+import { App } from '@capacitor/app';
+import { Capacitor, PluginListenerHandle } from '@capacitor/core';
 import { webSocket, WebSocketSubject } from 'rxjs/webSocket';
 import { Subject, Observable, BehaviorSubject, timer, Subscription } from 'rxjs';
-import { retry, filter, map, takeUntil } from 'rxjs/operators';
+import { retry, repeat, filter, map, takeUntil, tap } from 'rxjs/operators';
 
 // Defines the possible connection states
 export type ConnectionStatus = 'Connected' | 'Connecting' | 'Disconnected' | 'Error';
@@ -23,8 +25,14 @@ export class CamillaDspService implements OnDestroy {
   private messagesSubject = new Subject<any>();
   private connectionStatusSubject = new BehaviorSubject<ConnectionStatus>('Disconnected');
   private readonly RECONNECT_INTERVAL_MS = 5000;
-  // Ionic keeps previous pages alive, so several components can share this one connection
+  private readonly CONNECT_TIMEOUT_MS = 10000;
   private consumers = 0;
+  private desiredUrl: string | null = null;
+  private nativeActive = true;
+  private lifecycleGeneration = 0;
+  private lifecycleListener?: PluginListenerHandle;
+  private connectionGeneration = 0;
+  private readonly visibilityListener = () => this.updateAppActivity();
 
   // Public observables for components to subscribe to
   public messages$: Observable<any> = this.messagesSubject.asObservable();
@@ -38,7 +46,7 @@ export class CamillaDspService implements OnDestroy {
   private levelCommand = 'GetSignalLevelsSinceLast';
   private readonly LEVEL_REPLY_TIMEOUT_MS = 1000;
 
-  constructor() {
+  constructor(private zone: NgZone) {
     this.signalLevels$ = this.messages$.pipe(
       map(msg => this.extractLevels(msg)),
       filter((levels): levels is any => !!levels)
@@ -73,11 +81,17 @@ export class CamillaDspService implements OnDestroy {
    * @param url The full WebSocket URL (e.g., 'ws://beatnik-client-amp.local:1234')
    */
   public connect(url: string): void {
+    this.desiredUrl = url;
+    if (!this.isAppActive()) {
+      return;
+    }
     if (this.connectionStatusSubject.value !== 'Disconnected') {
       console.log('CamillaDSP already connected/connecting; ignoring duplicate connect() call.');
       return;
     }
 
+    const generation = ++this.connectionGeneration;
+    let connectWatchdog: ReturnType<typeof setTimeout> | undefined;
     this.connectionStatusSubject.next('Connecting');
     console.log(`Connecting to ${url}...`);
 
@@ -85,28 +99,37 @@ export class CamillaDspService implements OnDestroy {
       url: url,
       openObserver: {
         next: () => {
+          if (generation !== this.connectionGeneration) { return; }
+          clearTimeout(connectWatchdog);
           console.log('WebSocket connection established successfully! 🎉');
           this.connectionStatusSubject.next('Connected');
         },
       },
-      closeObserver: {
-        next: () => {
-          console.log('WebSocket connection closed.');
-          this.connectionStatusSubject.next('Disconnected');
-        },
-      },
     });
 
-    this.pipelineSubscription = this.socket$
+    const socket = this.socket$;
+    this.pipelineSubscription = new Observable<any>(observer => {
+      connectWatchdog = setTimeout(() => {
+        observer.error(new Error(`CamillaDSP connection to ${url} timed out`));
+      }, this.CONNECT_TIMEOUT_MS);
+      const subscription = socket.subscribe(observer);
+      return () => {
+        clearTimeout(connectWatchdog);
+        subscription.unsubscribe();
+      };
+    })
       .pipe(
         // Retries indefinitely with a fixed delay; takeUntil below lets disconnect() cancel it
         retry({
           delay: err => {
             console.error(`Connection error: ${err}. Retrying in ${this.RECONNECT_INTERVAL_MS / 1000}s...`);
-            this.connectionStatusSubject.next('Error');
-            return timer(this.RECONNECT_INTERVAL_MS);
+            return this.retryDelay(generation);
           },
         }),
+        repeat({ delay: () => {
+          console.warn('CamillaDSP connection closed. Retrying...');
+          return this.retryDelay(generation);
+        } }),
         takeUntil(this.stopReconnect$)
       )
       .subscribe({
@@ -116,6 +139,17 @@ export class CamillaDspService implements OnDestroy {
           this.connectionStatusSubject.next('Error');
         },
       });
+  }
+
+  private retryDelay(generation: number): Observable<number> {
+    this.connectionStatusSubject.next('Error');
+    return timer(this.RECONNECT_INTERVAL_MS).pipe(
+      tap(() => {
+        if (generation === this.connectionGeneration) {
+          this.connectionStatusSubject.next('Connecting');
+        }
+      })
+    );
   }
 
   /**
@@ -194,6 +228,9 @@ export class CamillaDspService implements OnDestroy {
   /** Connects (if needed) on behalf of a component; pair every call with release(). */
   public acquire(url: string): void {
     this.consumers++;
+    if (this.consumers === 1) {
+      this.startLifecycleListeners();
+    }
     this.connect(url);
   }
 
@@ -202,6 +239,54 @@ export class CamillaDspService implements OnDestroy {
     this.consumers = Math.max(0, this.consumers - 1);
     if (this.consumers === 0) {
       this.disconnect();
+      this.stopLifecycleListeners();
+    }
+  }
+
+  private isAppActive(): boolean {
+    return this.nativeActive && (typeof document === 'undefined' || !document.hidden);
+  }
+
+  private startLifecycleListeners(): void {
+    if (typeof document !== 'undefined') {
+      document.addEventListener('visibilitychange', this.visibilityListener);
+    }
+    if (Capacitor.isNativePlatform()) {
+      const generation = ++this.lifecycleGeneration;
+      App.addListener('appStateChange', state => this.zone.run(() => {
+        if (generation !== this.lifecycleGeneration) { return; }
+        this.nativeActive = state.isActive;
+        this.updateAppActivity();
+      })).then(handle => {
+        if (generation !== this.lifecycleGeneration) {
+          void handle.remove().catch(error =>
+            console.error('Failed to remove CamillaDSP app lifecycle listener:', error));
+        } else {
+          this.lifecycleListener = handle;
+        }
+      }).catch(error => console.error('Failed to monitor CamillaDSP app lifecycle:', error));
+    }
+  }
+
+  private stopLifecycleListeners(): void {
+    ++this.lifecycleGeneration;
+    if (typeof document !== 'undefined') {
+      document.removeEventListener('visibilitychange', this.visibilityListener);
+    }
+    if (this.lifecycleListener) {
+      void this.lifecycleListener.remove().catch(error =>
+        console.error('Failed to remove CamillaDSP app lifecycle listener:', error));
+      this.lifecycleListener = undefined;
+    }
+    this.nativeActive = true;
+  }
+
+  private updateAppActivity(): void {
+    if (!this.desiredUrl) { return; }
+    if (!this.isAppActive()) {
+      this.stopConnection();
+    } else {
+      this.connect(this.desiredUrl);
     }
   }
 
@@ -209,12 +294,18 @@ export class CamillaDspService implements OnDestroy {
    * Closes the WebSocket connection gracefully and cancels any pending reconnect attempt.
    */
   public disconnect(): void {
+    this.desiredUrl = null;
+    this.stopConnection();
+  }
+
+  private stopConnection(): void {
+    ++this.connectionGeneration;
     this.stopLevelUpdates();
     this.stopReconnect$.next(); // cancel any in-flight retry delay so it doesn't reconnect afterwards
     this.pipelineSubscription?.unsubscribe();
     this.pipelineSubscription = null;
     if (this.socket$ && !this.socket$.closed) {
-      this.socket$.complete(); // This will trigger the closeObserver
+      this.socket$.complete();
     }
     this.socket$ = null;
     this.connectionStatusSubject.next('Disconnected');
@@ -231,6 +322,7 @@ export class CamillaDspService implements OnDestroy {
 
   ngOnDestroy(): void {
     this.disconnect();
+    this.stopLifecycleListeners();
     this.messagesSubject.complete();
     this.connectionStatusSubject.complete();
     this.stopReconnect$.complete();

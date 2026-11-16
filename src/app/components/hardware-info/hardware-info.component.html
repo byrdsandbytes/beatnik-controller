@@ -1,0 +1,81 @@
+<ion-item *ngIf="error" lines="none" color="light">
+  <ion-label class="ion-text-wrap">{{ error }}</ion-label>
+</ion-item>
+
+<div class="row justify-content-center align-items-center ion-text-center" *ngIf="loading && !systemInfo">
+  <div class="col-6 col-lg-3" *ngFor="let _ of skeletonItems">
+    <h2><ion-skeleton-text [animated]="true" class="skeleton-value"></ion-skeleton-text></h2>
+    <p class="small-note"><ion-skeleton-text [animated]="true" class="skeleton-label"></ion-skeleton-text></p>
+  </div>
+</div>
+
+<div class="row justify-content-center align-items-center ion-text-center"
+  *ngIf="systemInfo">
+  <div class="col-6 col-lg-3 ion-text-center" *ngIf="systemInfo.temperature !== null">
+
+    <h2>{{ systemInfo.temperature | number:'1.0-2' }} °C</h2>
+    <p class="small-note">Device Temperature</p>
+
+  </div>
+  <div class="col-6 col-lg-3">
+    <h2>{{ systemInfo.totalRam - systemInfo.freeRam | number:'1.0-2' }} MB</h2>
+    <p class="small-note">RAM in use (of {{systemInfo.totalRam}} MB)</p>
+  </div>
+  <div class="col-6 col-lg-3" *ngIf="systemInfo.hostname">
+    <h2>{{ systemInfo.hostname }}</h2>
+    <p class="small-note">Hostname</p>
+  </div>
+  <div class="col-6 col-lg-3" *ngIf="systemInfo.ipAddresses">
+    <h2 style="font-size: 1.2rem;">
+      <ng-container *ngFor="let ip of systemInfo.ipAddresses">{{ ip }}<br /></ng-container>
+    </h2>
+    <p class="small-note">IP Addresses</p>
+  </div>
+
+  <div class="col-6 col-lg-3" *ngIf="systemInfo.os">
+    <h2>{{ systemInfo.os }}</h2>
+    <p class="small-note">OS</p>
+  </div>
+  <div class="col-6 col-lg-3" *ngIf="systemInfo.model">
+    <h2>{{ systemInfo.model }}</h2>
+    <p class="small-note">Model</p>
+  </div>
+  <div class="col-6 col-lg-3" *ngIf="systemInfo.storageType">
+    <h2>{{ systemInfo.storageType }}</h2>
+    <p class="small-note">Storage Type</p>
+  </div>
+  <div class="col-6 col-lg-3 " *ngIf="systemInfo.macAddress">
+    <h2 style="font-size: 1.2rem;">{{ systemInfo.macAddress }}</h2>
+    <p class="small-note">MAC Address</p>
+  </div>
+
+  <ng-container *ngIf="systemInfo.networkQuality as networkQuality">
+    <div class="col-6 col-lg-3" *ngIf="networkQuality.ssid">
+      <h2>{{ networkQuality.ssid }}</h2>
+      <p class="small-note">Wi-Fi SSID ({{ networkQuality.interface }})</p>
+    </div>
+    <div class="col-6 col-lg-3" *ngIf="networkQuality.band">
+      <h2>{{ networkQuality.band }}</h2>
+      <p class="small-note">Band{{ networkQuality.frequency !== null ? ' (' + networkQuality.frequency + ' MHz)' :
+        '' }}</p>
+    </div>
+    <div class="col-6 col-lg-3" *ngIf="networkQuality.linkQuality !== null">
+      <h2>{{ networkQuality.linkQuality }}%</h2>
+      <p class="small-note">Link Quality</p>
+    </div>
+    <div class="col-6 col-lg-3" *ngIf="networkQuality.signalLevel !== null">
+      <h2>{{ networkQuality.signalLevel }} dBm</h2>
+      <p class="small-note">Signal Level</p>
+    </div>
+    <!-- <div class="col-6 col-lg-3" *ngIf="networkQuality.noiseLevel !== null">
+      <h2>{{ networkQuality.noiseLevel }} dBm</h2>
+      <p class="small-note">Noise Level</p>
+    </div> -->
+  </ng-container>
+
+</div>
+
+<ion-button fill="clear" expand="full" color="primary" (click)="load()" [disabled]="loading">
+  <ion-spinner *ngIf="loading" name="crescent" class="ion-margin-end"></ion-spinner>
+  <u>Refresh System Info</u>
+</ion-button>
