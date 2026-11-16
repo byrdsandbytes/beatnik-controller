@@ -1,0 +1,89 @@
+@use '../instrument' as *;
+
+:host {
+  display: block;
+}
+
+.strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 1.75rem;
+  padding: 0.75rem 1.5rem;
+  background: var(--ion-color-primary);
+  color: #fff;
+  border: 1px solid var(--ion-background-color) ;
+  border-top: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+.item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.label {
+  @include caption;
+  color: #bbb;
+}
+
+.value {
+  @include readout;
+}
+
+.lamp {
+  @include lamp;
+  border-color: #666;
+
+  &.ok {
+    background: #1f7a3a;
+    box-shadow: 0 0 6px 1px rgba(31, 122, 58, 0.7);
+  }
+
+  &.amber {
+    background: #f4c708;
+    box-shadow: 0 0 6px 1px rgba(244, 199, 8, 0.7);
+  }
+}
+
+.bad .value {
+  color: var(--ion-color-danger-tint);
+}
+
+.info {
+  margin-left: auto;
+  padding: 0;
+  display: inline-flex;
+  background: transparent;
+  border: 0;
+  color: #bbb;
+  font-size: 0.95rem;
+  cursor: pointer;
+
+  &:hover {
+    color: #fff;
+  }
+}
+
+.help {
+  padding: 0.75rem 1rem;
+  font-size: 0.75rem;
+  line-height: 1.4;
+
+  h4 {
+    margin: 0 0 0.5rem;
+    font-size: 0.8rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  dt {
+    font-weight: 700;
+    margin-top: 0.4rem;
+  }
+
+  dd {
+    margin: 0;
+    color: var(--ion-color-medium);
+  }
+}

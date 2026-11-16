@@ -1,0 +1,12 @@
+<ion-header [translucent]="true">
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/camilla-dsp"></ion-back-button>
+    </ion-buttons>
+    <ion-title></ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" color="primary">
+  <app-camilla-dsp [url]="url" [kiosk]="true"></app-camilla-dsp>
+</ion-content>

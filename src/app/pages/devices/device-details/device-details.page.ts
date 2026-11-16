@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Speaker } from 'src/app/model/speaker.model';
 import { ModalController } from '@ionic/angular';
 import { ChooseSpeakersComponent } from 'src/app/components/choose-speakers/choose-speakers.component';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Observable } from 'rxjs';
 import { Client, Group, SnapCastServerStatusResponse, Stream } from 'src/app/model/snapcast.model';
 import { CoverDataService } from 'src/app/services/cover-data.service';
@@ -30,7 +30,8 @@ export class DeviceDetailsPage implements OnInit {
     private snapcastService: SnapcastService,
     private coverDateService: CoverDataService,
     private http: HttpClient,
-    private modalController: ModalController
+    private modalController: ModalController,
+    private router: Router
   ) { }
 
   async ionViewWillEnter() {
@@ -71,6 +72,15 @@ export class DeviceDetailsPage implements OnInit {
     });
   }
 
+  openCamillaDspFullscreen(): void {
+    const ip = this.group?.clients[0]?.host.ip?.replace(/^::ffff:/i, '');
+    if (!ip) {
+      console.error('DeviceDetailsPage: No client address available for CamillaDSP');
+      return;
+    }
+    this.router.navigate(['/full-scrren-dsp'], { queryParams: { url: `ws://${ip}:1234` } });
+  }
+
   async chooseSpeakers(group: Group) {
     const modal = await this.modalController.create({
       component: ChooseSpeakersComponent,
@@ -100,6 +110,10 @@ export class DeviceDetailsPage implements OnInit {
   }
 
   changeStream(streamId: string): void {
+    // ionChange also fires when the value is updated from server state
+    if (!streamId || streamId === this.group?.stream_id) {
+      return;
+    }
     if (!this.id) {
       console.error('DeviceDetailsPage: No ID available to change stream');
       return;

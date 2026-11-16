@@ -21,18 +21,18 @@
   outline: none;
 
   &:focus-visible .body {
-    stroke: var(--ion-color-light);
+    stroke: var(--ion-color-primary-contrast);
     stroke-width: 3;
   }
 }
 
 .tick {
-  stroke: var(--ion-color-light);
+  stroke: var(--ion-color-primary-contrast);
   stroke-width: 1.5;
 }
 
 .body {
-  fill: var(--ion-color-dark);
+  fill: var(--ion-color-primary);
   stroke: var(--ion-color-medium);
   stroke-width: 2;
 }
@@ -41,7 +41,7 @@
   transform-origin: 50px 50px;
 
   line {
-    stroke: var(--ion-color-light);
+    stroke: var(--ion-color-primary-contrast);
     stroke-width: 3;
     stroke-linecap: square;
   }

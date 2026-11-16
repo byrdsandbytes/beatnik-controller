@@ -1,3 +1,20 @@
 .bottom-padding {
   height: 160px;
 }
+ion-card-title {
+  font-size: 1.1rem;
+}
+
+.group-card-row {
+  display: flex;
+  align-items: center;
+}
+
+.group-thumb {
+  flex: 0 0 96px;
+}
+
+.group-card-text {
+  flex: 1;
+  min-width: 0;
+}

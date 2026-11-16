@@ -1,0 +1,48 @@
+<div class="panel" *ngIf="levels">
+  <header class="head">
+    <span class="brand">Beatnik · Headroom</span>
+    <span class="unit">dBFS</span>
+  </header>
+
+  <div class="grid-row">
+    <span></span>
+    <div class="ticks">
+      <span class="tick" *ngFor="let t of ticks" [style.left.%]="t.pos" [class.red]="t.red">
+        <i></i>{{ t.db }}
+      </span>
+    </div>
+    <span></span>
+  </div>
+
+  <section class="channel" *ngFor="let row of rows">
+    <div class="meta">
+      <span class="caption">{{ row.name }}</span>
+      <span class="readout">DSP {{ fmt(row.delta) }} dB</span>
+      <span class="readout">HR {{ row.headroom | number:'2.1-1' }} dB</span>
+      <span class="clip"><i class="lamp" [class.on]="row.clipping"></i><span class="caption">Clip</span></span>
+    </div>
+    <div class="grid-row">
+      <span class="caption">In</span>
+      <div class="track">
+        <div class="fill" [style.width.%]="frac(row.inRms) * 100"></div>
+        <div class="fill red" [style.left.%]="redStart" [style.width.%]="redWidth(row.inRms)"></div>
+        <div class="peak" [style.left.%]="frac(row.inPeak) * 100"></div>
+      </div>
+      <span class="readout">{{ fmt(row.inRms) }}</span>
+    </div>
+    <div class="grid-row">
+      <span class="caption">Out</span>
+      <div class="track">
+        <div class="fill" [style.width.%]="frac(row.outRms) * 100"></div>
+        <div class="fill red" [style.left.%]="redStart" [style.width.%]="redWidth(row.outRms)"></div>
+        <div class="peak" [style.left.%]="frac(row.outPeak) * 100"></div>
+      </div>
+      <span class="readout">{{ fmt(row.outRms) }}</span>
+    </div>
+  </section>
+
+  <footer class="foot">
+    <span class="caption">Master</span>
+    <span class="readout">{{ volume | number:'1.1-1' }} dB</span>
+  </footer>
+</div>

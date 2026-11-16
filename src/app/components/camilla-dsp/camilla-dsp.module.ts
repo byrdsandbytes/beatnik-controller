@@ -6,6 +6,12 @@ import { CamillaDspComponent } from './camilla-dsp.component';
 import { VuMeterModule } from './vu-meter/vu-meter.module';
 import { SignalLevelBarsModule } from './signal-level-bars/signal-level-bars-module';
 import { CamillaRangeSliderModule } from './camilla-range-slider/camilla-range-slider-module';
+import { DriverMapModule } from './visuals/driver-map/driver-map.module';
+import { DspHealthStripModule } from './visuals/dsp-health-strip/dsp-health-strip.module';
+import { HeadroomMeterModule } from './visuals/headroom-meter/headroom-meter.module';
+import { LoudnessTimelineModule } from './visuals/loudness-timeline/loudness-timeline.module';
+import { RadialGaugesModule } from './visuals/radial-gauges/radial-gauges.module';
+import { StereoBalanceModule } from './visuals/stereo-balance/stereo-balance.module';
 import { RotaryKnobModule } from './rotary-knob/rotary-knob.module';
 
 @NgModule({
@@ -15,6 +21,12 @@ import { RotaryKnobModule } from './rotary-knob/rotary-knob.module';
     IonicModule,
     VuMeterModule,
     SignalLevelBarsModule,
+    DriverMapModule,
+    DspHealthStripModule,
+    HeadroomMeterModule,
+    LoudnessTimelineModule,
+    RadialGaugesModule,
+    StereoBalanceModule,
     RotaryKnobModule,
     CamillaRangeSliderModule
   ],

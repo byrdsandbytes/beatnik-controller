@@ -1,0 +1,90 @@
+@use '../instrument' as *;
+
+:host {
+  display: block;
+}
+
+.panel {
+  @include face;
+}
+
+.head {
+  @include head;
+}
+
+.caption {
+  @include caption;
+}
+
+.readout {
+  @include readout;
+}
+
+.map {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.25rem;
+  justify-content: center;
+}
+
+figure {
+  margin: 0;
+  width: 130px;
+}
+
+svg {
+  width: 100%;
+  display: block;
+}
+
+.plate {
+  fill: none;
+  stroke: $ink;
+  stroke-width: 1;
+}
+
+.screw {
+  fill: none;
+  stroke: $ink;
+  stroke-width: 0.8;
+}
+
+.surround {
+  fill: none;
+  stroke: $ink;
+  stroke-width: 2;
+}
+
+.cone {
+  fill: $ink;
+  stroke: $ink;
+  stroke-width: 1;
+  transition: fill-opacity 0.1s linear;
+}
+
+.ring {
+  fill: none;
+  stroke: $ink;
+  stroke-width: 0.8;
+}
+
+.cap {
+  fill: $ink;
+  stroke: $ink;
+  stroke-width: 1;
+  transition: fill-opacity 0.1s linear;
+}
+
+figcaption {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.4rem;
+  margin-top: 0.4rem;
+  padding-top: 0.3rem;
+  border-top: 1px solid $ink;
+}
+
+.lamp {
+  @include lamp;
+}

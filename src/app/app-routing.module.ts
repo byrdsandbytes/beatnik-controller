@@ -110,6 +110,10 @@ const routes: Routes = [
     path: 'beatnik-update',
     loadChildren: () => import('./pages/beatnik-update/beatnik-update.module').then( m => m.BeatnikUpdatePageModule)
   },
+  {
+    path: 'full-scrren-dsp',
+    loadChildren: () => import('./pages/full-scrren-dsp/full-scrren-dsp.module').then( m => m.FullScrrenDspPageModule)
+  },
 
 
 ];

@@ -1,5 +1,7 @@
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { Preferences } from '@capacitor/preferences';
+import { Router } from '@angular/router';
+import { DspHealth } from './visuals/dsp-health-strip/dsp-health-strip.component';
 import { Subscription } from 'rxjs';
 import { UserPreference } from 'src/app/enum/user-preference.enum';
 import { CamillaDspConfig, MixerSource, Processor, SignalLevels } from 'src/app/model/camilla-dsp.model';
@@ -16,6 +18,10 @@ interface ProcessorControl {
     digits: string;
 }
 
+export type MeterStyle = 'bars' | 'vu' | 'headroom' | 'balance' | 'timeline' | 'rings' | 'drivers';
+const METER_STYLES: MeterStyle[] = ['bars', 'vu', 'headroom', 'balance', 'timeline', 'rings', 'drivers'];
+const HEALTH_POLL_MS = 1000;
+
 @Component({
     selector: 'app-camilla-dsp',
     templateUrl: './camilla-dsp.component.html',
@@ -28,6 +34,12 @@ export class CamillaDspComponent implements OnInit, OnDestroy {
 
     // 'linein' manages the preamp CamillaDSP configs instead of the playback ones
     @Input() mode: 'playback' | 'linein' = 'playback';
+
+    // fullscreen page: same panels, larger meters
+    @Input() kiosk = false;
+
+    health: DspHealth = { clippedSamples: null, bufferLevel: null, processingLoad: null, sampleRate: null };
+    private healthTimer?: ReturnType<typeof setInterval>;
 
     connectionStatus: ConnectionStatus = 'Disconnected';
     lastMessage: any = { message: 'No messages received yet.' };
@@ -46,7 +58,7 @@ export class CamillaDspComponent implements OnInit, OnDestroy {
     camillaConfigError = '';
     isConfigPickerOpen = false;
     configSearchTerm = '';
-    meterStyle: 'bars' | 'vu' = 'bars';
+    meterStyle: MeterStyle = 'bars';
     controlStyle: 'lines' | 'rotary' = 'lines';
     private processorSendTimer?: ReturnType<typeof setTimeout>;
     private configTimer?: ReturnType<typeof setTimeout>;
@@ -67,6 +79,14 @@ export class CamillaDspComponent implements OnInit, OnDestroy {
     readonly clipLimitControl: ProcessorControl =
         { key: 'clip_limit', label: 'Clip limit', unit: 'dB', min: -24, max: 0, step: 0.5, digits: '1.0-1' };
 
+    onMetersDoubleClick(event: MouseEvent): void {
+        // the style segment is clickable, so a double tap there must not open kiosk mode
+        if (this.kiosk || (event.target as HTMLElement).closest('ion-segment')) {
+            return;
+        }
+        this.router.navigate(['/full-scrren-dsp'], { queryParams: { url: this.url } });
+    }
+
     get filteredCamillaConfigs(): string[] {
         const searchTerm = this.configSearchTerm.trim().toLowerCase();
         return this.availableCamillaConfigs.filter(config => config.toLowerCase().includes(searchTerm));
@@ -74,16 +94,17 @@ export class CamillaDspComponent implements OnInit, OnDestroy {
 
     constructor(
         private camillaService: CamillaDspService,
-        private beatnikHardwareService: BeatnikHardwareService
+        private beatnikHardwareService: BeatnikHardwareService,
+        private router: Router
     ) { }
 
     async onMeterStyleChange(style: string | number | undefined) {
-        if (style !== 'bars' && style !== 'vu') {
+        if (!METER_STYLES.includes(style as MeterStyle)) {
             return;
         }
 
-        this.meterStyle = style;
-        await Preferences.set({ key: UserPreference.SIGNAL_METER_STYLE, value: style });
+        this.meterStyle = style as MeterStyle;
+        await Preferences.set({ key: UserPreference.SIGNAL_METER_STYLE, value: style as string });
     }
 
     async onControlStyleChange(style: string | number | undefined) {
@@ -97,8 +118,8 @@ export class CamillaDspComponent implements OnInit, OnDestroy {
 
     private async loadStylePreferences() {
         const meter = await Preferences.get({ key: UserPreference.SIGNAL_METER_STYLE });
-        if (meter.value === 'bars' || meter.value === 'vu') {
-            this.meterStyle = meter.value;
+        if (METER_STYLES.includes(meter.value as MeterStyle)) {
+            this.meterStyle = meter.value as MeterStyle;
         }
 
         const control = await Preferences.get({ key: UserPreference.CONTROL_STYLE });
@@ -160,7 +181,7 @@ export class CamillaDspComponent implements OnInit, OnDestroy {
     async ngOnInit() {
         this.loadStylePreferences();
         this.loadCamillaConfigState();
-        this.connect();
+        this.camillaService.acquire(this.url);
         // Subscribe to connection status changes
         this.subscriptions.add(
             this.camillaService.connectionStatus$.subscribe(status => {
@@ -170,7 +191,9 @@ export class CamillaDspComponent implements OnInit, OnDestroy {
                     this.startConfigTimer();
                     this.getConfigJson();
                     this.getCaptureSignalLevels();
+                    this.startHealthPolling();
                 } else {
+                    this.stopHealthPolling();
                     // Drop stale data so the UI never shows controls that cannot reach the device
                     this.clearConfigTimer();
                     this.configTimedOut = false;
@@ -201,6 +224,8 @@ export class CamillaDspComponent implements OnInit, OnDestroy {
                     }
                 } else if (message.GetVolume) {
                     this.currentVolume = message.GetVolume.value;
+                } else {
+                    this.applyHealthMessage(message);
                 }
             })
         );
@@ -410,11 +435,39 @@ export class CamillaDspComponent implements OnInit, OnDestroy {
         this.camillaService.sendCommand('SetVolume', volume);
     }
 
+    private startHealthPolling(): void {
+        this.stopHealthPolling();
+        this.pollHealth();
+        this.healthTimer = setInterval(() => this.pollHealth(), HEALTH_POLL_MS);
+    }
+
+    private stopHealthPolling(): void {
+        clearInterval(this.healthTimer);
+        this.healthTimer = undefined;
+    }
+
+    private pollHealth(): void {
+        ['GetClippedSamples', 'GetBufferLevel', 'GetProcessingLoad', 'GetCaptureRate']
+            .forEach(command => this.camillaService.sendCommand(command, null, true));
+    }
+
+    private applyHealthMessage(message: any): void {
+        const read = (key: string): number | null => message[key]?.result === 'Ok' ? message[key].value : null;
+        const health = { ...this.health };
+        if (message.GetClippedSamples) { health.clippedSamples = read('GetClippedSamples'); }
+        else if (message.GetBufferLevel) { health.bufferLevel = read('GetBufferLevel'); }
+        else if (message.GetProcessingLoad) { health.processingLoad = read('GetProcessingLoad'); }
+        else if (message.GetCaptureRate) { health.sampleRate = read('GetCaptureRate'); }
+        else { return; }
+        this.health = health;
+    }
+
     ngOnDestroy() {
+        this.stopHealthPolling();
         clearTimeout(this.processorSendTimer);
         this.clearConfigTimer();
-        // Disconnect before unsubscribing so no late message/status update fires after teardown
-        this.camillaService.disconnect();
+        // Release before unsubscribing so no late message/status update fires after teardown
+        this.camillaService.release();
         this.subscriptions.unsubscribe();
     }
 

@@ -1,0 +1,45 @@
+<div class="panel">
+  <header class="head">
+    <span class="brand">Beatnik · Output</span>
+    <span class="unit">dBFS</span>
+  </header>
+
+  <div class="gauges">
+    <figure *ngFor="let ring of rings">
+      <svg viewBox="-8 -8 136 136" role="img" [attr.aria-label]="ring.name + ' level'">
+        <g [attr.transform]="'rotate(135 ' + center + ' ' + center + ')'">
+          <circle [attr.cx]="center" [attr.cy]="center" [attr.r]="scaleRadius" class="scale"
+            [attr.stroke-dasharray]="scaleDash" />
+          <circle [attr.cx]="center" [attr.cy]="center" [attr.r]="scaleRadius" class="scale red"
+            [attr.stroke-dasharray]="redDash" [attr.stroke-dashoffset]="redOffset" />
+          <circle [attr.cx]="center" [attr.cy]="center" [attr.r]="outerRadius" class="track thin"
+            [attr.stroke-dasharray]="trackOuter" />
+          <circle [attr.cx]="center" [attr.cy]="center" [attr.r]="innerRadius" class="track thick"
+            [attr.stroke-dasharray]="trackInner" />
+          <circle [attr.cx]="center" [attr.cy]="center" [attr.r]="outerRadius" class="arc thin"
+            [attr.stroke-dasharray]="ring.peakDash" />
+          <circle [attr.cx]="center" [attr.cy]="center" [attr.r]="innerRadius" class="arc thick"
+            [attr.stroke-dasharray]="ring.rmsDash" />
+        </g>
+        <ng-container *ngFor="let tick of ticks">
+          <line [attr.x1]="tick.x1" [attr.y1]="tick.y1" [attr.x2]="tick.x2" [attr.y2]="tick.y2" class="tick"
+            [class.red]="tick.red" />
+          <text [attr.x]="tick.labelX" [attr.y]="tick.labelY" class="tick-label" [class.red]="tick.red">{{ tick.label }}</text>
+        </ng-container>
+        <text x="60" y="58" class="value">{{ fmt(ring.rms) }}</text>
+        <text x="60" y="68" class="unit-text">RMS dB</text>
+        <circle cx="60" cy="96" r="3" class="lamp" [class.on]="ring.clipping" />
+      </svg>
+      <figcaption class="caption">{{ ring.name }}</figcaption>
+    </figure>
+  </div>
+
+  <footer class="foot">
+    <span class="caption">Master</span>
+    <span class="readout">{{ volume | number:'1.1-1' }} dB</span>
+    <ng-container *ngIf="sampleRate">
+      <span class="caption">Rate</span>
+      <span class="readout">{{ sampleRate / 1000 | number:'1.0-1' }} kHz</span>
+    </ng-container>
+  </footer>
+</div>

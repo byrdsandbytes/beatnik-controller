@@ -1,0 +1,27 @@
+<div class="panel">
+  <header class="head">
+    <span class="brand">Beatnik · Drivers</span>
+    <span class="unit">dBFS</span>
+  </header>
+
+  <div class="map">
+    <figure *ngFor="let driver of drivers; trackBy: trackByLabel">
+      <svg viewBox="0 0 100 100" role="img" [attr.aria-label]="driver.label + ' driver'">
+        <rect x="2" y="2" width="96" height="96" class="plate" />
+        <circle cx="9" cy="9" r="2" class="screw" />
+        <circle cx="91" cy="9" r="2" class="screw" />
+        <circle cx="9" cy="91" r="2" class="screw" />
+        <circle cx="91" cy="91" r="2" class="screw" />
+        <circle cx="50" cy="50" r="38" class="surround" />
+        <circle cx="50" cy="50" r="30" class="cone" [attr.fill-opacity]="driver.coneOpacity" />
+        <circle cx="50" cy="50" r="22" class="ring" />
+        <circle cx="50" cy="50" r="11" class="cap" [attr.fill-opacity]="driver.capOpacity" />
+      </svg>
+      <figcaption>
+        <span class="caption">{{ driver.label }}</span>
+        <span class="readout">{{ fmt(driver.db) }}</span>
+        <i class="lamp" [class.on]="driver.clipping"></i>
+      </figcaption>
+    </figure>
+  </div>
+</div>
