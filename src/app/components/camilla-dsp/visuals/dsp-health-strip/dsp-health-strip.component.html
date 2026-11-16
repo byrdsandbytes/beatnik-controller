@@ -17,4 +17,24 @@
     <span class="label">Rate</span>
     <span class="value">{{ h.sampleRate ? (h.sampleRate / 1000 | number:'1.0-1') + ' kHz' : '–' }}</span>
   </span>
+  <button type="button" id="dsp-health-info" class="info" aria-label="What do these values mean?">
+    <ion-icon name="information-circle-outline"></ion-icon>
+  </button>
+  <ion-popover trigger="dsp-health-info" triggerAction="click" side="top" alignment="end">
+    <ng-template>
+      <div class="help">
+        <h4>DSP health</h4>
+        <dl>
+          <dt>Clip</dt>
+          <dd>Samples that exceeded 0 dBFS and were clipped. Should stay at 0; anything higher means audible distortion, so lower the master volume or the filter gain.</dd>
+          <dt>CPU</dt>
+          <dd>Processing load of the DSP. Above 80% there is little reserve left; above 95% dropouts are likely.</dd>
+          <dt>Buffer</dt>
+          <dd>Number of samples waiting in the playback buffer. A stable value is healthy; a value close to 0 means the output is running dry.</dd>
+          <dt>Rate</dt>
+          <dd>Sample rate of the incoming audio.</dd>
+        </dl>
+      </div>
+    </ng-template>
+  </ion-popover>
 </div>

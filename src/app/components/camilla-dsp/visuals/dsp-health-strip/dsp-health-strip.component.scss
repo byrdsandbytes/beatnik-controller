@@ -49,3 +49,41 @@
 .bad .value {
   color: var(--ion-color-danger-tint);
 }
+
+.info {
+  margin-left: auto;
+  padding: 0;
+  display: inline-flex;
+  background: transparent;
+  border: 0;
+  color: #bbb;
+  font-size: 0.95rem;
+  cursor: pointer;
+
+  &:hover {
+    color: #fff;
+  }
+}
+
+.help {
+  padding: 0.75rem 1rem;
+  font-size: 0.75rem;
+  line-height: 1.4;
+
+  h4 {
+    margin: 0 0 0.5rem;
+    font-size: 0.8rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  dt {
+    font-weight: 700;
+    margin-top: 0.4rem;
+  }
+
+  dd {
+    margin: 0;
+    color: var(--ion-color-medium);
+  }
+}
