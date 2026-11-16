@@ -17,9 +17,9 @@
     <span class="label">Rate</span>
     <span class="value">{{ h.sampleRate ? (h.sampleRate / 1000 | number:'1.0-1') + ' kHz' : '–' }}</span>
   </span>
-  <button type="button" id="dsp-health-info" class="info" aria-label="What do these values mean?">
+  <!-- <button type="button" id="dsp-health-info" class="info" aria-label="What do these values mean?">
     <ion-icon name="information-circle-outline"></ion-icon>
-  </button>
+  </button> -->
   <ion-popover trigger="dsp-health-info" triggerAction="click" side="top" alignment="end">
     <ng-template>
       <div class="help">
