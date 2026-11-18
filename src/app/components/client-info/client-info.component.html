@@ -26,11 +26,15 @@
 
 <div class="segment-content">
 
+<!-- Always mounted (just hidden) so the system info is already loaded when the Info tab is opened -->
+<div class="container" [hidden]="segment !== 'details'" *ngIf="deviceHost">
+  <app-hardware-info [host]="deviceHost"></app-hardware-info>
+</div>
+
 <ng-container *ngIf="segment === 'details'">
 
   <div class=container>
 
-    <app-hardware-info *ngIf="deviceHost" [host]="deviceHost"></app-hardware-info>
     <ng-container *ngIf="client">
       <div class="row justify-content-center align-items-center ion-text-center">
         <div class="col-6 col-lg-3" *ngIf="client.host.arch">

@@ -73,6 +73,7 @@ ion-list-header:has(.meter-style-segment) {
   max-width: 100%;
   min-height: 32px;
   --background: transparent;
+  // justify-content: flex-start;
 
   // border: 1px solid var(--ion-color-light);
 }
