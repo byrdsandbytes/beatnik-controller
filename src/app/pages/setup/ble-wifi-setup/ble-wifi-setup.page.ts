@@ -1,10 +1,14 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
-import { NavController } from '@ionic/angular';
-import { firstValueFrom, Observable } from 'rxjs';
+import { AlertController, IonContent, NavController } from '@ionic/angular';
+import { firstValueFrom, Observable, Subscription } from 'rxjs';
 import { BeatnikBlenoService, BleNetwork, WifiStatus } from 'src/app/services/beatnik-bleno.service';
-import Swiper, { SwiperOptions } from 'swiper';
+import SwiperCore, { EffectFade, SwiperOptions } from 'swiper';
+import Swiper from 'swiper';
+
+SwiperCore.use([EffectFade]);
 import { Network, ConnectionStatus } from '@capacitor/network';
+import { PluginListenerHandle } from '@capacitor/core';
 
 
 @Component({
@@ -13,7 +17,9 @@ import { Network, ConnectionStatus } from '@capacitor/network';
   styleUrls: ['./ble-wifi-setup.page.scss'],
   standalone: false
 })
-export class BleWifiSetupPage implements OnInit {
+export class BleWifiSetupPage implements OnInit, OnDestroy {
+
+  @ViewChild(IonContent) private content?: IonContent;
 
   isScanning: boolean = false;
   isWifiVerifying: boolean = false;
@@ -27,10 +33,20 @@ export class BleWifiSetupPage implements OnInit {
   swiperConfig: SwiperOptions = {
     slidesPerView: 1,
     spaceBetween: 0,
-    allowTouchMove: false
+    effect: 'fade',
+    fadeEffect: { crossFade: true },
+    speed: 350,
+    allowTouchMove: false,
+    // Keyboard, mouse wheel and nested scrolling must never move the wizard
+    keyboard: false,
+    mousewheel: false,
+    simulateTouch: false,
+    noSwiping: true
   };
 
   selectedNetwork: BleNetwork | null = null;
+  manualSsid: string = '';
+  isRescanning = false;
   networkPassword: string = '';
   passwordVisible: boolean = false;
 
@@ -39,20 +55,37 @@ export class BleWifiSetupPage implements OnInit {
 
   smartphoneNetworkStatus: ConnectionStatus | null = null;
 
+  private networkListener?: PluginListenerHandle;
+  private deviceStatusSub?: Subscription;
+  private networksSub?: Subscription;
+  private wifiStatusSub?: Subscription;
+  private rescanTimer?: ReturnType<typeof setTimeout>;
+  private networksTimer?: ReturnType<typeof setTimeout>;
+
   constructor(
     private beatikBlenoService: BeatnikBlenoService,
     private router: Router,
-    private navCtrl: NavController
+    private navCtrl: NavController,
+    private alertController: AlertController
   ) { }
 
   async ngOnInit() {
     this.smartphoneNetworkStatus = await Network.getStatus();
     console.log('Initial smartphone network status:', this.smartphoneNetworkStatus);
-    Network.addListener('networkStatusChange', status => {
-      console.log('Network status changed', status);
+    this.networkListener = await Network.addListener('networkStatusChange', status => {
       this.smartphoneNetworkStatus = status;
     });
   }
+
+  ngOnDestroy() {
+    this.networkListener?.remove();
+    this.deviceStatusSub?.unsubscribe();
+    this.networksSub?.unsubscribe();
+    this.wifiStatusSub?.unsubscribe();
+    clearTimeout(this.networksTimer);
+    clearTimeout(this.rescanTimer);
+  }
+  
 
   async scanForServices() {
     this.isScanning = true;
@@ -68,7 +101,8 @@ export class BleWifiSetupPage implements OnInit {
   }
 
   subsribeToDeviceConnectionStatus() {
-    this.deviceConnectionStatus$.subscribe(status => {
+    this.deviceStatusSub?.unsubscribe();
+    this.deviceStatusSub = this.deviceConnectionStatus$.subscribe(status => {
       console.log('Device connection status:', status);
       // delay to allow UI to update
       if (status === 'Scanning') {
@@ -78,9 +112,8 @@ export class BleWifiSetupPage implements OnInit {
       } else if (status === 'Connected') {
         this.statusText = 'Connected to Beatnik device.';
         // delay to allow UI to update
-        setTimeout(() => {
-          this.subscribeToAvailableNetworks();
-        }, 1000);
+        clearTimeout(this.networksTimer);
+        this.networksTimer = setTimeout(() => this.subscribeToAvailableNetworks(), 1000);
       } else {
         this.statusText = 'Disconnected. Please start scan again.';
       }
@@ -90,9 +123,10 @@ export class BleWifiSetupPage implements OnInit {
   subscribeToAvailableNetworks() {
     this.statusText = 'Searching for available Wi-Fi networks...';
     // delay to allow UI to update
-    setTimeout(() => {
-      
-      this.availableNetworks$.subscribe(networks => {
+    this.networksSub?.unsubscribe();
+    clearTimeout(this.networksTimer);
+    this.networksTimer = setTimeout(() => {
+      this.networksSub = this.availableNetworks$.subscribe(networks => {
         console.log('Available networks:', networks);
         if (networks.length > 0) {
           this.statusText = `Found ${networks.length} Wi-Fi networks. Please select one to connect.`;
@@ -100,14 +134,68 @@ export class BleWifiSetupPage implements OnInit {
           this.statusText = 'No Wi-Fi networks found. Please try again.';
         }
         this.isScanning = false;
-        this.slideTo(1);
-
+        this.finishRescan();
+        // Later list updates must not pull the user back from a further step
+        if (this.slideIndex === 0) {
+          this.slideTo(1);
+        }
       });
     }, 2000);
   }
 
+  get isManualNetwork(): boolean {
+    return this.manualSsid.trim() !== '';
+  }
+
+  async rescanNetworks() {
+    if (this.isRescanning) {
+      return;
+    }
+    this.isRescanning = true;
+    await this.beatikBlenoService.scanForWifiNetworks();
+    // The list arrives via notifications; stop the spinner if nothing comes back
+    clearTimeout(this.rescanTimer);
+    this.rescanTimer = setTimeout(() => this.finishRescan(), 15000);
+  }
+
+  private finishRescan() {
+    this.isRescanning = false;
+    clearTimeout(this.rescanTimer);
+  }
+
+  // Lets the user connect to a network that isn't listed (e.g. a hidden SSID)
+  async enterNetworkManually() {
+    const alert = await this.alertController.create({
+      header: 'Enter network manually',
+      inputs: [{ name: 'ssid', type: 'text', placeholder: 'Network name (SSID)', value: this.manualSsid }],
+      buttons: [
+        { text: 'Cancel', role: 'cancel' },
+        {
+          text: 'Continue',
+          handler: (data) => {
+            const ssid = (data?.ssid ?? '').trim();
+            if (!ssid) {
+              return false;
+            }
+            this.manualSsid = ssid;
+            this.selectedNetwork = { ssid, quality: 0, security: 'unknown', band: 'unknown' };
+            this.slideTo(2);
+            return true;
+          }
+        }
+      ]
+    });
+    await alert.present();
+  }
+
+  onNetworkSelected() {
+    this.manualSsid = '';
+  }
+
   onSlideChange(event: any) {
-    console.log('slide change');
+    const swiper: Swiper | undefined = event?.[0] ?? this.swiperInstance;
+    this.slideIndex = swiper?.activeIndex ?? 0;
+    this.content?.scrollToTop(200);
   }
 
   onSwiper(swiper: any) {
@@ -118,17 +206,14 @@ export class BleWifiSetupPage implements OnInit {
 
   async slideNext() {
     this.swiperInstance?.slideNext();
-    this.slideIndex = this.swiperInstance?.activeIndex || 0;
   }
 
   async slideTo(index: number) {
     this.swiperInstance?.slideTo(index);
-    this.slideIndex = this.swiperInstance?.activeIndex || 0;
   }
 
   slidePrev() {
     this.swiperInstance?.slidePrev();
-    this.slideIndex = this.swiperInstance?.activeIndex || 0;
   }
 
   async provisionWifi() {
@@ -148,7 +233,8 @@ export class BleWifiSetupPage implements OnInit {
   }
 
   async subscribeToWifiStatus() {
-    this.wifiConnectionStatus.subscribe(status => {
+    this.wifiStatusSub?.unsubscribe();
+    this.wifiStatusSub = this.wifiConnectionStatus.subscribe(status => {
       console.log('Wi-Fi connection status:', status);
       if (status.connected) {
         this.statusText = `Connected to Wi-Fi network. IP Address: ${status.ip}`;

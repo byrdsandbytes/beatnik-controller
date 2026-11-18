@@ -97,3 +97,10 @@
   // text-align: center;
   // font-size: 14px;
 }
+
+// The swiper keeps its natural height (all slides stretch to the tallest one), so the
+// page stays the same size between steps and ion-content scrolls instead of cropping
+.swiper {
+  display: block;
+  padding-bottom: 16px;
+}
