@@ -1,12 +1,18 @@
-<ion-header [translucent]="true">
-  <ion-toolbar class="ion-no-border">
+<ion-header class="ion-no-border" translucent="true">
+  <ion-toolbar color="light" class="ion-no-border">
     <ion-buttons slot="start">
       <ion-button (click)="handleBack()">
         <ion-icon slot="start" name="chevron-back"></ion-icon>
         Back
       </ion-button>
     </ion-buttons>
-    <ion-title>Network Configuration</ion-title>
+    <ion-title>Setup</ion-title>
+    <ion-buttons slot="end" *ngIf="slideIndex === 1">
+      <ion-button (click)="rescanNetworks()" [disabled]="isRescanning" aria-label="Scan again">
+        <ion-spinner *ngIf="isRescanning" name="crescent"></ion-spinner>
+        <ion-icon size="small" *ngIf="!isRescanning" slot="icon-only" name="refresh"></ion-icon>
+      </ion-button>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
@@ -15,7 +21,8 @@
 
 
   <div class="container">
-    <swiper class="swiper" (swiper)="onSwiper($event)" (slideChange)="onSlideChange($event)" [config]="swiperConfig">
+    <swiper class="swiper" (swiper)="onSwiper($event)" (slideChange)="onSlideChange($event)" [config]="swiperConfig"
+      [noSwiping]="true">
       <ng-container>
         <ng-template swiperSlide>
 
@@ -93,18 +100,19 @@
 
 
 
-              <ion-radio-group [(ngModel)]="selectedNetwork">
-                <ion-item *ngFor="let network of networks">
-                  <ion-radio [value]="network">
-                    <ion-label>
-                      <h3>{{ network.ssid }}</h3>
-                      <p>Quality: {{ network.quality }} </p>
-                      <p>Security: {{ network.security }} </p>
-                      <p>Band: {{ network.band }}</p>
-                    </ion-label>
-                  </ion-radio>
-                </ion-item>
-
+              <ion-radio-group [(ngModel)]="selectedNetwork" (ngModelChange)="onNetworkSelected()">
+                <ion-list>
+                  <ion-item *ngFor="let network of networks">
+                    <ion-radio [value]="network">
+                      <ion-label>
+                        <h3>{{ network.ssid }}</h3>
+                        <p>Quality: {{ network.quality }} </p>
+                        <p>Security: {{ network.security }} </p>
+                        <p>Band: {{ network.band }}</p>
+                      </ion-label>
+                    </ion-radio>
+                  </ion-item>
+                </ion-list>
 
               </ion-radio-group>
             </ion-list>
@@ -123,7 +131,11 @@
                 <p class="ion-margin-horizontal">Please enter the password for the Wi-Fi network
                   "{{selectedNetwork.ssid}}":</p>
               </ion-text>
-              <ion-item>
+              <ion-item *ngIf="isManualNetwork">
+                <ion-input label="Network name (SSID)" labelPlacement="stacked" autocapitalize="off"
+                  [(ngModel)]="selectedNetwork.ssid"></ion-input>
+              </ion-item>
+              <ion-item *ngIf="!isManualNetwork">
                 <ion-label>Network</ion-label>
                 <ion-select *ngIf="(availableNetworks$|async) as networks" placeholder="Network"
                   [(ngModel)]="selectedNetwork">
@@ -221,7 +233,6 @@
 
 
 </ion-content>
-
 <ion-footer class="ion-no-border">
   <ion-toolbar color="light" class="ion-no-border ion-padding-horizontal">
     <div [ngSwitch]="slideIndex">
@@ -241,6 +252,9 @@
         <div>
           <ion-button (click)="slideNext()" expand="block" [disabled]="!selectedNetwork">
             <ion-icon slot="start" name="bluetooth-outline"></ion-icon> Select Network
+          </ion-button>
+          <ion-button (click)="enterNetworkManually()" expand="block" fill="clear">
+            Enter network manually
           </ion-button>
         </div>
 
@@ -262,19 +276,9 @@
       </div>
     </div>
 
-    <!-- <div>
-      <ion-button expand="block" fill="clear">
-        Cancel
-      </ion-button>
-    </div> -->
-    <!-- <div class="ion-margin-top">
-      <ion-button fill="clear" (click)="slidePrev()">
-        Previous
-      </ion-button>
-      <ion-button fill="clear" (click)="slideNext()">
-        Next
-      </ion-button>
-    </div> -->
+
 
   </ion-toolbar>
 </ion-footer>
+
+<
