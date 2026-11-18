@@ -25,7 +25,7 @@
                 </ion-label>
             </ion-list-header>
             <ion-toolbar class="meter-toolbar" color="primary">
-                <ion-segment  class="meter-style-segment" [scrollable]="true" [value]="meterStyle"
+                <ion-segment slot="start" class="meter-style-segment" [scrollable]="true" [value]="meterStyle"
                     (ionChange)="onMeterStyleChange($event.detail.value)">
                     <ion-segment-button value="bars">
                         <ion-label>Bars</ion-label>
@@ -39,15 +39,7 @@
                     <ion-segment-button value="balance">
                         <ion-label>Balance</ion-label>
                     </ion-segment-button>
-                    <ion-segment-button value="timeline">
-                        <ion-label>Timeline</ion-label>
-                    </ion-segment-button>
-                    <ion-segment-button value="rings">
-                        <ion-label>Rings</ion-label>
-                    </ion-segment-button>
-                    <ion-segment-button value="drivers">
-                        <ion-label>Drivers</ion-label>
-                    </ion-segment-button>
+                   
                 </ion-segment>
             </ion-toolbar>
 
@@ -102,8 +94,8 @@
                     Master
                 </ion-label>
             </ion-list-header>
-            <ion-toolbar class="meter-toolbar" color="primary">
-                <ion-segment class="meter-style-segment" [value]="controlStyle"
+            <ion-toolbar class="meter-toolbar " color="primary">
+                <ion-segment slot="start" class="meter-style-segment" [value]="controlStyle"
                     (ionChange)="onControlStyleChange($event.detail.value)">
                     <ion-segment-button value="lines">
                         <ion-label>Lines</ion-label>
