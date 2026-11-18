@@ -3,7 +3,10 @@ import { Router } from '@angular/router';
 import { AlertController, IonContent, NavController } from '@ionic/angular';
 import { firstValueFrom, Observable, Subscription } from 'rxjs';
 import { BeatnikBlenoService, BleNetwork, WifiStatus } from 'src/app/services/beatnik-bleno.service';
-import Swiper, { SwiperOptions } from 'swiper';
+import SwiperCore, { EffectFade, SwiperOptions } from 'swiper';
+import Swiper from 'swiper';
+
+SwiperCore.use([EffectFade]);
 import { Network, ConnectionStatus } from '@capacitor/network';
 import { PluginListenerHandle } from '@capacitor/core';
 
@@ -30,6 +33,9 @@ export class BleWifiSetupPage implements OnInit, OnDestroy {
   swiperConfig: SwiperOptions = {
     slidesPerView: 1,
     spaceBetween: 0,
+    effect: 'fade',
+    fadeEffect: { crossFade: true },
+    speed: 350,
     allowTouchMove: false,
     // Keyboard, mouse wheel and nested scrolling must never move the wizard
     keyboard: false,
