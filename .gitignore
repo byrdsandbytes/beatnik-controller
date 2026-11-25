@@ -72,3 +72,6 @@ Thumbs.db
 # Platform directories
 android/*
 ios/*
+
+# Generated doc screenshots
+/screenshots

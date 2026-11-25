@@ -10,7 +10,7 @@
               "name": "sp.1",
               "volume": {
                 "muted": false,
-                "percent": 100
+                "percent": 72
               }
             },
             "connected": true,
@@ -18,7 +18,7 @@
               "arch": "aarch64",
               "ip": "::ffff:192.168.1.151",
               "mac": "2c:cf:67:f0:f9:4a",
-              "name": "beatnik-server",
+              "name": "beatnik-livingroom",
               "os": "Debian GNU/Linux 12 (bookworm)"
             },
             "id": "2c:cf:67:f0:f9:4a",
@@ -35,7 +35,7 @@
         ],
         "id": "f13057aa-ba82-449a-41cd-12144c04dfd3",
         "muted": false,
-        "name": "Office",
+        "name": "Living Room",
         "stream_id": "AirPlay"
       },
       {
@@ -44,18 +44,18 @@
             "config": {
               "instance": 1,
               "latency": 0,
-              "name": "sp.2",
+              "name": "sp.4",
               "volume": {
                 "muted": false,
-                "percent": 100
+                "percent": 55
               }
             },
             "connected": true,
             "host": {
               "arch": "aarch64",
-              "ip": "::ffff:192.168.1.151",
-              "mac": "2c:cf:67:f0:f9:4a",
-              "name": "beatnik-server",
+              "ip": "::ffff:192.168.1.152",
+              "mac": "2c:cf:67:f0:f9:4b",
+              "name": "beatnik-kitchen",
               "os": "Debian GNU/Linux 12 (bookworm)"
             },
             "id": "2c:cf:67:f0:f9:4b",
@@ -72,15 +72,155 @@
         ],
         "id": "k23057aa-ba82-449a-41cd-12144c04dfd3",
         "muted": false,
-        "name": "Living Room",
+        "name": "Kitchen",
         "stream_id": "AirPlay"
+      },
+      {
+        "clients": [
+          {
+            "config": {
+              "instance": 1,
+              "latency": 0,
+              "name": "amp.1",
+              "volume": {
+                "muted": false,
+                "percent": 40
+              }
+            },
+            "connected": true,
+            "host": {
+              "arch": "aarch64",
+              "ip": "::ffff:192.168.1.150",
+              "mac": "2c:cf:67:f0:f9:40",
+              "name": "beatnik-server",
+              "os": "Debian GNU/Linux 12 (bookworm)"
+            },
+            "id": "2c:cf:67:f0:f9:40",
+            "lastSeen": {
+              "sec": 1752491174,
+              "usec": 663848
+            },
+            "snapclient": {
+              "name": "Snapclient",
+              "protocolVersion": 2,
+              "version": "0.31.0"
+            }
+          }
+        ],
+        "id": "a1b2c3d4-0000-4000-8000-000000000003",
+        "muted": false,
+        "name": "Office",
+        "stream_id": "Spotify"
+      },
+      {
+        "clients": [
+          {
+            "config": {
+              "instance": 1,
+              "latency": 20,
+              "name": "gen.1",
+              "volume": {
+                "muted": false,
+                "percent": 80
+              }
+            },
+            "connected": true,
+            "host": {
+              "arch": "aarch64",
+              "ip": "::ffff:192.168.1.154",
+              "mac": "2c:cf:67:f0:f9:4d",
+              "name": "beatnik-terrace-l",
+              "os": "Debian GNU/Linux 12 (bookworm)"
+            },
+            "id": "2c:cf:67:f0:f9:4d",
+            "lastSeen": {
+              "sec": 1752491174,
+              "usec": 663848
+            },
+            "snapclient": {
+              "name": "Snapclient",
+              "protocolVersion": 2,
+              "version": "0.31.0"
+            }
+          },
+          {
+            "config": {
+              "instance": 1,
+              "latency": 20,
+              "name": "gen.1",
+              "volume": {
+                "muted": false,
+                "percent": 80
+              }
+            },
+            "connected": true,
+            "host": {
+              "arch": "aarch64",
+              "ip": "::ffff:192.168.1.155",
+              "mac": "2c:cf:67:f0:f9:4e",
+              "name": "beatnik-terrace-r",
+              "os": "Debian GNU/Linux 12 (bookworm)"
+            },
+            "id": "2c:cf:67:f0:f9:4e",
+            "lastSeen": {
+              "sec": 1752491174,
+              "usec": 663848
+            },
+            "snapclient": {
+              "name": "Snapclient",
+              "protocolVersion": 2,
+              "version": "0.31.0"
+            }
+          }
+        ],
+        "id": "a1b2c3d4-0000-4000-8000-000000000004",
+        "muted": false,
+        "name": "Terrace",
+        "stream_id": "Spotify"
+      },
+      {
+        "clients": [
+          {
+            "config": {
+              "instance": 1,
+              "latency": 0,
+              "name": "sp.3",
+              "volume": {
+                "muted": false,
+                "percent": 30
+              }
+            },
+            "connected": true,
+            "host": {
+              "arch": "aarch64",
+              "ip": "::ffff:192.168.1.153",
+              "mac": "2c:cf:67:f0:f9:4c",
+              "name": "beatnik-bedroom",
+              "os": "Debian GNU/Linux 12 (bookworm)"
+            },
+            "id": "2c:cf:67:f0:f9:4c",
+            "lastSeen": {
+              "sec": 1752491174,
+              "usec": 663848
+            },
+            "snapclient": {
+              "name": "Snapclient",
+              "protocolVersion": 2,
+              "version": "0.31.0"
+            }
+          }
+        ],
+        "id": "a1b2c3d4-0000-4000-8000-000000000005",
+        "muted": false,
+        "name": "Bedroom",
+        "stream_id": "AirPlay2"
       }
     ],
     "server": {
       "host": {
         "arch": "aarch64",
-        "ip": "",
-        "mac": "",
+        "ip": "192.168.1.150",
+        "mac": "2c:cf:67:f0:f9:40",
         "name": "beatnik-server",
         "os": "Debian GNU/Linux 12 (bookworm)"
       },
@@ -153,7 +293,7 @@
             "title": "Blowin' In the Wind"
           }
         },
-        "status": "playing",
+        "status": "idle",
         "uri": {
           "fragment": "",
           "host": "",
@@ -186,10 +326,14 @@
             },
             "artUrl": "http://beatnik-server:1780/__image_cache?name=9797dce73e69e8801c717122adc2ce75.svg",
             "duration": 350.55999755859375,
-            "title": "Fantastic Tomb"
+            "title": "Fantastic Tomb",
+            "artist": [
+              "Beatnik Sessions"
+            ],
+            "album": "Late Night Grooves"
           }
         },
-        "status": "idle",
+        "status": "playing",
         "uri": {
           "fragment": "",
           "host": "",
@@ -203,6 +347,35 @@
           },
           "raw": "spotify:///librespot?chunk_ms=20&codec=flac&devicename=Beatnik-Spotify&name=Spotify&sampleformat=44100:16:2",
           "scheme": "spotify"
+        }
+      },
+      {
+        "id": "Turntable",
+        "properties": {
+          "canControl": false,
+          "canGoNext": false,
+          "canGoPrevious": false,
+          "canPause": false,
+          "canPlay": false,
+          "canSeek": false,
+          "metadata": {
+            "title": "Line In"
+          }
+        },
+        "status": "idle",
+        "uri": {
+          "fragment": "",
+          "host": "",
+          "path": "",
+          "scheme": "alsa",
+          "query": {
+            "chunk_ms": "20",
+            "codec": "flac",
+            "device": "hw:0,0",
+            "name": "Turntable",
+            "sampleformat": "44100:16:2"
+          },
+          "raw": "alsa:///?chunk_ms=20&codec=flac&device=hw:0,0&name=Turntable&sampleformat=44100:16:2"
         }
       }
     ]

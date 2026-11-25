@@ -15,7 +15,8 @@
     "generate:page": "ionic g page pages/$npm_config_name",
     "generate:guard": "ng g guard guards/$npm_config_name",
     "ios": "ionic cap run ios -l --external",
-    "android": "ionic cap run android -l --external"
+    "android": "ionic cap run android -l --external",
+    "screenshots": "node scripts/screenshots.mjs"
   },
   "private": true,
   "dependencies": {
@@ -80,6 +81,7 @@
     "karma-coverage": "~2.2.0",
     "karma-jasmine": "~5.1.0",
     "karma-jasmine-html-reporter": "~2.1.0",
+    "playwright": "^1.65.1",
     "typescript": "~5.6.3"
   },
   "description": "An Ionic project"
