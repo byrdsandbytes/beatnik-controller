@@ -1,0 +1,9 @@
+What's new:
+• Server status screen with usage info
+• Live signal level visuals (VU meter, gauge) and full screen DSP view
+• Update your devices right from the app
+• Choose speaker images for your groups
+• Wifi band and frequency info for devices
+• Big "Add Device" button on the dashboard
+• Faster loading when returning to the app
+• Improved device discovery, plus many UI and stability fixes

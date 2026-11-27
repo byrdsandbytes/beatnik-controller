@@ -1,6 +1,38 @@
 # Changelog
 ## [Unreleased]
 
+### Added
+- Add screenshot automation scripts and mock server state
+
+### Changed
+- Update tested devices list and attribute testers
+
+## [0.8.2] - 2026-11-18
+
+### Added
+- Cache system info
+- Extract hardware info into its own component
+
+### Changed
+- Use crossfade animation for page transitions
+- Improve DSP loading cycle when returning from background
+- Clean up client info component and CamillaDSP service
+
+### Fixed
+- Fix scrolling issues on wifi setup page
+- Fix livereload issues with Capacitor
+
+## [0.8.1] - 2026-11-16
+
+### Added
+- Add full screen DSP view
+- Add DSP health strip
+
+### Changed
+- Format signal level visuals
+- Clean up dark mode
+- Various styling fixes
+
 ## [0.8.0] - 2026-11-13
 
 ### Added
@@ -13,17 +45,29 @@
 ### Changed
 - Move signal level to its own component
 - Outsource and restyle range slider
-- Adapt to Apple's new BLE permission system
-- Adapt to new mdns plugin version
-- Refactor update logic
 - Use color variables and reduce console logging
 
 ### Fixed
 - Fix BLE connection issues on iOS
-- Fix iOS build issues
 - Add error handling on server status screen
 
+## [0.7.10] - 2026-10-30
 
+### Changed
+- Adapt to new mdns plugin version
+
+### Fixed
+- Fix iOS build issues
+
+## [0.7.3] - 2026-10-17
+
+### Added
+- Add device updating logic and screen
+- Add CamillaDSP line-in (POC)
+
+### Changed
+- Refactor update logic
+- Adapt to Apple's new BLE permission system
 
 ## [0.7.2] - 2026-10-14
 
