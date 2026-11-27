@@ -22,7 +22,7 @@ export const SUPPORTED_HATS: Record<string, HatProfile> = {
     name: 'HiFiBerry DAC / MiniAmp / Beocreate / DAC+ Light',
     overlay: 'dtoverlay=hifiberry-dac',
     eepromMatch: 'HiFiBerry DAC',
-    testedbyBeatnik: false,
+    testedbyBeatnik: true,
     testedByCommunity: false,
     camilla: {
       device: 'plughw:CARD=sndrpihifiberry,DEV=0',
@@ -60,7 +60,7 @@ export const SUPPORTED_HATS: Record<string, HatProfile> = {
     // Kernel >= 6.1.77
     overlay: 'dtoverlay=hifiberry-dacplus-pro',
     eepromMatch: 'HiFiBerry DAC+ Pro',
-    testedbyBeatnik: false,
+    testedbyBeatnik: true,
     testedByCommunity: false,
     camilla: {
       device: 'plughw:CARD=sndrpihifiberry,DEV=0',
@@ -85,7 +85,7 @@ export const SUPPORTED_HATS: Record<string, HatProfile> = {
     name: 'HiFiBerry DAC+ ADC',
     overlay: 'dtoverlay=hifiberry-dacplusadc',
     eepromMatch: 'HiFiBerry DAC+ ADC',
-    testedbyBeatnik: false,
+    testedbyBeatnik: true,
     testedByCommunity: false,
     camilla: {
       device: 'plughw:CARD=sndrpihifiberry,DEV=0',
@@ -124,24 +124,13 @@ export const SUPPORTED_HATS: Record<string, HatProfile> = {
     // Uses DAC+ Standard overlay on newer kernels
     overlay: 'dtoverlay=hifiberry-dacplus-std',
     eepromMatch: 'HiFiBerry Amp2', 
-    testedbyBeatnik: false,
-    testedByCommunity: false,
+    testedbyBeatnik: true,
+    testedByCommunity: true,
     camilla: {
       device: 'plughw:CARD=sndrpihifiberry,DEV=0',
       format: 'S32LE'
     }
   },
-  // 'hifiberry-amp3': {
-  //   id: 'hifiberry-amp3',
-  //   name: 'HiFiBerry Amp3',
-  //   overlay: 'dtoverlay=hifiberry-amp3',
-  //   eepromMatch: 'HiFiBerry Amp3',
-  //   testedbyBeatnik: false,
-  //   camilla: {
-  //     device: 'plughw:CARD=sndrpihifiberry,DEV=0',
-  //     format: 'S32LE'
-  //   }
-  // },
   'hifiberry-amp4pro': {
     id: 'hifiberry-amp4pro',
     name: 'HiFiBerry Amp4 Pro',
